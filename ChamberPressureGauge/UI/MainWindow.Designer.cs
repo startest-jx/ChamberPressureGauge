@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.menuMain = new System.Windows.Forms.MenuStrip();
             this.menConnect = new System.Windows.Forms.ToolStripMenuItem();
             this.miConnect = new System.Windows.Forms.ToolStripMenuItem();
@@ -46,7 +47,6 @@
             this.miOtherReport = new System.Windows.Forms.ToolStripMenuItem();
             this.menHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.tbMain = new System.Windows.Forms.ToolStrip();
-            this.tbConfig = new System.Windows.Forms.ToolStripButton();
             this.tbConnet = new System.Windows.Forms.ToolStripButton();
             this.tbStart = new System.Windows.Forms.ToolStripButton();
             this.tbReset = new System.Windows.Forms.ToolStripButton();
@@ -54,8 +54,18 @@
             this.tbReport = new System.Windows.Forms.ToolStripButton();
             this.tbExit = new System.Windows.Forms.ToolStripButton();
             this.staMain = new System.Windows.Forms.StatusStrip();
+            this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
+            this.lblNone = new System.Windows.Forms.ToolStripStatusLabel();
+            this.lblTime = new System.Windows.Forms.ToolStripStatusLabel();
+            this.grpLog = new System.Windows.Forms.GroupBox();
+            this.txtLog = new System.Windows.Forms.TextBox();
+            this.timClock = new System.Windows.Forms.Timer(this.components);
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.menuMain.SuspendLayout();
             this.tbMain.SuspendLayout();
+            this.staMain.SuspendLayout();
+            this.grpLog.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuMain
@@ -68,7 +78,7 @@
             this.menuMain.Location = new System.Drawing.Point(0, 0);
             this.menuMain.Name = "menuMain";
             this.menuMain.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.menuMain.Size = new System.Drawing.Size(599, 25);
+            this.menuMain.Size = new System.Drawing.Size(1244, 25);
             this.menuMain.TabIndex = 0;
             this.menuMain.Text = "menuStrip1";
             // 
@@ -87,30 +97,30 @@
             // miConnect
             // 
             this.miConnect.Name = "miConnect";
-            this.miConnect.Size = new System.Drawing.Size(152, 22);
+            this.miConnect.Size = new System.Drawing.Size(151, 22);
             this.miConnect.Text = "开始连接(&C)";
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(149, 6);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(148, 6);
             // 
             // miConfig
             // 
             this.miConfig.Name = "miConfig";
-            this.miConfig.Size = new System.Drawing.Size(152, 22);
+            this.miConfig.Size = new System.Drawing.Size(151, 22);
             this.miConfig.Text = "配置参数(&O)...";
             this.miConfig.Click += new System.EventHandler(this.EventConfig);
             // 
             // toolStripMenuItem2
             // 
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(149, 6);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(148, 6);
             // 
             // miExit
             // 
             this.miExit.Name = "miExit";
-            this.miExit.Size = new System.Drawing.Size(152, 22);
+            this.miExit.Size = new System.Drawing.Size(151, 22);
             this.miExit.Text = "退出(&E)";
             // 
             // menData
@@ -185,7 +195,6 @@
             // 
             this.tbMain.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this.tbMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.tbConfig,
             this.tbConnet,
             this.tbStart,
             this.tbReset,
@@ -195,24 +204,13 @@
             this.tbMain.Location = new System.Drawing.Point(0, 25);
             this.tbMain.Name = "tbMain";
             this.tbMain.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.tbMain.Size = new System.Drawing.Size(599, 87);
+            this.tbMain.Size = new System.Drawing.Size(1244, 87);
             this.tbMain.TabIndex = 1;
             this.tbMain.Text = "toolStrip1";
             // 
-            // tbConfig
-            // 
-            this.tbConfig.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tbConfig.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_config;
-            this.tbConfig.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
-            this.tbConfig.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tbConfig.Name = "tbConfig";
-            this.tbConfig.Size = new System.Drawing.Size(84, 84);
-            this.tbConfig.Text = "toolStripButton1";
-            this.tbConfig.ToolTipText = "配置参数";
-            this.tbConfig.Click += new System.EventHandler(this.EventConfig);
-            // 
             // tbConnet
             // 
+            this.tbConnet.AutoSize = false;
             this.tbConnet.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.tbConnet.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_connect;
             this.tbConnet.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
@@ -221,9 +219,11 @@
             this.tbConnet.Size = new System.Drawing.Size(84, 84);
             this.tbConnet.Text = "toolStripButton2";
             this.tbConnet.ToolTipText = "开始连接";
+            this.tbConnet.Click += new System.EventHandler(this.Connect);
             // 
             // tbStart
             // 
+            this.tbStart.AutoSize = false;
             this.tbStart.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.tbStart.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_start_listening;
             this.tbStart.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
@@ -232,9 +232,11 @@
             this.tbStart.Size = new System.Drawing.Size(84, 84);
             this.tbStart.Text = "toolStripButton3";
             this.tbStart.ToolTipText = "开始测量";
+            this.tbStart.Click += new System.EventHandler(this.Start);
             // 
             // tbReset
             // 
+            this.tbReset.AutoSize = false;
             this.tbReset.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.tbReset.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_reset;
             this.tbReset.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
@@ -243,9 +245,11 @@
             this.tbReset.Size = new System.Drawing.Size(84, 84);
             this.tbReset.Text = "toolStripButton4";
             this.tbReset.ToolTipText = "复位";
+            this.tbReset.Click += new System.EventHandler(this.Reset);
             // 
             // tbChart
             // 
+            this.tbChart.AutoSize = false;
             this.tbChart.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.tbChart.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_chart;
             this.tbChart.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
@@ -257,6 +261,7 @@
             // 
             // tbReport
             // 
+            this.tbReport.AutoSize = false;
             this.tbReport.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.tbReport.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_report;
             this.tbReport.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
@@ -268,6 +273,7 @@
             // 
             // tbExit
             // 
+            this.tbExit.AutoSize = false;
             this.tbExit.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.tbExit.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_close;
             this.tbExit.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
@@ -279,27 +285,102 @@
             // 
             // staMain
             // 
-            this.staMain.Location = new System.Drawing.Point(0, 347);
+            this.staMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.lblStatus,
+            this.lblNone,
+            this.lblTime});
+            this.staMain.Location = new System.Drawing.Point(0, 631);
             this.staMain.Name = "staMain";
-            this.staMain.Size = new System.Drawing.Size(599, 22);
+            this.staMain.Size = new System.Drawing.Size(1244, 22);
             this.staMain.TabIndex = 2;
-            this.staMain.Text = "statusStrip1";
+            // 
+            // lblStatus
+            // 
+            this.lblStatus.Name = "lblStatus";
+            this.lblStatus.Size = new System.Drawing.Size(0, 17);
+            this.lblStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // lblNone
+            // 
+            this.lblNone.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right)));
+            this.lblNone.Name = "lblNone";
+            this.lblNone.Size = new System.Drawing.Size(1229, 17);
+            this.lblNone.Spring = true;
+            // 
+            // lblTime
+            // 
+            this.lblTime.Name = "lblTime";
+            this.lblTime.Size = new System.Drawing.Size(0, 17);
+            this.lblTime.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // grpLog
+            // 
+            this.grpLog.Controls.Add(this.txtLog);
+            this.grpLog.Location = new System.Drawing.Point(6, 490);
+            this.grpLog.Name = "grpLog";
+            this.grpLog.Size = new System.Drawing.Size(415, 138);
+            this.grpLog.TabIndex = 3;
+            this.grpLog.TabStop = false;
+            this.grpLog.Text = "日志";
+            // 
+            // txtLog
+            // 
+            this.txtLog.Location = new System.Drawing.Point(6, 20);
+            this.txtLog.Multiline = true;
+            this.txtLog.Name = "txtLog";
+            this.txtLog.ReadOnly = true;
+            this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txtLog.Size = new System.Drawing.Size(403, 112);
+            this.txtLog.TabIndex = 0;
+            // 
+            // timClock
+            // 
+            this.timClock.Interval = 1000;
+            this.timClock.Tick += new System.EventHandler(this.timClock_Tick);
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Location = new System.Drawing.Point(6, 115);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(415, 369);
+            this.groupBox1.TabIndex = 4;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "通道监测";
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Location = new System.Drawing.Point(427, 115);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(805, 513);
+            this.groupBox2.TabIndex = 5;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "图表";
             // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(599, 369);
+            this.ClientSize = new System.Drawing.Size(1244, 653);
+            this.Controls.Add(this.groupBox2);
+            this.Controls.Add(this.groupBox1);
+            this.Controls.Add(this.grpLog);
             this.Controls.Add(this.staMain);
             this.Controls.Add(this.tbMain);
             this.Controls.Add(this.menuMain);
             this.MainMenuStrip = this.menuMain;
             this.Name = "MainWindow";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "膛压仪测量数据接收终端";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            this.Load += new System.EventHandler(this.WinLoad);
             this.menuMain.ResumeLayout(false);
             this.menuMain.PerformLayout();
             this.tbMain.ResumeLayout(false);
             this.tbMain.PerformLayout();
+            this.staMain.ResumeLayout(false);
+            this.staMain.PerformLayout();
+            this.grpLog.ResumeLayout(false);
+            this.grpLog.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -325,7 +406,6 @@
         private System.Windows.Forms.ToolStripMenuItem miCurReport;
         private System.Windows.Forms.ToolStripMenuItem miOtherReport;
         private System.Windows.Forms.ToolStrip tbMain;
-        private System.Windows.Forms.ToolStripButton tbConfig;
         private System.Windows.Forms.ToolStripButton tbConnet;
         private System.Windows.Forms.ToolStripButton tbStart;
         private System.Windows.Forms.ToolStripButton tbReset;
@@ -333,6 +413,14 @@
         private System.Windows.Forms.ToolStripButton tbReport;
         private System.Windows.Forms.ToolStripButton tbExit;
         private System.Windows.Forms.StatusStrip staMain;
+        private System.Windows.Forms.GroupBox grpLog;
+        private System.Windows.Forms.TextBox txtLog;
+        private System.Windows.Forms.ToolStripStatusLabel lblStatus;
+        private System.Windows.Forms.ToolStripStatusLabel lblTime;
+        private System.Windows.Forms.Timer timClock;
+        private System.Windows.Forms.ToolStripStatusLabel lblNone;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.GroupBox groupBox2;
     }
 }
 

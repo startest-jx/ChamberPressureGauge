@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Modules\Comm.cs" />
     <Compile Include="UI\ConfigWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -108,6 +109,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Images\toolbar_stop_listening.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Images\toobar_loading.gif" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

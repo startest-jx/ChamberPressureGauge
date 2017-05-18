@@ -63,6 +63,16 @@ namespace ChamberPressureGauge.Properties {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
+        internal static System.Drawing.Bitmap toobar_loading {
+            get {
+                object obj = ResourceManager.GetObject("toobar_loading", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
         internal static System.Drawing.Bitmap toolbar_chart {
             get {
                 object obj = ResourceManager.GetObject("toolbar_chart", resourceCulture);

@@ -59,7 +59,7 @@
             this.groupBox1.Size = new System.Drawing.Size(200, 68);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "命令服务端";
+            this.groupBox1.Text = "主控板";
             // 
             // txtCmdPort
             // 
@@ -104,7 +104,7 @@
             this.groupBox2.Size = new System.Drawing.Size(200, 68);
             this.groupBox2.TabIndex = 4;
             this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "数据服务端";
+            this.groupBox2.Text = "数位板";
             // 
             // txtDataPort
             // 
