@@ -20,7 +20,9 @@ namespace ChamberPressureGauge.Modules
         public event EventHandle DataReceived;  // 用于让外部引用处理接收到的数据
         protected byte[] ReveivedBuffer;
         protected Mutex BufferLock = new Mutex();
-        public Comm(string host, int port)
+        protected bool LengthSwitch = false;  // 长度校验开关
+        protected int TempReceiveLength = 0;  // 用于上次未收全情况下更改接收长度
+        public Comm(string host, int port, bool CheckLength)
         {
             _IP = IPAddress.Parse(host);
             _IPE = new IPEndPoint(_IP, port);
@@ -66,15 +68,16 @@ namespace ChamberPressureGauge.Modules
         }
         protected void Read(object obj)  // 接收线程
         {
-            long bytes = (long)obj;
             while (KeepReading)
             {
+                int bytes = TempReceiveLength == 0 || !LengthSwitch ? (int)obj : TempReceiveLength;
                 if (_IsConnected)
                 {
                     byte[] readBuffer = new byte[bytes];
                     try
                     {
                         int count = _Socket.Receive(readBuffer);
+                        TempReceiveLength = bytes - count;
                         ReveivedBuffer = new byte[count];
                         BufferLock.WaitOne();
                         for (int i = 0; i < count; i++)
@@ -97,7 +100,7 @@ namespace ChamberPressureGauge.Modules
                 }
             }
         }
-        protected bool StartReading(long bytes)  // 开始监听，启动接收线程
+        protected bool StartReading(int bytes)  // 开始监听，启动接收线程
         {
             if (!KeepReading)
             {
@@ -129,7 +132,7 @@ namespace ChamberPressureGauge.Modules
 
     public class CtrlPanel : Comm
     {
-        public CtrlPanel() : base ("192.168.1.178", 4001)
+        public CtrlPanel(string IP, int Port) : base(IP, Port, false)
         {
 
         }
@@ -178,27 +181,26 @@ namespace ChamberPressureGauge.Modules
             else
                 SendCmd("TESTFAILED");
         }
-        public bool[] CheckChannelStatus(ref string StatusString)
+        public bool CheckChannelStatus(ref Channel[] Channels)
         {
-            bool[] ChannelStatus = new bool[12] { false, false, false, false, false, false, false, false, false, false, false, false, };
+            //bool[] ChannelStatus = new bool[12] { false, false, false, false, false, false, false, false, false, false, false, false, };
             string ChannelStatusString = SendCmd("LINESTATUE", true, 500);
-            StatusString = ChannelStatusString;
             if (ChannelStatusString != null)
             {
                 for (int i = 0; i < ChannelStatusString.Length; i++)
                 {
                     if (ChannelStatusString[i] == '0')
                     {
-                        ChannelStatus[i] = true;
+                        Channels[i].DeviceExist = true;
                     }
                     else
                     {
-                        ChannelStatus[i] = false;
+                        Channels[i].DeviceExist = false;
                     }
                 }
-                return ChannelStatus;
+                return true;
             }
-            return null;
+            return false;
         }
         public bool CheckClockStatus()
         {
@@ -222,11 +224,9 @@ namespace ChamberPressureGauge.Modules
         private bool IsNewData = false;  // 确保不会记录重复数据
         private Mutex DataLock = new Mutex();
         public ushort[] CurrentData = new ushort[16];
-        StreamWriter sw;
-        public DgtlPanel() : base("192.168.1.126", 8000)
+        public DgtlPanel(string IP, int Port) : base(IP, Port, true)
         {
-            FileStream fs = new FileStream("log.txt", FileMode.Create);
-            sw = new StreamWriter(fs);
+
         }
         public void DataUpdate(byte[] readBuffer, int offset, int length)  // 接收采集板发来的16进制数据，并将其转换成双字节数组
         {
@@ -243,7 +243,6 @@ namespace ChamberPressureGauge.Modules
                     DataArray[ArrayIndex] = (ushort)((readBuffer[BufferIndex + 2 * ArrayIndex + 1] << 8) | readBuffer[BufferIndex + 2 * ArrayIndex]);
                     LogLine += DataArray[ArrayIndex].ToString() + " ";
                 }
-                sw.WriteLine(LogLine);
                 DataLock.WaitOne();
                 CurrentData = DataArray;
                 IsNewData = true;
@@ -282,7 +281,7 @@ namespace ChamberPressureGauge.Modules
             byte[] Bytes = { 0xFF, 0xFD, 0x00, 0x01, 0x01 };
             Send(Bytes, 0, Bytes.Length);
         }
-        public bool[] CheckChannelStatus()
+        public void CheckChannelStatus(ref Channel[] Channels)
         {
             List<ushort[]> DataStock = new List<ushort[]>();
             // 接收1秒钟的数据
@@ -299,9 +298,9 @@ namespace ChamberPressureGauge.Modules
                 }
                 CurSec = DateTime.Now.ToBinary();
             }
-            bool[] ChannelStatus = new bool[10] { false, false, false, false, false, false, false, false, false, false };
-            long[] ChannelValueSum = new long[ChannelStatus.Length];
-            for (int i = 0; i < ChannelStatus.Length; i++)
+            //bool[] ChannelStatus = new bool[10] { false, false, false, false, false, false, false, false, false, false };
+            long[] ChannelValueSum = new long[Channels.Length];
+            for (int i = 0; i < Channels.Length; i++)
                 ChannelValueSum[i] = 0;
             foreach (ushort[] DataArray in DataStock)
             {
@@ -316,25 +315,25 @@ namespace ChamberPressureGauge.Modules
                 ChannelValueSum[8] += DataArray[2];
                 ChannelValueSum[9] += DataArray[3];
             }
-            for (int i = 0; i < ChannelStatus.Length; i ++)
+            for (int i = 0; i < Channels.Length; i ++)
             {
                 if (ChannelValueSum[i] > 52000 * DataStock.Count)
                 {
-                    ChannelStatus[i] = true;
+                    Channels[i].Health = true;
                 }
                 else
                 {
-                    ChannelStatus[i] = false;
+                    Channels[i].Health = false;
                 }
             }
-            return ChannelStatus;
         }
         public void GetCurrentChannelData(ref Channel[] Channels)
         {
             for (int i = 0; i < 6; i ++)
             {
                 DataLock.WaitOne();
-                Channels[i].CurrentData = (Convert.ToDouble(CurrentData[i + 9]) * Math.Pow(2, -20) * 25 - 0.25) * Channels[i].Range + Channels[i].Calibration;
+                Channels[i].CurrentData = (Convert.ToDouble(CurrentData[i + 9]) * Math.Pow(2, -20) * 25 - 0.25)
+                    * Channels[i].Range + Channels[i].Calibration;
                 DataLock.ReleaseMutex();
             }
         }

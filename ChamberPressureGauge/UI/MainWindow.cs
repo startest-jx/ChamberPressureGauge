@@ -16,27 +16,19 @@ namespace ChamberPressureGauge
     public partial class MainWindow : Form
     {
         // 全局变量
-        CtrlPanel _CtrlPanel;
-        DgtlPanel _DgtlPanel;
-        Thread _CntTotal, _ChannelCheck;  // 连接线程，通道检测线程
-        int _Status = 0;  // 0 未连接 1 正在连接 2 已连接 3 测量
-        int[] DataStock;  // 采集卡数据存放
-        Mutex CmdLock = new Mutex(), DataLock = new Mutex(), ChannelLock = new Mutex();  // 命令、数据、通道使能互斥锁
-        Channel[] _Channels = new Channel[10];  // 通道
-        bool[] ChannelExist = new bool[12];  // 通道存在情况
-        bool[] ChannelHealth = new bool[10];  // 通道健康状况
-        bool AutoChannelCheck = false;  // 通道自动检查开关
+        Slaver _Slaver;  // 下位机
+        Thread _Connect, _ChannelCheck;  // 连接线程，通道检测线程
+        bool ChannelUpdating = false;  // 通道检测Timer是否被占用
 
         public void Log(string LogInfo)  // 日志输出
         {
             txtLog.AppendText(LogInfo + Environment.NewLine);
         }
-        public void ChangeStatus(int Status)
+        public void ChangeStatus(ConnectStatus Status)
         {
-            _Status = Status;
             switch (Status)
             {
-                case 0:
+                case ConnectStatus.Disconnected:
                     tbConnet.Enabled = true;
                     tbConnet.ToolTipText = "连接";
                     tbConnet.Image = Resources.toolbar_connect;
@@ -52,12 +44,12 @@ namespace ChamberPressureGauge
 
                     lblStatus.Text = "断开";
 
-                    foreach (ChnLED Item in txtPressure)
+                    foreach (ChnLED Item in ChannelData)
                     {
                         Item.Silenced();
                     }
                     break;
-                case 1:
+                case ConnectStatus.Connecting:
                     Log("开始连接...");
                     tbConnet.Enabled = false;
                     tbConnet.ToolTipText = "正在连接...";
@@ -73,7 +65,7 @@ namespace ChamberPressureGauge
 
                     lblStatus.Text = "正在连接...";
                     break;
-                case 2:
+                case ConnectStatus.Connected:
                     tbConnet.Enabled = true;
                     tbConnet.ToolTipText = "断开连接";
                     tbConnet.Image = Resources.toolbar_disconnect;
@@ -89,7 +81,7 @@ namespace ChamberPressureGauge
 
                     lblStatus.Text = "已连接";
                     break;
-                case 3:
+                case ConnectStatus.Measuring:
                     tbConnet.Enabled = true;
                     tbConnet.ToolTipText = "断开连接";
                     tbConnet.Image = Resources.toolbar_disconnect;
@@ -108,36 +100,31 @@ namespace ChamberPressureGauge
                     break;
             }
         }
-        public void ConnectTotal()
+        public void ConnectControl()
         {
             // 连接
             Log("正在连接主控板...");
             if (!ConnectCtrl())
             {
-                ChangeStatus(0);
-                StopThread();
+                _Slaver.Status = ConnectStatus.Disconnected;
                 // 断开原有连接
-                _CtrlPanel.Close();
-                _DgtlPanel.Close();
+                _Slaver.Close();
                 return;
             }
             Thread.Sleep(500);
             Log("正在连接数位板...");
             if (!ConnectDgtl())
             {
-                ChangeStatus(0);
-                StopThread();
+                _Slaver.Status = ConnectStatus.Disconnected;
                 // 断开原有连接
-                _CtrlPanel.Close();
-                _DgtlPanel.Close();
+                _Slaver.Close();
                 return;
             }
-            ChangeStatus(2);
             // 复位
             Reset(null, null);
             // 自检
             Log("正在发送时钟检测命令...");
-            if (_CtrlPanel.CheckClockStatus())
+            if (_Slaver.CheckClockStatus())
                 Log("时钟状态正常.");
             else
                 Log("时钟状态异常.");
@@ -158,39 +145,37 @@ namespace ChamberPressureGauge
             //        return;
             //}
             Log("发送自检命令.");
-            _CtrlPanel.SelfTest();
+            _Slaver.SelfTest();
             Thread.Sleep(1000);
             // 开始接收
-            _DgtlPanel.StartReceiving();
+            _Slaver.StartReceiving();
             Thread.Sleep(1000);
             // 检查通道是否正常
-            ChannelHealth = _DgtlPanel.CheckChannelStatus();
-            for (int i = 0; i < ChannelHealth.Length; i ++)
+            _Slaver.UpdateChannelHealth();
+            for (int i = 0; i < _Slaver.Channels.Length - 2; i ++)
             {
-                _Channels[i] = new Channel(string.Format("{0}通道{1}", i < 6 ? "压力" : "数字量/计时", i < 6 ? i + 1 : i - 5),
-                    i < 6 ? ChannelType.Pressure : ChannelType.Digital, ChannelHealth[i]);
-                _Channels[i].Health = ChannelHealth[i];
-                Log(string.Format("{0}通道{1}工作{2}.", 
-                    i < 6 ? "压力" : "数字量/计时", 
-                    i < 6 ? i + 1 : i - 5,
-                    ChannelHealth[i] ? "正常" : "异常"));
+                Log(string.Format("{0}: {1}.", 
+                    _Slaver.Channels[i].Name, 
+                    _Slaver.Channels[i].Health ? "正常" : "异常"));
             }
 
             Log("发送自检成功命令.");
-            _CtrlPanel.SelfTest(true);
-            _CtrlPanel.Reset();
+            _Slaver.SelfTest(true);
+            _Slaver.Reset();
 
             // 通道检测
             Log("打开通道检测线程.");
-            _ChannelCheck = new Thread(new ThreadStart(ChannelCheck));
-            _ChannelCheck.Start();
+            timChannelUpdate.Start();
+            //_ChannelCheck = new Thread(new ThreadStart(ChannelCheck));
+            //_ChannelCheck.Start();
 
-            Log("通知数位板发送数据.");
-            _DgtlPanel.StartPicking();;
+            //Log("通知数位板发送数据.");
+            //_DgtlPanel.StartPicking();;
+            _Slaver.Status = ConnectStatus.Connected;
         }
         public bool ConnectCtrl()
         {
-            if (_CtrlPanel.Open())
+            if (_Slaver.CPOpen("192.168.1.178", 4001))
             {
                 Log("主控板连接成功.");
                 return true;
@@ -203,7 +188,7 @@ namespace ChamberPressureGauge
         }
         public bool ConnectDgtl()
         {
-            if (_DgtlPanel.Open())
+            if (_Slaver.DPOpen("192.168.1.126", 8000))
             {
                 Log("数位板连接成功.");
                 return true;
@@ -214,127 +199,52 @@ namespace ChamberPressureGauge
                 return false;
             }
         }
+        private void timChannelUpdate_Tick(object sender, EventArgs e)
+        {
+            if (ChannelUpdating)
+                return;
+            ChannelUpdating = true;
+            ChannelCheck();
+            ChannelUpdating = false;
+        }
         public void ChannelCheck()
         {
-            while (AutoChannelCheck && (_Status == 2 || _Status == 3))
+            if (_Slaver.Status == ConnectStatus.Connected || _Slaver.Status == ConnectStatus.Measuring)
             {
-                string rtStr = null;
-                ChannelExist = _CtrlPanel.CheckChannelStatus(ref rtStr);
-                if (ChannelExist == null)
+                if (!_Slaver.UpdateChannelExist())
                 {
-                    Thread.Sleep(500);
-                    continue;
+                    return;
                 }
-                for (int i = 0; i < _Channels.Length; i ++)
+                for (int i = 0; i < _Slaver.Channels.Length; i ++)
                 {
-                    _Channels[i].DeviceExist = ChannelExist[i];
                     if (i < 6)
                     {
-                        _Channels[i].Range = int.Parse(System.Text.RegularExpressions.Regex.Replace(cbPressure[i].SelectedItem.ToString(), @"[^0-9]+", ""));
+                        int Range = int.Parse(System.Text.RegularExpressions.Regex.Replace(cbPressureRange[i].SelectedItem.ToString(), @"[^0-9]+", ""));
+                        _Slaver.Channels[i].Range = Range;
                     }
                 }
-                _DgtlPanel.GetCurrentChannelData(ref _Channels);
-                for (int i = 0; i < txtPressure.Length; i ++)
+                _Slaver.UpdateChannelData();
+                for (int i = 0; i < ChannelData.Length; i ++)
                 {
-                    if (_Channels[i].Health)
+                    if (_Slaver.Channels[i].Health)
                     {
-                        txtPressure[i].MarkHealth();
+                        ChannelData[i].MarkHealth();
                     }
                     else
                     {
-                        txtPressure[i].MarkIll();
+                        ChannelData[i].MarkIll();
                     }
-                    if (_Channels[i].DeviceExist)
+                    if (_Slaver.Channels[i].DeviceExist)
                     {
-                        txtPressure[i].Activate();
-                        txtPressure[i].Text = string.Format("{0:000.000}", _Channels[i].CurrentData);
+                        ChannelData[i].Activate();
+                        ChannelData[i].Text = string.Format("{0:000.000}", _Slaver.Channels[i].CurrentData);
                     }
                     else
                     {
-                        txtPressure[i].Silenced();
+                        ChannelData[i].Silenced();
                     }
                 }
-                Thread.Sleep(500);
             }
-        }
-        public void StartThread()
-        {
-            // 打开监听
-            _CtrlPanel.StartRead();
-            //_CtrlPanel.DataReceived += new Comm.EventHandle(CmdStore);
-            _DgtlPanel.StartRead();
-            _DgtlPanel.DataReceived += new Comm.EventHandle(_DgtlPanel.DataUpdate);
-
-            AutoChannelCheck = true;
-        }
-        public void StopThread()
-        {
-            // 关闭监听
-            AutoChannelCheck = false;
-
-            //_CtrlPanel.DataReceived -= new Comm.EventHandle(CmdStore);
-            _CtrlPanel.StopReading();
-            _DgtlPanel.DataReceived -= new Comm.EventHandle(_DgtlPanel.DataUpdate);
-            _DgtlPanel.StopReading();
-
-        }
-        //public void CmdStore(byte[] readBuffer, int offset, int length)
-        //{
-        //    CmdLock.WaitOne();
-        //    CmdStock = new byte[length];
-        //    for (int i = 0; i < length; i ++)
-        //    {
-        //        CmdStock[i] = readBuffer[i];
-        //    }
-        //    CmdLock.ReleaseMutex();
-        //}
-        //public string CmdRead()
-        //{
-        //    CmdLock.WaitOne();
-        //    string str = "";
-        //    if (CmdStock != null)
-        //        str = Encoding.Default.GetString(CmdStock);
-        //    CmdLock.ReleaseMutex();
-        //    return str;
-        //}
-        //public string CheckCmd()
-        //{
-        //    long PreSec = DateTime.Now.ToBinary();
-        //    long CurSec = DateTime.Now.ToBinary();
-        //    while (CurSec - PreSec <= 10000)
-        //    {
-        //        string str = CmdRead();
-        //        if (str.Length == 0)
-        //            continue;
-        //        Log("接收到主控板消息: " + str);
-        //        if (str[0] == 0x23 && str[str.Length - 1] == 0x0A)
-        //        {
-        //            CmdLock.WaitOne();
-        //            CmdStock = null;  // 抹除原命令防止干扰
-        //            CmdLock.ReleaseMutex();
-        //            return str.Substring(1, str.Length - 2);
-        //        }
-        //    }
-        //    // Log("命令接收超时.");
-        //    return "";
-        //}
-        public void DataStore(byte[] readBuffer, int offset, int length)  // 接收采集板发来的16进制数据，并将其转换成双字节数组
-        {
-            DataLock.WaitOne();
-            DataStock = new int[length];
-            string LogInfo = "";
-            for (int i = 0; i < length / 2; i++)
-            {
-                DataStock[i] = (readBuffer[2 * i + 1] << 8) | readBuffer[2 * i];
-                LogInfo += string.Format("{0:X4} ", DataStock[i]);
-                if ((i + 1) % 16 == 0)
-                {
-                    lstData.Items.Add(LogInfo);
-                    LogInfo = "";
-                }
-            }
-            DataLock.ReleaseMutex();
-            //Log(LogInfo);
         }
         public MainWindow()
         {
@@ -344,9 +254,10 @@ namespace ChamberPressureGauge
         private void WinLoad(object sender, EventArgs e)
         {
             Log("程序初始化...");
-            ChangeStatus(0);
-            //timClock.Start();
-            foreach (ComboBox Item in cbPressure)
+            _Slaver = new Slaver(ChangeStatus);
+            _Slaver.Status = ConnectStatus.Disconnected;
+            timClock.Start();
+            foreach (ComboBox Item in cbPressureRange)
             {
                 Item.SelectedItem = "10 MPa";
             }
@@ -354,7 +265,7 @@ namespace ChamberPressureGauge
         }
         private void WinClosing(object sender, FormClosingEventArgs e)
         {
-            if (_Status == 0)
+            if (_Slaver.Status == ConnectStatus.Disconnected)
             {
                 
             }
@@ -380,33 +291,26 @@ namespace ChamberPressureGauge
         }
         private void Reset(object sender, EventArgs e)
         {
-            DataStock = null;
             Log("发送复位指令.");
-            _CtrlPanel.Reset();
+            _Slaver.Reset();
         }
         private void Connect(object sender, EventArgs e)
         {
-            if (_Status == 0)
+            if (_Slaver.Status == ConnectStatus.Disconnected)
             {
-                ChangeStatus(1);
-                _CtrlPanel = new CtrlPanel();
-                _DgtlPanel = new DgtlPanel();
-                StartThread();
-
-                _CntTotal = new Thread(new ThreadStart(ConnectTotal));
-                _CntTotal.Start();
+                _Slaver.Status = ConnectStatus.Connecting;
+                _Connect = new Thread(new ThreadStart(ConnectControl));
+                _Connect.Start();
             }
             else
             {
                 Log("正在断开连接...");
-                ChangeStatus(0);
-                _CntTotal.Abort();
-                StopThread();
-                ChangeStatus(0);  // 二次信号
+                timChannelUpdate.Stop();
+                _Connect.Abort();
+                _Slaver.Status = ConnectStatus.Disconnected;
                 // 关闭连接
-                _DgtlPanel.Close();
+                _Slaver.Close();
                 Log("已断开数位板连接.");
-                _CtrlPanel.Close();
                 Log("已断开主控板连接.");
             }
         }

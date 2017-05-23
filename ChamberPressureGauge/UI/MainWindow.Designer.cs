@@ -66,25 +66,26 @@ namespace ChamberPressureGauge
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.grpCP6 = new System.Windows.Forms.GroupBox();
-            this.txtPressure[0] = new ChamberPressureGauge.Modules.ChnLED();
+            this.ChannelData[0] = new ChamberPressureGauge.Modules.ChnLED();
             this.grpCP3 = new System.Windows.Forms.GroupBox();
-            this.txtPressure[1] = new ChamberPressureGauge.Modules.ChnLED();
+            this.ChannelData[1] = new ChamberPressureGauge.Modules.ChnLED();
             this.grpCP5 = new System.Windows.Forms.GroupBox();
-            this.txtPressure[2] = new ChamberPressureGauge.Modules.ChnLED();
+            this.ChannelData[2] = new ChamberPressureGauge.Modules.ChnLED();
             this.grpCP4 = new System.Windows.Forms.GroupBox();
-            this.txtPressure[3] = new ChamberPressureGauge.Modules.ChnLED();
+            this.ChannelData[3] = new ChamberPressureGauge.Modules.ChnLED();
             this.grpCP2 = new System.Windows.Forms.GroupBox();
-            this.txtPressure[4] = new ChamberPressureGauge.Modules.ChnLED();
+            this.ChannelData[4] = new ChamberPressureGauge.Modules.ChnLED();
             this.grpCP1 = new System.Windows.Forms.GroupBox();
-            this.txtPressure[5] = new ChamberPressureGauge.Modules.ChnLED();
+            this.ChannelData[5] = new ChamberPressureGauge.Modules.ChnLED();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.lstData = new System.Windows.Forms.ListBox();
-            this.cbPressure[0] = new System.Windows.Forms.ComboBox();
-            this.cbPressure[1] = new System.Windows.Forms.ComboBox();
-            this.cbPressure[2] = new System.Windows.Forms.ComboBox();
-            this.cbPressure[3] = new System.Windows.Forms.ComboBox();
-            this.cbPressure[4] = new System.Windows.Forms.ComboBox();
-            this.cbPressure[5] = new System.Windows.Forms.ComboBox();
+            this.timChannelUpdate = new System.Timers.Timer(200);
+            this.cbPressureRange[0] = new System.Windows.Forms.ComboBox();
+            this.cbPressureRange[1] = new System.Windows.Forms.ComboBox();
+            this.cbPressureRange[2] = new System.Windows.Forms.ComboBox();
+            this.cbPressureRange[3] = new System.Windows.Forms.ComboBox();
+            this.cbPressureRange[4] = new System.Windows.Forms.ComboBox();
+            this.cbPressureRange[5] = new System.Windows.Forms.ComboBox();
             this.menuMain.SuspendLayout();
             this.tbMain.SuspendLayout();
             this.staMain.SuspendLayout();
@@ -408,30 +409,30 @@ namespace ChamberPressureGauge
             // 
             // grpCP6
             // 
-            this.grpCP6.Controls.Add(this.cbPressure[5]);
-            this.grpCP6.Controls.Add(this.txtPressure[5]);
+            this.grpCP6.Controls.Add(this.cbPressureRange[5]);
+            this.grpCP6.Controls.Add(this.ChannelData[5]);
             this.grpCP6.Location = new System.Drawing.Point(222, 129);
             this.grpCP6.Name = "grpCP6";
             this.grpCP6.Size = new System.Drawing.Size(209, 48);
             this.grpCP6.TabIndex = 4;
             this.grpCP6.TabStop = false;
             this.grpCP6.Text = "通道 6";
-            // 
+                        // 
             // txtPress4
             // 
-            this.txtPressure[3].Font = new System.Drawing.Font("Axure Handwriting", 8.999999F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtPressure[3].Location = new System.Drawing.Point(6, 20);
-            this.txtPressure[3].Name = "txtPress4";
-            this.txtPressure[3].ReadOnly = true;
-            this.txtPressure[3].Size = new System.Drawing.Size(112, 22);
-            this.txtPressure[3].TabIndex = 3;
-            this.txtPressure[3].TabStop = false;
-            this.txtPressure[3].TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            // 
+            this.ChannelData[3].Font = new System.Drawing.Font("Axure Handwriting", 8.999999F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ChannelData[3].Location = new System.Drawing.Point(6, 20);
+            this.ChannelData[3].Name = "txtPress4";
+            this.ChannelData[3].ReadOnly = true;
+            this.ChannelData[3].Size = new System.Drawing.Size(112, 22);
+            this.ChannelData[3].TabIndex = 3;
+            this.ChannelData[3].TabStop = false;
+            this.ChannelData[3].TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+// 
             // grpCP3
             // 
-            this.grpCP3.Controls.Add(this.cbPressure[2]);
-            this.grpCP3.Controls.Add(this.txtPressure[2]);
+            this.grpCP3.Controls.Add(this.cbPressureRange[2]);
+            this.grpCP3.Controls.Add(this.ChannelData[2]);
             this.grpCP3.Location = new System.Drawing.Point(6, 129);
             this.grpCP3.Name = "grpCP3";
             this.grpCP3.Size = new System.Drawing.Size(210, 48);
@@ -441,19 +442,19 @@ namespace ChamberPressureGauge
             // 
             // txtPress3
             // 
-            this.txtPressure[2].Font = new System.Drawing.Font("Axure Handwriting", 8.999999F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtPressure[2].Location = new System.Drawing.Point(7, 21);
-            this.txtPressure[2].Name = "txtPress3";
-            this.txtPressure[2].ReadOnly = true;
-            this.txtPressure[2].Size = new System.Drawing.Size(112, 22);
-            this.txtPressure[2].TabIndex = 2;
-            this.txtPressure[2].TabStop = false;
-            this.txtPressure[2].TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.ChannelData[2].Font = new System.Drawing.Font("Axure Handwriting", 8.999999F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ChannelData[2].Location = new System.Drawing.Point(7, 21);
+            this.ChannelData[2].Name = "txtPress3";
+            this.ChannelData[2].ReadOnly = true;
+            this.ChannelData[2].Size = new System.Drawing.Size(112, 22);
+            this.ChannelData[2].TabIndex = 2;
+            this.ChannelData[2].TabStop = false;
+            this.ChannelData[2].TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
             // grpCP5
             // 
-            this.grpCP5.Controls.Add(this.cbPressure[4]);
-            this.grpCP5.Controls.Add(this.txtPressure[4]);
+            this.grpCP5.Controls.Add(this.cbPressureRange[4]);
+            this.grpCP5.Controls.Add(this.ChannelData[4]);
             this.grpCP5.Location = new System.Drawing.Point(222, 75);
             this.grpCP5.Name = "grpCP5";
             this.grpCP5.Size = new System.Drawing.Size(209, 48);
@@ -463,19 +464,19 @@ namespace ChamberPressureGauge
             // 
             // txtPress5
             // 
-            this.txtPressure[4].Font = new System.Drawing.Font("Axure Handwriting", 8.999999F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtPressure[4].Location = new System.Drawing.Point(6, 20);
-            this.txtPressure[4].Name = "txtPress5";
-            this.txtPressure[4].ReadOnly = true;
-            this.txtPressure[4].Size = new System.Drawing.Size(112, 22);
-            this.txtPressure[4].TabIndex = 4;
-            this.txtPressure[4].TabStop = false;
-            this.txtPressure[4].TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.ChannelData[4].Font = new System.Drawing.Font("Axure Handwriting", 8.999999F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ChannelData[4].Location = new System.Drawing.Point(6, 20);
+            this.ChannelData[4].Name = "txtPress5";
+            this.ChannelData[4].ReadOnly = true;
+            this.ChannelData[4].Size = new System.Drawing.Size(112, 22);
+            this.ChannelData[4].TabIndex = 4;
+            this.ChannelData[4].TabStop = false;
+            this.ChannelData[4].TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
             // grpCP4
             // 
-            this.grpCP4.Controls.Add(this.cbPressure[3]);
-            this.grpCP4.Controls.Add(this.txtPressure[3]);
+            this.grpCP4.Controls.Add(this.cbPressureRange[3]);
+            this.grpCP4.Controls.Add(this.ChannelData[3]);
             this.grpCP4.Location = new System.Drawing.Point(222, 21);
             this.grpCP4.Name = "grpCP4";
             this.grpCP4.Size = new System.Drawing.Size(209, 48);
@@ -485,19 +486,19 @@ namespace ChamberPressureGauge
             // 
             // txtPress6
             // 
-            this.txtPressure[5].Font = new System.Drawing.Font("Axure Handwriting", 8.999999F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtPressure[5].Location = new System.Drawing.Point(6, 20);
-            this.txtPressure[5].Name = "txtPress6";
-            this.txtPressure[5].ReadOnly = true;
-            this.txtPressure[5].Size = new System.Drawing.Size(112, 22);
-            this.txtPressure[5].TabIndex = 5;
-            this.txtPressure[5].TabStop = false;
-            this.txtPressure[5].TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.ChannelData[5].Font = new System.Drawing.Font("Axure Handwriting", 8.999999F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ChannelData[5].Location = new System.Drawing.Point(6, 20);
+            this.ChannelData[5].Name = "txtPress6";
+            this.ChannelData[5].ReadOnly = true;
+            this.ChannelData[5].Size = new System.Drawing.Size(112, 22);
+            this.ChannelData[5].TabIndex = 5;
+            this.ChannelData[5].TabStop = false;
+            this.ChannelData[5].TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
             // grpCP2
             // 
-            this.grpCP2.Controls.Add(this.cbPressure[1]);
-            this.grpCP2.Controls.Add(this.txtPressure[1]);
+            this.grpCP2.Controls.Add(this.cbPressureRange[1]);
+            this.grpCP2.Controls.Add(this.ChannelData[1]);
             this.grpCP2.Location = new System.Drawing.Point(7, 75);
             this.grpCP2.Name = "grpCP2";
             this.grpCP2.Size = new System.Drawing.Size(209, 48);
@@ -507,19 +508,19 @@ namespace ChamberPressureGauge
             // 
             // txtPress2
             // 
-            this.txtPressure[1].Font = new System.Drawing.Font("Axure Handwriting", 8.999999F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtPressure[1].Location = new System.Drawing.Point(6, 20);
-            this.txtPressure[1].Name = "txtPress2";
-            this.txtPressure[1].ReadOnly = true;
-            this.txtPressure[1].Size = new System.Drawing.Size(112, 22);
-            this.txtPressure[1].TabIndex = 1;
-            this.txtPressure[1].TabStop = false;
-            this.txtPressure[1].TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.ChannelData[1].Font = new System.Drawing.Font("Axure Handwriting", 8.999999F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ChannelData[1].Location = new System.Drawing.Point(6, 20);
+            this.ChannelData[1].Name = "txtPress2";
+            this.ChannelData[1].ReadOnly = true;
+            this.ChannelData[1].Size = new System.Drawing.Size(112, 22);
+            this.ChannelData[1].TabIndex = 1;
+            this.ChannelData[1].TabStop = false;
+            this.ChannelData[1].TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
             // grpCP1
             // 
-            this.grpCP1.Controls.Add(this.cbPressure[0]);
-            this.grpCP1.Controls.Add(this.txtPressure[0]);
+            this.grpCP1.Controls.Add(this.cbPressureRange[0]);
+            this.grpCP1.Controls.Add(this.ChannelData[0]);
             this.grpCP1.Location = new System.Drawing.Point(7, 21);
             this.grpCP1.Name = "grpCP1";
             this.grpCP1.Size = new System.Drawing.Size(209, 48);
@@ -529,14 +530,14 @@ namespace ChamberPressureGauge
             // 
             // txtPress1
             // 
-            this.txtPressure[0].Font = new System.Drawing.Font("Axure Handwriting", 8.999999F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtPressure[0].Location = new System.Drawing.Point(6, 20);
-            this.txtPressure[0].Name = "txtPress1";
-            this.txtPressure[0].ReadOnly = true;
-            this.txtPressure[0].Size = new System.Drawing.Size(112, 22);
-            this.txtPressure[0].TabIndex = 0;
-            this.txtPressure[0].TabStop = false;
-            this.txtPressure[0].TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.ChannelData[0].Font = new System.Drawing.Font("Axure Handwriting", 8.999999F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ChannelData[0].Location = new System.Drawing.Point(6, 20);
+            this.ChannelData[0].Name = "txtPress1";
+            this.ChannelData[0].ReadOnly = true;
+            this.ChannelData[0].Size = new System.Drawing.Size(112, 22);
+            this.ChannelData[0].TabIndex = 0;
+            this.ChannelData[0].TabStop = false;
+            this.ChannelData[0].TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
             // groupBox2
             // 
@@ -557,101 +558,107 @@ namespace ChamberPressureGauge
             this.lstData.Size = new System.Drawing.Size(758, 484);
             this.lstData.TabIndex = 0;
             // 
+            // timChannelUpdate
+            // 
+            this.timChannelUpdate.AutoReset = true;
+            this.timChannelUpdate.Enabled = false;
+            this.timChannelUpdate.Elapsed += new System.Timers.ElapsedEventHandler(this.timChannelUpdate_Tick);
+            // 
             // cbPress1
             // 
-            this.cbPressure[0].DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbPressure[0].FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.cbPressure[0].FormattingEnabled = true;
-            this.cbPressure[0].Items.AddRange(new object[] {
+            this.cbPressureRange[0].DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbPressureRange[0].FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.cbPressureRange[0].FormattingEnabled = true;
+            this.cbPressureRange[0].Items.AddRange(new object[] {
             "1 MPa",
             "2 MPa",
             "5 MPa",
             "10 MPa",
             "40 MPa"});
-            this.cbPressure[0].Location = new System.Drawing.Point(125, 21);
-            this.cbPressure[0].Name = "cbPress1";
-            this.cbPressure[0].Size = new System.Drawing.Size(60, 20);
-            this.cbPressure[0].TabIndex = 1;
+            this.cbPressureRange[0].Location = new System.Drawing.Point(125, 21);
+            this.cbPressureRange[0].Name = "cbPress1";
+            this.cbPressureRange[0].Size = new System.Drawing.Size(60, 20);
+            this.cbPressureRange[0].TabIndex = 1;
             // 
             // cbPress2
             // 
-            this.cbPressure[1].DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbPressure[1].FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.cbPressure[1].FormattingEnabled = true;
-            this.cbPressure[1].Items.AddRange(new object[] {
+            this.cbPressureRange[1].DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbPressureRange[1].FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.cbPressureRange[1].FormattingEnabled = true;
+            this.cbPressureRange[1].Items.AddRange(new object[] {
             "1 MPa",
             "2 MPa",
             "5 MPa",
             "10 MPa",
             "40 MPa"});
-            this.cbPressure[1].Location = new System.Drawing.Point(125, 21);
-            this.cbPressure[1].Name = "cbPress2";
-            this.cbPressure[1].Size = new System.Drawing.Size(60, 20);
-            this.cbPressure[1].TabIndex = 2;
+            this.cbPressureRange[1].Location = new System.Drawing.Point(125, 21);
+            this.cbPressureRange[1].Name = "cbPress2";
+            this.cbPressureRange[1].Size = new System.Drawing.Size(60, 20);
+            this.cbPressureRange[1].TabIndex = 2;
             // 
             // cbPress3
             // 
-            this.cbPressure[2].DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbPressure[2].FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.cbPressure[2].FormattingEnabled = true;
-            this.cbPressure[2].Items.AddRange(new object[] {
+            this.cbPressureRange[2].DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbPressureRange[2].FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.cbPressureRange[2].FormattingEnabled = true;
+            this.cbPressureRange[2].Items.AddRange(new object[] {
             "1 MPa",
             "2 MPa",
             "5 MPa",
             "10 MPa",
             "40 MPa"});
-            this.cbPressure[2].Location = new System.Drawing.Point(125, 21);
-            this.cbPressure[2].Name = "cbPress3";
-            this.cbPressure[2].Size = new System.Drawing.Size(60, 20);
-            this.cbPressure[2].TabIndex = 3;
+            this.cbPressureRange[2].Location = new System.Drawing.Point(125, 21);
+            this.cbPressureRange[2].Name = "cbPress3";
+            this.cbPressureRange[2].Size = new System.Drawing.Size(60, 20);
+            this.cbPressureRange[2].TabIndex = 3;
             // 
             // cbPress4
             // 
-            this.cbPressure[3].DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbPressure[3].FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.cbPressure[3].FormattingEnabled = true;
-            this.cbPressure[3].Items.AddRange(new object[] {
+            this.cbPressureRange[3].DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbPressureRange[3].FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.cbPressureRange[3].FormattingEnabled = true;
+            this.cbPressureRange[3].Items.AddRange(new object[] {
             "1 MPa",
             "2 MPa",
             "5 MPa",
             "10 MPa",
             "40 MPa"});
-            this.cbPressure[3].Location = new System.Drawing.Point(125, 21);
-            this.cbPressure[3].Name = "cbPress4";
-            this.cbPressure[3].Size = new System.Drawing.Size(60, 20);
-            this.cbPressure[3].TabIndex = 4;
+            this.cbPressureRange[3].Location = new System.Drawing.Point(125, 21);
+            this.cbPressureRange[3].Name = "cbPress4";
+            this.cbPressureRange[3].Size = new System.Drawing.Size(60, 20);
+            this.cbPressureRange[3].TabIndex = 4;
             // 
             // cbPress5
             // 
-            this.cbPressure[4].DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbPressure[4].FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.cbPressure[4].FormattingEnabled = true;
-            this.cbPressure[4].Items.AddRange(new object[] {
+            this.cbPressureRange[4].DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbPressureRange[4].FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.cbPressureRange[4].FormattingEnabled = true;
+            this.cbPressureRange[4].Items.AddRange(new object[] {
             "1 MPa",
             "2 MPa",
             "5 MPa",
             "10 MPa",
             "40 MPa"});
-            this.cbPressure[4].Location = new System.Drawing.Point(125, 21);
-            this.cbPressure[4].Name = "cbPress5";
-            this.cbPressure[4].Size = new System.Drawing.Size(60, 20);
-            this.cbPressure[4].TabIndex = 6;
+            this.cbPressureRange[4].Location = new System.Drawing.Point(125, 21);
+            this.cbPressureRange[4].Name = "cbPress5";
+            this.cbPressureRange[4].Size = new System.Drawing.Size(60, 20);
+            this.cbPressureRange[4].TabIndex = 6;
             // 
             // cbPress6
             // 
-            this.cbPressure[5].DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbPressure[5].FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.cbPressure[5].FormattingEnabled = true;
-            this.cbPressure[5].Items.AddRange(new object[] {
+            this.cbPressureRange[5].DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbPressureRange[5].FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.cbPressureRange[5].FormattingEnabled = true;
+            this.cbPressureRange[5].Items.AddRange(new object[] {
             "1 MPa",
             "2 MPa",
             "5 MPa",
             "10 MPa",
             "40 MPa"});
-            this.cbPressure[5].Location = new System.Drawing.Point(125, 21);
-            this.cbPressure[5].Name = "cbPress6";
-            this.cbPressure[5].Size = new System.Drawing.Size(60, 20);
-            this.cbPressure[5].TabIndex = 7;
+            this.cbPressureRange[5].Location = new System.Drawing.Point(125, 21);
+            this.cbPressureRange[5].Name = "cbPress6";
+            this.cbPressureRange[5].Size = new System.Drawing.Size(60, 20);
+            this.cbPressureRange[5].TabIndex = 7;
             // 
             // MainWindow
             // 
@@ -736,7 +743,7 @@ namespace ChamberPressureGauge
         private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.GroupBox grpCP6;
-        private ChnLED[] txtPressure = new ChnLED[6];
+        private ChnLED[] ChannelData = new ChnLED[6];
         private System.Windows.Forms.GroupBox grpCP3;
         //private ChnLED txtPress3;
         private System.Windows.Forms.GroupBox grpCP5;
@@ -748,7 +755,8 @@ namespace ChamberPressureGauge
         private System.Windows.Forms.GroupBox grpCP1;
         //private ChnLED txtPress1;
         private System.Windows.Forms.ListBox lstData;
-        private System.Windows.Forms.ComboBox[] cbPressure = new System.Windows.Forms.ComboBox[6];
+        private System.Windows.Forms.ComboBox[] cbPressureRange = new System.Windows.Forms.ComboBox[6];
+        private System.Timers.Timer timChannelUpdate;
         //private System.Windows.Forms.ComboBox cbPress6;
         //private System.Windows.Forms.ComboBox cbPress3;
         //private System.Windows.Forms.ComboBox cbPress5;
