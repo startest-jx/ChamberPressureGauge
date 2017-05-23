@@ -11,9 +11,6 @@ namespace ChamberPressureGauge.UI
 {
     public partial class ConfigWindow : Form
     {
-        Thread cThread = null;  // 主控板接收线程
-        Thread dThread = null;  // 数位板接收线程
-
         public ConfigWindow()
         {
             InitializeComponent();
