@@ -302,7 +302,7 @@ namespace ChamberPressureGauge.Modules
             long[] ChannelValueSum = new long[Channels.Length];
             for (int i = 0; i < Channels.Length; i++)
                 ChannelValueSum[i] = 0;
-            foreach (ushort[] DataArray in DataStock)
+            foreach (var DataArray in DataStock)
             {
                 ChannelValueSum[0] += DataArray[9];
                 ChannelValueSum[1] += DataArray[10];
@@ -332,8 +332,9 @@ namespace ChamberPressureGauge.Modules
             for (int i = 0; i < 6; i ++)
             {
                 DataLock.WaitOne();
-                Channels[i].CurrentData = (Convert.ToDouble(CurrentData[i + 9]) * Math.Pow(2, -20) * 25 - 0.25)
-                    * Channels[i].Range + Channels[i].Calibration;
+                Channels[i].CurrentData = CurrentData[i + 9];
+                //Channels[i].CurrentData = (Convert.ToDouble(CurrentData[i + 9]) * Math.Pow(2, -20) * 25 - 0.25)
+                //    * Channels[i].Range + Channels[i].Calibration;
                 DataLock.ReleaseMutex();
             }
         }

@@ -39,7 +39,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\ChannelData.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\PressureChannel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\PressureChannel.Designer.cs">
+      <DependentUpon>PressureChannel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\VarChannel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\VarChannel.Designer.cs">
+      <DependentUpon>VarChannel.cs</DependentUpon>
+    </Compile>
     <Compile Include="Modules\Channel.cs" />
+    <Compile Include="Modules\Slaver.cs" />
     <Compile Include="Modules\Comm.cs" />
     <Compile Include="UI\ConfigWindow.cs">
       <SubType>Form</SubType>
@@ -55,6 +71,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Controls\PressureChannel.resx">
+      <DependentUpon>PressureChannel.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UI\ConfigWindow.resx">
       <DependentUpon>ConfigWindow.cs</DependentUpon>
     </EmbeddedResource>
@@ -112,6 +131,7 @@
     <None Include="Images\toolbar_stop_listening.ico" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Images\Refresh.ico" />
     <Content Include="Images\toobar_loading.gif" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

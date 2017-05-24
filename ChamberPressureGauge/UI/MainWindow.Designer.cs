@@ -1,4 +1,4 @@
-﻿using ChamberPressureGauge.Modules;
+﻿using ChamberPressureGauge.Controls;
 
 namespace ChamberPressureGauge
 {
@@ -63,42 +63,27 @@ namespace ChamberPressureGauge
             this.txtLog = new System.Windows.Forms.TextBox();
             this.timClock = new System.Windows.Forms.Timer(this.components);
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.grpCP6 = new System.Windows.Forms.GroupBox();
-            this.ChannelData[0] = new ChamberPressureGauge.Modules.ChnLED();
-            this.grpCP3 = new System.Windows.Forms.GroupBox();
-            this.ChannelData[1] = new ChamberPressureGauge.Modules.ChnLED();
-            this.grpCP5 = new System.Windows.Forms.GroupBox();
-            this.ChannelData[2] = new ChamberPressureGauge.Modules.ChnLED();
-            this.grpCP4 = new System.Windows.Forms.GroupBox();
-            this.ChannelData[3] = new ChamberPressureGauge.Modules.ChnLED();
-            this.grpCP2 = new System.Windows.Forms.GroupBox();
-            this.ChannelData[4] = new ChamberPressureGauge.Modules.ChnLED();
-            this.grpCP1 = new System.Windows.Forms.GroupBox();
-            this.ChannelData[5] = new ChamberPressureGauge.Modules.ChnLED();
+            this.tcChannel = new System.Windows.Forms.TabControl();
+            this.tpPressure = new System.Windows.Forms.TabPage();
+            this.lblSecond = new System.Windows.Forms.Label();
+            this.txtMeasuringTime = new System.Windows.Forms.TextBox();
+            this.lblMeasuringTime = new System.Windows.Forms.Label();
+            this.btnRefreshTriggerChannel = new System.Windows.Forms.Button();
+            this.cbTriggerChannel = new System.Windows.Forms.ComboBox();
+            this.lblTriggerChannel = new System.Windows.Forms.Label();
+            this.cbTriggerMode = new System.Windows.Forms.ComboBox();
+            this.lblTriggerMode = new System.Windows.Forms.Label();
+            this.tpDigital = new System.Windows.Forms.TabPage();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.lstData = new System.Windows.Forms.ListBox();
-            this.timChannelUpdate = new System.Timers.Timer(200);
-            this.cbPressureRange[0] = new System.Windows.Forms.ComboBox();
-            this.cbPressureRange[1] = new System.Windows.Forms.ComboBox();
-            this.cbPressureRange[2] = new System.Windows.Forms.ComboBox();
-            this.cbPressureRange[3] = new System.Windows.Forms.ComboBox();
-            this.cbPressureRange[4] = new System.Windows.Forms.ComboBox();
-            this.cbPressureRange[5] = new System.Windows.Forms.ComboBox();
+            this.timChannelUpdate = new System.Timers.Timer();
             this.menuMain.SuspendLayout();
             this.tbMain.SuspendLayout();
             this.staMain.SuspendLayout();
             this.grpLog.SuspendLayout();
             this.groupBox1.SuspendLayout();
-            this.groupBox3.SuspendLayout();
-            this.grpCP6.SuspendLayout();
-            this.grpCP3.SuspendLayout();
-            this.grpCP5.SuspendLayout();
-            this.grpCP4.SuspendLayout();
-            this.grpCP2.SuspendLayout();
-            this.grpCP1.SuspendLayout();
-            this.groupBox2.SuspendLayout();
+            this.tcChannel.SuspendLayout();
+            this.tpPressure.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.timChannelUpdate)).BeginInit();
             this.SuspendLayout();
             // 
             // menuMain
@@ -110,7 +95,7 @@ namespace ChamberPressureGauge
             this.menHelp});
             this.menuMain.Location = new System.Drawing.Point(0, 0);
             this.menuMain.Name = "menuMain";
-            this.menuMain.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
+            this.menuMain.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
             this.menuMain.Size = new System.Drawing.Size(1239, 25);
             this.menuMain.TabIndex = 0;
             this.menuMain.Text = "menuStrip1";
@@ -130,30 +115,30 @@ namespace ChamberPressureGauge
             // miConnect
             // 
             this.miConnect.Name = "miConnect";
-            this.miConnect.Size = new System.Drawing.Size(152, 22);
+            this.miConnect.Size = new System.Drawing.Size(151, 22);
             this.miConnect.Text = "开始连接(&C)";
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(149, 6);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(148, 6);
             // 
             // miConfig
             // 
             this.miConfig.Name = "miConfig";
-            this.miConfig.Size = new System.Drawing.Size(152, 22);
+            this.miConfig.Size = new System.Drawing.Size(151, 22);
             this.miConfig.Text = "配置参数(&O)...";
             this.miConfig.Click += new System.EventHandler(this.EventConfig);
             // 
             // toolStripMenuItem2
             // 
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(149, 6);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(148, 6);
             // 
             // miExit
             // 
             this.miExit.Name = "miExit";
-            this.miExit.Size = new System.Drawing.Size(152, 22);
+            this.miExit.Size = new System.Drawing.Size(151, 22);
             this.miExit.Text = "退出(&E)";
             // 
             // menData
@@ -236,7 +221,7 @@ namespace ChamberPressureGauge
             this.tbExit});
             this.tbMain.Location = new System.Drawing.Point(0, 25);
             this.tbMain.Name = "tbMain";
-            this.tbMain.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
+            this.tbMain.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
             this.tbMain.Size = new System.Drawing.Size(1239, 87);
             this.tbMain.TabIndex = 1;
             this.tbMain.Text = "toolStrip1";
@@ -323,7 +308,7 @@ namespace ChamberPressureGauge
             this.lblStatus,
             this.lblNone,
             this.lblTime});
-            this.staMain.Location = new System.Drawing.Point(0, 631);
+            this.staMain.Location = new System.Drawing.Point(0, 707);
             this.staMain.Name = "staMain";
             this.staMain.Size = new System.Drawing.Size(1239, 22);
             this.staMain.TabIndex = 2;
@@ -350,21 +335,23 @@ namespace ChamberPressureGauge
             // grpLog
             // 
             this.grpLog.Controls.Add(this.txtLog);
-            this.grpLog.Location = new System.Drawing.Point(6, 490);
+            this.grpLog.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.grpLog.Location = new System.Drawing.Point(6, 566);
             this.grpLog.Name = "grpLog";
-            this.grpLog.Size = new System.Drawing.Size(449, 138);
+            this.grpLog.Size = new System.Drawing.Size(628, 138);
             this.grpLog.TabIndex = 3;
             this.grpLog.TabStop = false;
             this.grpLog.Text = "日志";
             // 
             // txtLog
             // 
+            this.txtLog.BackColor = System.Drawing.Color.White;
             this.txtLog.Location = new System.Drawing.Point(6, 20);
             this.txtLog.Multiline = true;
             this.txtLog.Name = "txtLog";
             this.txtLog.ReadOnly = true;
             this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtLog.Size = new System.Drawing.Size(437, 112);
+            this.txtLog.Size = new System.Drawing.Size(612, 112);
             this.txtLog.TabIndex = 0;
             // 
             // timClock
@@ -374,297 +361,158 @@ namespace ChamberPressureGauge
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.groupBox4);
-            this.groupBox1.Controls.Add(this.groupBox3);
+            this.groupBox1.Controls.Add(this.tcChannel);
+            this.groupBox1.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.groupBox1.Location = new System.Drawing.Point(6, 115);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(449, 369);
+            this.groupBox1.Size = new System.Drawing.Size(628, 445);
             this.groupBox1.TabIndex = 4;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "通道监测";
             // 
-            // groupBox4
+            // tcChannel
             // 
-            this.groupBox4.Location = new System.Drawing.Point(6, 210);
-            this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(437, 153);
-            this.groupBox4.TabIndex = 1;
-            this.groupBox4.TabStop = false;
-            this.groupBox4.Text = "数字量/计时";
+            this.tcChannel.Controls.Add(this.tpPressure);
+            this.tcChannel.Controls.Add(this.tpDigital);
+            this.tcChannel.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.tcChannel.Location = new System.Drawing.Point(7, 21);
+            this.tcChannel.Name = "tcChannel";
+            this.tcChannel.SelectedIndex = 0;
+            this.tcChannel.Size = new System.Drawing.Size(615, 418);
+            this.tcChannel.TabIndex = 0;
             // 
-            // groupBox3
+            // tpPressure
             // 
-            this.groupBox3.Controls.Add(this.grpCP6);
-            this.groupBox3.Controls.Add(this.grpCP3);
-            this.groupBox3.Controls.Add(this.grpCP5);
-            this.groupBox3.Controls.Add(this.grpCP4);
-            this.groupBox3.Controls.Add(this.grpCP2);
-            this.groupBox3.Controls.Add(this.grpCP1);
-            this.groupBox3.Location = new System.Drawing.Point(6, 20);
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(437, 184);
-            this.groupBox3.TabIndex = 0;
-            this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "压力";
+            this.tpPressure.BackColor = System.Drawing.Color.White;
+            this.tpPressure.Controls.Add(this.lblSecond);
+            this.tpPressure.Controls.Add(this.txtMeasuringTime);
+            this.tpPressure.Controls.Add(this.lblMeasuringTime);
+            this.tpPressure.Controls.Add(this.btnRefreshTriggerChannel);
+            this.tpPressure.Controls.Add(this.cbTriggerChannel);
+            this.tpPressure.Controls.Add(this.lblTriggerChannel);
+            this.tpPressure.Controls.Add(this.cbTriggerMode);
+            this.tpPressure.Controls.Add(this.lblTriggerMode);
+            this.tpPressure.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.tpPressure.Location = new System.Drawing.Point(4, 26);
+            this.tpPressure.Name = "tpPressure";
+            this.tpPressure.Padding = new System.Windows.Forms.Padding(3);
+            this.tpPressure.Size = new System.Drawing.Size(607, 388);
+            this.tpPressure.TabIndex = 0;
+            this.tpPressure.Text = "压力";
             // 
-            // grpCP6
+            // lblSecond
             // 
-            this.grpCP6.Controls.Add(this.cbPressureRange[5]);
-            this.grpCP6.Controls.Add(this.ChannelData[5]);
-            this.grpCP6.Location = new System.Drawing.Point(222, 129);
-            this.grpCP6.Name = "grpCP6";
-            this.grpCP6.Size = new System.Drawing.Size(209, 48);
-            this.grpCP6.TabIndex = 4;
-            this.grpCP6.TabStop = false;
-            this.grpCP6.Text = "通道 6";
-                        // 
-            // txtPress4
+            this.lblSecond.AutoSize = true;
+            this.lblSecond.Location = new System.Drawing.Point(566, 347);
+            this.lblSecond.Name = "lblSecond";
+            this.lblSecond.Size = new System.Drawing.Size(20, 17);
+            this.lblSecond.TabIndex = 7;
+            this.lblSecond.Text = "秒";
             // 
-            this.ChannelData[3].Font = new System.Drawing.Font("Axure Handwriting", 8.999999F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ChannelData[3].Location = new System.Drawing.Point(6, 20);
-            this.ChannelData[3].Name = "txtPress4";
-            this.ChannelData[3].ReadOnly = true;
-            this.ChannelData[3].Size = new System.Drawing.Size(112, 22);
-            this.ChannelData[3].TabIndex = 3;
-            this.ChannelData[3].TabStop = false;
-            this.ChannelData[3].TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-// 
-            // grpCP3
+            // txtMeasuringTime
             // 
-            this.grpCP3.Controls.Add(this.cbPressureRange[2]);
-            this.grpCP3.Controls.Add(this.ChannelData[2]);
-            this.grpCP3.Location = new System.Drawing.Point(6, 129);
-            this.grpCP3.Name = "grpCP3";
-            this.grpCP3.Size = new System.Drawing.Size(210, 48);
-            this.grpCP3.TabIndex = 1;
-            this.grpCP3.TabStop = false;
-            this.grpCP3.Text = "通道 3";
+            this.txtMeasuringTime.Location = new System.Drawing.Point(485, 344);
+            this.txtMeasuringTime.Name = "txtMeasuringTime";
+            this.txtMeasuringTime.Size = new System.Drawing.Size(75, 23);
+            this.txtMeasuringTime.TabIndex = 6;
+            this.txtMeasuringTime.LostFocus += new System.EventHandler(this.txtMeasuringTime_LostFocus);
             // 
-            // txtPress3
+            // lblMeasuringTime
             // 
-            this.ChannelData[2].Font = new System.Drawing.Font("Axure Handwriting", 8.999999F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ChannelData[2].Location = new System.Drawing.Point(7, 21);
-            this.ChannelData[2].Name = "txtPress3";
-            this.ChannelData[2].ReadOnly = true;
-            this.ChannelData[2].Size = new System.Drawing.Size(112, 22);
-            this.ChannelData[2].TabIndex = 2;
-            this.ChannelData[2].TabStop = false;
-            this.ChannelData[2].TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.lblMeasuringTime.AutoSize = true;
+            this.lblMeasuringTime.Location = new System.Drawing.Point(420, 347);
+            this.lblMeasuringTime.Name = "lblMeasuringTime";
+            this.lblMeasuringTime.Size = new System.Drawing.Size(59, 17);
+            this.lblMeasuringTime.TabIndex = 5;
+            this.lblMeasuringTime.Text = "测量时间:";
             // 
-            // grpCP5
+            // btnRefreshTriggerChannel
             // 
-            this.grpCP5.Controls.Add(this.cbPressureRange[4]);
-            this.grpCP5.Controls.Add(this.ChannelData[4]);
-            this.grpCP5.Location = new System.Drawing.Point(222, 75);
-            this.grpCP5.Name = "grpCP5";
-            this.grpCP5.Size = new System.Drawing.Size(209, 48);
-            this.grpCP5.TabIndex = 3;
-            this.grpCP5.TabStop = false;
-            this.grpCP5.Text = "通道 5";
+            this.btnRefreshTriggerChannel.BackColor = System.Drawing.SystemColors.Control;
+            this.btnRefreshTriggerChannel.Image = global::ChamberPressureGauge.Properties.Resources.Refresh;
+            this.btnRefreshTriggerChannel.Location = new System.Drawing.Point(390, 344);
+            this.btnRefreshTriggerChannel.Name = "btnRefreshTriggerChannel";
+            this.btnRefreshTriggerChannel.Size = new System.Drawing.Size(24, 24);
+            this.btnRefreshTriggerChannel.TabIndex = 4;
+            this.btnRefreshTriggerChannel.UseVisualStyleBackColor = false;
+            this.btnRefreshTriggerChannel.Click += new System.EventHandler(this.btnRefreshTriggerChannel_Click);
             // 
-            // txtPress5
+            // cbTriggerChannel
             // 
-            this.ChannelData[4].Font = new System.Drawing.Font("Axure Handwriting", 8.999999F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ChannelData[4].Location = new System.Drawing.Point(6, 20);
-            this.ChannelData[4].Name = "txtPress5";
-            this.ChannelData[4].ReadOnly = true;
-            this.ChannelData[4].Size = new System.Drawing.Size(112, 22);
-            this.ChannelData[4].TabIndex = 4;
-            this.ChannelData[4].TabStop = false;
-            this.ChannelData[4].TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.cbTriggerChannel.BackColor = System.Drawing.Color.White;
+            this.cbTriggerChannel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbTriggerChannel.FormattingEnabled = true;
+            this.cbTriggerChannel.Location = new System.Drawing.Point(263, 344);
+            this.cbTriggerChannel.Name = "cbTriggerChannel";
+            this.cbTriggerChannel.Size = new System.Drawing.Size(121, 25);
+            this.cbTriggerChannel.TabIndex = 3;
+            this.cbTriggerChannel.SelectedIndexChanged += new System.EventHandler(this.cbTriggerChannel_SelectedIndexChanged);
             // 
-            // grpCP4
+            // lblTriggerChannel
             // 
-            this.grpCP4.Controls.Add(this.cbPressureRange[3]);
-            this.grpCP4.Controls.Add(this.ChannelData[3]);
-            this.grpCP4.Location = new System.Drawing.Point(222, 21);
-            this.grpCP4.Name = "grpCP4";
-            this.grpCP4.Size = new System.Drawing.Size(209, 48);
-            this.grpCP4.TabIndex = 2;
-            this.grpCP4.TabStop = false;
-            this.grpCP4.Text = "通道 4";
+            this.lblTriggerChannel.AutoSize = true;
+            this.lblTriggerChannel.Location = new System.Drawing.Point(198, 347);
+            this.lblTriggerChannel.Name = "lblTriggerChannel";
+            this.lblTriggerChannel.Size = new System.Drawing.Size(59, 17);
+            this.lblTriggerChannel.TabIndex = 2;
+            this.lblTriggerChannel.Text = "计量通道:";
             // 
-            // txtPress6
+            // cbTriggerMode
             // 
-            this.ChannelData[5].Font = new System.Drawing.Font("Axure Handwriting", 8.999999F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ChannelData[5].Location = new System.Drawing.Point(6, 20);
-            this.ChannelData[5].Name = "txtPress6";
-            this.ChannelData[5].ReadOnly = true;
-            this.ChannelData[5].Size = new System.Drawing.Size(112, 22);
-            this.ChannelData[5].TabIndex = 5;
-            this.ChannelData[5].TabStop = false;
-            this.ChannelData[5].TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.cbTriggerMode.BackColor = System.Drawing.Color.White;
+            this.cbTriggerMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbTriggerMode.FormattingEnabled = true;
+            this.cbTriggerMode.Items.AddRange(new object[] {
+            "自动触发(推荐)",
+            "手动触发",
+            "外触发"});
+            this.cbTriggerMode.Location = new System.Drawing.Point(71, 344);
+            this.cbTriggerMode.Name = "cbTriggerMode";
+            this.cbTriggerMode.Size = new System.Drawing.Size(121, 25);
+            this.cbTriggerMode.TabIndex = 1;
+            this.cbTriggerMode.SelectedIndexChanged += new System.EventHandler(this.cbTriggerMode_SelectedIndexChanged);
             // 
-            // grpCP2
+            // lblTriggerMode
             // 
-            this.grpCP2.Controls.Add(this.cbPressureRange[1]);
-            this.grpCP2.Controls.Add(this.ChannelData[1]);
-            this.grpCP2.Location = new System.Drawing.Point(7, 75);
-            this.grpCP2.Name = "grpCP2";
-            this.grpCP2.Size = new System.Drawing.Size(209, 48);
-            this.grpCP2.TabIndex = 1;
-            this.grpCP2.TabStop = false;
-            this.grpCP2.Text = "通道 2";
+            this.lblTriggerMode.AutoSize = true;
+            this.lblTriggerMode.Location = new System.Drawing.Point(6, 347);
+            this.lblTriggerMode.Name = "lblTriggerMode";
+            this.lblTriggerMode.Size = new System.Drawing.Size(59, 17);
+            this.lblTriggerMode.TabIndex = 0;
+            this.lblTriggerMode.Text = "触发方式:";
             // 
-            // txtPress2
+            // tpDigital
             // 
-            this.ChannelData[1].Font = new System.Drawing.Font("Axure Handwriting", 8.999999F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ChannelData[1].Location = new System.Drawing.Point(6, 20);
-            this.ChannelData[1].Name = "txtPress2";
-            this.ChannelData[1].ReadOnly = true;
-            this.ChannelData[1].Size = new System.Drawing.Size(112, 22);
-            this.ChannelData[1].TabIndex = 1;
-            this.ChannelData[1].TabStop = false;
-            this.ChannelData[1].TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            // 
-            // grpCP1
-            // 
-            this.grpCP1.Controls.Add(this.cbPressureRange[0]);
-            this.grpCP1.Controls.Add(this.ChannelData[0]);
-            this.grpCP1.Location = new System.Drawing.Point(7, 21);
-            this.grpCP1.Name = "grpCP1";
-            this.grpCP1.Size = new System.Drawing.Size(209, 48);
-            this.grpCP1.TabIndex = 0;
-            this.grpCP1.TabStop = false;
-            this.grpCP1.Text = "通道 1";
-            // 
-            // txtPress1
-            // 
-            this.ChannelData[0].Font = new System.Drawing.Font("Axure Handwriting", 8.999999F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ChannelData[0].Location = new System.Drawing.Point(6, 20);
-            this.ChannelData[0].Name = "txtPress1";
-            this.ChannelData[0].ReadOnly = true;
-            this.ChannelData[0].Size = new System.Drawing.Size(112, 22);
-            this.ChannelData[0].TabIndex = 0;
-            this.ChannelData[0].TabStop = false;
-            this.ChannelData[0].TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.tpDigital.Location = new System.Drawing.Point(4, 26);
+            this.tpDigital.Name = "tpDigital";
+            this.tpDigital.Padding = new System.Windows.Forms.Padding(3);
+            this.tpDigital.Size = new System.Drawing.Size(607, 388);
+            this.tpDigital.TabIndex = 1;
+            this.tpDigital.Text = "数字量/计时";
+            this.tpDigital.UseVisualStyleBackColor = true;
             // 
             // groupBox2
             // 
-            this.groupBox2.Controls.Add(this.lstData);
-            this.groupBox2.Location = new System.Drawing.Point(461, 115);
+            this.groupBox2.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.groupBox2.Location = new System.Drawing.Point(640, 115);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(771, 513);
+            this.groupBox2.Size = new System.Drawing.Size(592, 589);
             this.groupBox2.TabIndex = 5;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "图表";
             // 
-            // lstData
-            // 
-            this.lstData.FormattingEnabled = true;
-            this.lstData.ItemHeight = 12;
-            this.lstData.Location = new System.Drawing.Point(7, 21);
-            this.lstData.Name = "lstData";
-            this.lstData.Size = new System.Drawing.Size(758, 484);
-            this.lstData.TabIndex = 0;
-            // 
             // timChannelUpdate
             // 
-            this.timChannelUpdate.AutoReset = true;
-            this.timChannelUpdate.Enabled = false;
+            this.timChannelUpdate.Interval = 500D;
+            this.timChannelUpdate.SynchronizingObject = this;
             this.timChannelUpdate.Elapsed += new System.Timers.ElapsedEventHandler(this.timChannelUpdate_Tick);
-            // 
-            // cbPress1
-            // 
-            this.cbPressureRange[0].DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbPressureRange[0].FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.cbPressureRange[0].FormattingEnabled = true;
-            this.cbPressureRange[0].Items.AddRange(new object[] {
-            "1 MPa",
-            "2 MPa",
-            "5 MPa",
-            "10 MPa",
-            "40 MPa"});
-            this.cbPressureRange[0].Location = new System.Drawing.Point(125, 21);
-            this.cbPressureRange[0].Name = "cbPress1";
-            this.cbPressureRange[0].Size = new System.Drawing.Size(60, 20);
-            this.cbPressureRange[0].TabIndex = 1;
-            // 
-            // cbPress2
-            // 
-            this.cbPressureRange[1].DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbPressureRange[1].FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.cbPressureRange[1].FormattingEnabled = true;
-            this.cbPressureRange[1].Items.AddRange(new object[] {
-            "1 MPa",
-            "2 MPa",
-            "5 MPa",
-            "10 MPa",
-            "40 MPa"});
-            this.cbPressureRange[1].Location = new System.Drawing.Point(125, 21);
-            this.cbPressureRange[1].Name = "cbPress2";
-            this.cbPressureRange[1].Size = new System.Drawing.Size(60, 20);
-            this.cbPressureRange[1].TabIndex = 2;
-            // 
-            // cbPress3
-            // 
-            this.cbPressureRange[2].DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbPressureRange[2].FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.cbPressureRange[2].FormattingEnabled = true;
-            this.cbPressureRange[2].Items.AddRange(new object[] {
-            "1 MPa",
-            "2 MPa",
-            "5 MPa",
-            "10 MPa",
-            "40 MPa"});
-            this.cbPressureRange[2].Location = new System.Drawing.Point(125, 21);
-            this.cbPressureRange[2].Name = "cbPress3";
-            this.cbPressureRange[2].Size = new System.Drawing.Size(60, 20);
-            this.cbPressureRange[2].TabIndex = 3;
-            // 
-            // cbPress4
-            // 
-            this.cbPressureRange[3].DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbPressureRange[3].FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.cbPressureRange[3].FormattingEnabled = true;
-            this.cbPressureRange[3].Items.AddRange(new object[] {
-            "1 MPa",
-            "2 MPa",
-            "5 MPa",
-            "10 MPa",
-            "40 MPa"});
-            this.cbPressureRange[3].Location = new System.Drawing.Point(125, 21);
-            this.cbPressureRange[3].Name = "cbPress4";
-            this.cbPressureRange[3].Size = new System.Drawing.Size(60, 20);
-            this.cbPressureRange[3].TabIndex = 4;
-            // 
-            // cbPress5
-            // 
-            this.cbPressureRange[4].DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbPressureRange[4].FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.cbPressureRange[4].FormattingEnabled = true;
-            this.cbPressureRange[4].Items.AddRange(new object[] {
-            "1 MPa",
-            "2 MPa",
-            "5 MPa",
-            "10 MPa",
-            "40 MPa"});
-            this.cbPressureRange[4].Location = new System.Drawing.Point(125, 21);
-            this.cbPressureRange[4].Name = "cbPress5";
-            this.cbPressureRange[4].Size = new System.Drawing.Size(60, 20);
-            this.cbPressureRange[4].TabIndex = 6;
-            // 
-            // cbPress6
-            // 
-            this.cbPressureRange[5].DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbPressureRange[5].FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.cbPressureRange[5].FormattingEnabled = true;
-            this.cbPressureRange[5].Items.AddRange(new object[] {
-            "1 MPa",
-            "2 MPa",
-            "5 MPa",
-            "10 MPa",
-            "40 MPa"});
-            this.cbPressureRange[5].Location = new System.Drawing.Point(125, 21);
-            this.cbPressureRange[5].Name = "cbPress6";
-            this.cbPressureRange[5].Size = new System.Drawing.Size(60, 20);
-            this.cbPressureRange[5].TabIndex = 7;
             // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1239, 653);
+            this.BackColor = System.Drawing.Color.White;
+            this.ClientSize = new System.Drawing.Size(1239, 729);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.grpLog);
@@ -686,20 +534,10 @@ namespace ChamberPressureGauge
             this.grpLog.ResumeLayout(false);
             this.grpLog.PerformLayout();
             this.groupBox1.ResumeLayout(false);
-            this.groupBox3.ResumeLayout(false);
-            this.grpCP6.ResumeLayout(false);
-            this.grpCP6.PerformLayout();
-            this.grpCP3.ResumeLayout(false);
-            this.grpCP3.PerformLayout();
-            this.grpCP5.ResumeLayout(false);
-            this.grpCP5.PerformLayout();
-            this.grpCP4.ResumeLayout(false);
-            this.grpCP4.PerformLayout();
-            this.grpCP2.ResumeLayout(false);
-            this.grpCP2.PerformLayout();
-            this.grpCP1.ResumeLayout(false);
-            this.grpCP1.PerformLayout();
-            this.groupBox2.ResumeLayout(false);
+            this.tcChannel.ResumeLayout(false);
+            this.tpPressure.ResumeLayout(false);
+            this.tpPressure.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.timChannelUpdate)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -740,28 +578,18 @@ namespace ChamberPressureGauge
         private System.Windows.Forms.ToolStripStatusLabel lblNone;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox groupBox2;
-        private System.Windows.Forms.GroupBox groupBox4;
-        private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.GroupBox grpCP6;
-        private ChnLED[] ChannelData = new ChnLED[6];
-        private System.Windows.Forms.GroupBox grpCP3;
-        //private ChnLED txtPress3;
-        private System.Windows.Forms.GroupBox grpCP5;
-        //private ChnLED txtPress5;
-        private System.Windows.Forms.GroupBox grpCP4;
-        //private ChnLED txtPress6;
-        private System.Windows.Forms.GroupBox grpCP2;
-        //private ChnLED txtPress2;
-        private System.Windows.Forms.GroupBox grpCP1;
-        //private ChnLED txtPress1;
-        private System.Windows.Forms.ListBox lstData;
-        private System.Windows.Forms.ComboBox[] cbPressureRange = new System.Windows.Forms.ComboBox[6];
         private System.Timers.Timer timChannelUpdate;
-        //private System.Windows.Forms.ComboBox cbPress6;
-        //private System.Windows.Forms.ComboBox cbPress3;
-        //private System.Windows.Forms.ComboBox cbPress5;
-        //private System.Windows.Forms.ComboBox cbPress4;
-        //private System.Windows.Forms.ComboBox cbPress2;
+        private System.Windows.Forms.TabControl tcChannel;
+        private System.Windows.Forms.TabPage tpPressure;
+        private System.Windows.Forms.TabPage tpDigital;
+        private System.Windows.Forms.ComboBox cbTriggerChannel;
+        private System.Windows.Forms.Label lblTriggerChannel;
+        private System.Windows.Forms.ComboBox cbTriggerMode;
+        private System.Windows.Forms.Label lblTriggerMode;
+        private System.Windows.Forms.Button btnRefreshTriggerChannel;
+        private System.Windows.Forms.Label lblSecond;
+        private System.Windows.Forms.TextBox txtMeasuringTime;
+        private System.Windows.Forms.Label lblMeasuringTime;
     }
 }
 

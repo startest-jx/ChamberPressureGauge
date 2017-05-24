@@ -1,5 +1,6 @@
 ﻿using ChamberPressureGauge.UI;
 using ChamberPressureGauge.Modules;
+using ChamberPressureGauge.Controls;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -16,16 +17,37 @@ namespace ChamberPressureGauge
     public partial class MainWindow : Form
     {
         // 全局变量
+        private delegate void _Log(string LogInfo);
+        private delegate void _ChangeStatus(ConnectStatus Status);
+        private delegate void _RefreshTriggerChannel();
+
         Slaver _Slaver;  // 下位机
-        Thread _Connect, _ChannelCheck;  // 连接线程，通道检测线程
+        Thread _Connect;  // 连接线程，通道检测线程
         bool ChannelUpdating = false;  // 通道检测Timer是否被占用
 
         public void Log(string LogInfo)  // 日志输出
         {
-            txtLog.AppendText(LogInfo + Environment.NewLine);
+            if (InvokeRequired)
+            {
+                _Log me = new _Log(Log);
+                object[] arg = new object[] { LogInfo };
+                Invoke(me, arg);
+            }
+            else
+            {
+                txtLog.AppendText(LogInfo + Environment.NewLine);
+            }
+                
         }
         public void ChangeStatus(ConnectStatus Status)
         {
+            if (InvokeRequired)
+            {
+                _ChangeStatus me = new _ChangeStatus(ChangeStatus);
+                object[] arg = new object[] { Status };
+                Invoke(me, arg);
+                return;
+            }
             switch (Status)
             {
                 case ConnectStatus.Disconnected:
@@ -44,9 +66,9 @@ namespace ChamberPressureGauge
 
                     lblStatus.Text = "断开";
 
-                    foreach (ChnLED Item in ChannelData)
+                    foreach (var Item in _Slaver.Channels)
                     {
-                        Item.Silenced();
+                        Item.DeviceExist = false;
                     }
                     break;
                 case ConnectStatus.Connecting:
@@ -128,22 +150,6 @@ namespace ChamberPressureGauge
                 Log("时钟状态正常.");
             else
                 Log("时钟状态异常.");
-
-            //string ClockStatusString = CheckCmd();
-            //switch (ClockStatusString)
-            //{
-            //    case "CLKSUCCEED":
-            //        Log("时钟状态正常.");
-            //        break;
-            //    case "CLKFAILED":
-            //        Log("时钟状态异常.");
-            //        break;
-            //    default:
-            //        Log("未接收到下位机回复.");
-            //        ChangeStatus(0);
-            //        StopThread();
-            //        return;
-            //}
             Log("发送自检命令.");
             _Slaver.SelfTest();
             Thread.Sleep(1000);
@@ -166,12 +172,10 @@ namespace ChamberPressureGauge
             // 通道检测
             Log("打开通道检测线程.");
             timChannelUpdate.Start();
-            //_ChannelCheck = new Thread(new ThreadStart(ChannelCheck));
-            //_ChannelCheck.Start();
 
-            //Log("通知数位板发送数据.");
-            //_DgtlPanel.StartPicking();;
             _Slaver.Status = ConnectStatus.Connected;
+            Thread.Sleep(2000);
+            RefreshTriggerChannel();
         }
         public bool ConnectCtrl()
         {
@@ -215,52 +219,33 @@ namespace ChamberPressureGauge
                 {
                     return;
                 }
-                for (int i = 0; i < _Slaver.Channels.Length; i ++)
-                {
-                    if (i < 6)
-                    {
-                        int Range = int.Parse(System.Text.RegularExpressions.Regex.Replace(cbPressureRange[i].SelectedItem.ToString(), @"[^0-9]+", ""));
-                        _Slaver.Channels[i].Range = Range;
-                    }
-                }
                 _Slaver.UpdateChannelData();
-                for (int i = 0; i < ChannelData.Length; i ++)
-                {
-                    if (_Slaver.Channels[i].Health)
-                    {
-                        ChannelData[i].MarkHealth();
-                    }
-                    else
-                    {
-                        ChannelData[i].MarkIll();
-                    }
-                    if (_Slaver.Channels[i].DeviceExist)
-                    {
-                        ChannelData[i].Activate();
-                        ChannelData[i].Text = string.Format("{0:000.000}", _Slaver.Channels[i].CurrentData);
-                    }
-                    else
-                    {
-                        ChannelData[i].Silenced();
-                    }
-                }
+
             }
         }
         public MainWindow()
         {
             InitializeComponent();
-            CheckForIllegalCrossThreadCalls = false;
+            //CheckForIllegalCrossThreadCalls = false;
         }
         private void WinLoad(object sender, EventArgs e)
         {
             Log("程序初始化...");
-            _Slaver = new Slaver(ChangeStatus);
-            _Slaver.Status = ConnectStatus.Disconnected;
-            timClock.Start();
-            foreach (ComboBox Item in cbPressureRange)
+            _Slaver = new Slaver(ChangeStatus);  // 主对象
+            // 控件放置
+            for (int i = 0; i < 6; i ++)
             {
-                Item.SelectedItem = "10 MPa";
+                tpPressure.Controls.Add(_Slaver.Channels[i].Control);
+                _Slaver.Channels[i].Control.Location = 
+                    new Point(i % 2 == 0 ? 10 : _Slaver.Channels[i].Control.Width + 20,
+                    10 + i / 2 * (_Slaver.Channels[i].Control.Height + 10));
+                //_Slaver.Channels[i].Control.Size = new Size(220, 100);
+                _Slaver.Channels[i].Control.TabIndex = i;
+                _Slaver.Channels[i].Control.TabStop = false;
             }
+            _Slaver.Status = ConnectStatus.Disconnected;
+            cbTriggerMode.SelectedIndex = 0;
+            timClock.Start();
             Log("初始化完成.");
         }
         private void WinClosing(object sender, FormClosingEventArgs e)
@@ -316,7 +301,75 @@ namespace ChamberPressureGauge
         }
         private void Start(object sender, EventArgs e)
         {
+            _Slaver.Start(); /////////
+        }
 
+        private void cbTriggerMode_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            _Slaver.TriggerMode = (TriggerMode)cbTriggerMode.SelectedIndex;
+            if (cbTriggerMode.SelectedIndex == 0)
+            {
+                AutoTrigger(true);
+            }
+            else
+            {
+                AutoTrigger(false);
+            }
+        }
+        private void cbTriggerChannel_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cbTriggerChannel.SelectedIndex == -1)
+            {
+                return;
+            }
+            _Slaver.SetTriggerChannel(int.Parse(System.Text.RegularExpressions.Regex.Replace(cbTriggerChannel.SelectedItem.ToString(), @"[^0-9]+", "")));
+        }
+
+        private void AutoTrigger(bool IsOrNot)
+        {
+            lblTriggerChannel.Visible = IsOrNot;
+            cbTriggerChannel.Visible = IsOrNot;
+            btnRefreshTriggerChannel.Visible = IsOrNot;
+            RefreshTriggerChannel();
+        }
+        private void RefreshTriggerChannel()
+        {
+            if (InvokeRequired)
+            {
+                _RefreshTriggerChannel me = new _RefreshTriggerChannel(RefreshTriggerChannel);
+                Invoke(me);
+                return;
+            }
+            cbTriggerChannel.Items.Clear();
+            for (int i = 0; i < 6; i++)
+            {
+                if (_Slaver.Channels[i].DeviceExist)
+                {
+                    cbTriggerChannel.Items.Add(_Slaver.Channels[i].Name);
+                }
+            }
+            if (cbTriggerChannel.SelectedIndex == -1 && cbTriggerChannel.Items.Count != 0)
+            {
+                cbTriggerChannel.SelectedIndex = 0;
+            }
+        }
+
+        private void btnRefreshTriggerChannel_Click(object sender, EventArgs e)
+        {
+            RefreshTriggerChannel();
+        }
+
+        private void txtMeasuringTime_LostFocus(object sender, EventArgs e)
+        {
+            try
+            {
+                _Slaver.MeasuringTime = double.Parse(txtMeasuringTime.Text);
+            }
+            catch
+            {
+
+            }
+            txtMeasuringTime.Text = string.Format("{0:000.0000}", _Slaver.MeasuringTime);
         }
     }
 }
