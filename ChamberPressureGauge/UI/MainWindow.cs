@@ -263,12 +263,12 @@ namespace ChamberPressureGauge
             ChartArea.CursorX.IsUserSelectionEnabled = true;
             ChartArea.CursorY.IsUserEnabled = true;
             ChartArea.CursorY.IsUserSelectionEnabled = true;
-            ChartArea.AxisX.Title = "时间/s";
+            ChartArea.AxisX.Title = "时间 / s";
             ChartArea.AxisX.IsLabelAutoFit = true;
             ChartArea.AxisX.LabelStyle.Angle = 90;
             ChartArea.AxisX.Minimum = 0;
             ChartArea.AxisX.Interval = 1;
-            ChartArea.AxisY.Title = "压力/MPa";
+            ChartArea.AxisY.Title = "压力 / MPa";
             ChartArea.AxisY.IsLabelAutoFit = true;
             var Legend = new Legend();
             DataChart.Legends.Add(Legend);
