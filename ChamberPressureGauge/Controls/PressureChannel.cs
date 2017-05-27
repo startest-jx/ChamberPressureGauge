@@ -6,6 +6,7 @@ using System.Data;
 using System.Text;
 using System.Windows.Forms;
 using System.Threading;
+using ChamberPressureGauge.Modules;
 
 namespace ChamberPressureGauge.Controls
 {
@@ -35,8 +36,6 @@ namespace ChamberPressureGauge.Controls
                 return temp;
             }
         }
-        private bool IsIncreaseDown = false;
-        private bool IsDecreaseDown = false;
 
 
         public PressureChannel(string Name)
@@ -66,7 +65,7 @@ namespace ChamberPressureGauge.Controls
         {
             txtChannelData.MarkIll();
         }
-        public override void RefreshData()  // 刷新数据
+        public override void RefreshData(int CurrentData)  // 刷新数据
         {
             // 更新Range
             RangeLock.WaitOne();
@@ -84,12 +83,13 @@ namespace ChamberPressureGauge.Controls
 
             }
             Calibration = temp;
-            
 
-            RangeLock.WaitOne();
-            temp = _Range;
-            RangeLock.ReleaseMutex();
-            double Data = (Convert.ToDouble(OriginData) * Math.Pow(2, -20) * 25 - 0.25) * temp + Calibration;
+
+            //RangeLock.WaitOne();
+            //temp = _Range;
+            //RangeLock.ReleaseMutex();
+            //double Data = (Convert.ToDouble(OriginData) * Math.Pow(2, -20) * 25 - 0.25) * temp + Calibration;
+            double Data = Channel.PressureFormula(CurrentData, Range, Calibration);
             txtChannelData.Text = string.Format("{0:000.0000}", Data);
         }
         private void cbRange_SelectedIndexChanged(object sender, EventArgs e)
@@ -104,47 +104,16 @@ namespace ChamberPressureGauge.Controls
             txtCalibration.Text = string.Format("{0:000.0000}", Calibration);
         }
 
-        private void Increase()
+        private void Increase(object sender, EventArgs e)
         {
             Calibration += 0.0001;
             txtCalibration.Text = string.Format("{0:000.0000}", Calibration);
         }
 
-        private void Decrease()
+        private void Decrease(object sender, EventArgs e)
         {
             Calibration -= 0.0001;
             txtCalibration.Text = string.Format("{0:000.0000}", Calibration);
-        }
-
-        private void Increasing(object sender, MouseEventArgs e)
-        {
-            IsIncreaseDown = true;
-        }
-
-        private void StopIncreasing(object sender, MouseEventArgs e)
-        {
-            IsIncreaseDown = false;
-        }
-        private void Decreasing(object sender, MouseEventArgs e)
-        {
-            IsDecreaseDown = true;
-        }
-
-        private void StopDecreasing(object sender, MouseEventArgs e)
-        {
-            IsDecreaseDown = false;
-        }
- 
-        private void timCalCtrl_Tick(object sender, EventArgs e)
-        {
-            if (IsIncreaseDown)
-            {
-                Increase();
-            }
-            if (IsDecreaseDown)
-            {
-                Decrease();
-            }
         }
     }
 }

@@ -17,7 +17,7 @@ namespace ChamberPressureGauge.Controls
         public void Activate()
         {
             Enabled = true;
-            //Text = "- DEVICE FOUND -";
+            Text = "- DEVICE FOUND -";
         }
         public void Silenced()
         {

@@ -30,12 +30,22 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Images\monitor.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <NoWin32Manifest>true</NoWin32Manifest>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>ChamberPressureGauge.Program</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Forms.DataVisualization, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -54,6 +64,7 @@
     <Compile Include="Controls\VarChannel.Designer.cs">
       <DependentUpon>VarChannel.cs</DependentUpon>
     </Compile>
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Modules\Channel.cs" />
     <Compile Include="Modules\Slaver.cs" />
     <Compile Include="Modules\Comm.cs" />
@@ -132,6 +143,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Images\Refresh.ico" />
+    <Content Include="Images\monitor.ico" />
+    <None Include="Images\monitor.png" />
     <Content Include="Images\toobar_loading.gif" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -9,12 +9,12 @@ using System.Threading;
 
 namespace ChamberPressureGauge.Controls
 {
-    public abstract partial class VarChannel : UserControl
+    public partial class VarChannel : UserControl
     {
         private Mutex DataLock = new Mutex(), 
             CalLock = new Mutex();
-        private ushort _OriginData;
-        public ushort OriginData {
+        private int _OriginData;
+        public int OriginData {
             set
             {
                 DataLock.WaitOne();
@@ -54,10 +54,25 @@ namespace ChamberPressureGauge.Controls
         {
             InitializeComponent();
         }
-        public abstract void RefreshData();
-        public abstract void Activate();
-        public abstract void Silenced();
-        public abstract void MarkHealth();
-        public abstract void MarkIll();
+        public virtual void RefreshData(int CurrentData)
+        {
+
+        }
+        public virtual void Activate()
+        {
+
+        }
+        public virtual void Silenced()
+        {
+
+        }
+        public virtual void MarkHealth()
+        {
+
+        }
+        public virtual void MarkIll()
+        {
+
+        }
     }
 }
