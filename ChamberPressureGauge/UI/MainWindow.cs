@@ -1,6 +1,6 @@
-﻿using ChamberPressureGauge.UI;
-using ChamberPressureGauge.Modules;
+﻿using ChamberPressureGauge.Modules;
 using ChamberPressureGauge.Controls;
+using ChamberPressureGauge.UI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,7 +11,16 @@ using System.Windows.Forms;
 using System.Threading;
 using System.Windows;
 using ChamberPressureGauge.Properties;
-using System.Windows.Forms.DataVisualization.Charting;
+//using System.Windows.Media;
+using LiveCharts.Geared;
+using LiveCharts.Wpf;
+using Brushes = System.Windows.Media.Brushes;
+//using LiveCharts;
+//using LiveCharts.Defaults;
+//using LiveCharts.Wpf;
+//using LiveCharts; //Core of the library
+//using LiveCharts.Wpf; //The WPF controls
+//using LiveCharts.WinForms; //the WinForm wrappers
 
 namespace ChamberPressureGauge
 {
@@ -33,13 +42,16 @@ namespace ChamberPressureGauge
         // 全局变量
         private delegate void _Log(string LogInfo);
         private delegate void _ChangeStatus(ConnectStatus Status);
-        private delegate void _RefreshTriggerChannel();
+        private delegate void NonParaFun();
         private delegate void _DrawLines(Channel[] Channels);
+        private delegate void _StartCountDown(double value);
         
         Slaver _Slaver;  // 下位机
-        Thread _Connect, _Measure;  // 连接线程，测量线程
         bool ChannelUpdating = false;  // 通道检测Timer是否被占用
-        private Chart DataChart;
+        //private Chart DataChart;
+        //private double CountDownValue;  // 倒计时
+        //private Thread tCountDown;
+        private CountDown CountDown;
 
         public void Log(string LogInfo)  // 日志输出
         {
@@ -51,7 +63,7 @@ namespace ChamberPressureGauge
             }
             else
             {
-                txtLog.AppendText(LogInfo + Environment.NewLine);
+                txtLog.AppendText(string.Format("{0} {1}", DateTime.Now.ToString(), LogInfo) + Environment.NewLine);
             }
                 
         }
@@ -85,7 +97,7 @@ namespace ChamberPressureGauge
 
                     tcChannel.Show();
                     picLoading.Hide();
-
+ 
                     foreach (var Item in _Slaver.Channels)
                     {
                         Item.DeviceExist = false;
@@ -93,8 +105,9 @@ namespace ChamberPressureGauge
                     break;
                 case ConnectStatus.Connecting:
                     Log("开始连接...");
-                    tbConnet.Enabled = false;
-                    tbConnet.ToolTipText = "正在连接...";
+                    tbConnet.Enabled = true;
+                    tbConnet.ToolTipText = "取消";
+                    tbConnet.Image = Resources.toolbar_cancel;
 
                     tbStart.Enabled = false;
                     tbStart.ToolTipText = "开始测量(需要先连接)";
@@ -155,51 +168,103 @@ namespace ChamberPressureGauge
                     break;
             }
         }
-        public void ConnectControl()
+        public void ConnectControl(ref DoWorkEventArgs e)
         {
+            if (bwConnect.CancellationPending)
+            {
+                e.Cancel = true;
+                return;
+            }
             // 连接
             if(!_Slaver.Connect())
             {
+                bwConnect.CancelAsync();
+                //_Slaver.Close();
+                //return;
+            }
+            if (bwConnect.CancellationPending)
+            {
+                e.Cancel = true;
                 return;
             }
-            //Log("正在连接主控板...");
-            //if (!ConnectCtrl())
-            //{
-            //    _Slaver.Status = ConnectStatus.Disconnected;
-            //    // 断开原有连接
-            //    _Slaver.Close();
-            //    return;
-            //}
-            //Thread.Sleep(500);
-            //Log("正在连接数位板...");
-            //if (!ConnectDgtl())
-            //{
-            //    _Slaver.Status = ConnectStatus.Disconnected;
-            //    // 断开原有连接
-            //    _Slaver.Close();
-            //    return;
-            //}
             // 复位
             _Slaver.Reset();
+            if (bwConnect.CancellationPending)
+            {
+                e.Cancel = true;
+                return;
+            }
             // 自检
             _Slaver.CheckClockStatus();
+            if (bwConnect.CancellationPending)
+            {
+                e.Cancel = true;
+                return;
+            }
             _Slaver.SelfTest();
+            if (bwConnect.CancellationPending)
+            {
+                e.Cancel = true;
+                return;
+            }
             Thread.Sleep(1000);
+            if (bwConnect.CancellationPending)
+            {
+                e.Cancel = true;
+                return;
+            }
             // 开始接收
             _Slaver.StartReceiving();
+            if (bwConnect.CancellationPending)
+            {
+                e.Cancel = true;
+                return;
+            }
             Thread.Sleep(1000);
+            if (bwConnect.CancellationPending)
+            {
+                e.Cancel = true;
+                return;
+            }
             // 检查通道是否正常
             _Slaver.UpdateChannelHealth();
+            if (bwConnect.CancellationPending)
+            {
+                e.Cancel = true;
+                return;
+            }
             _Slaver.SelfTest(true);
+            if (bwConnect.CancellationPending)
+            {
+                e.Cancel = true;
+                return;
+            }
             _Slaver.Reset();
-
+            if (bwConnect.CancellationPending)
+            {
+                e.Cancel = true;
+                return;
+            }
+            _Slaver.UpdateChannelExist();
+            if (bwConnect.CancellationPending)
+            {
+                e.Cancel = true;
+                return;
+            }
             // 通道检测
             Log("打开通道检测线程.");
             timChannelUpdate.Start();
-
-            _Slaver.Status = ConnectStatus.Connected;
-            Thread.Sleep(2000);
-            RefreshTriggerChannel();
+            if (bwConnect.CancellationPending)
+            {
+                e.Cancel = true;
+                return;
+            }
+            //Thread.Sleep(2000);
+            //if (bwConnect.CancellationPending)
+            //{
+            //    e.Cancel = true;
+            //    return;
+            //}
         }
         //public bool ConnectCtrl()
         //{
@@ -253,47 +318,77 @@ namespace ChamberPressureGauge
         }
         private void ChartInit()
         {
-            if (gbChart.Controls.IndexOf(DataChart) != -1)
-                gbChart.Controls.Remove(DataChart);
-            DataChart = new Chart();
-            DataChart.Dock = DockStyle.Fill;
-            var ChartArea = new ChartArea();
-            DataChart.ChartAreas.Add(ChartArea);
-            ChartArea.CursorX.IsUserEnabled = true;
-            ChartArea.CursorX.IsUserSelectionEnabled = true;
-            ChartArea.CursorY.IsUserEnabled = true;
-            ChartArea.CursorY.IsUserSelectionEnabled = true;
-            ChartArea.AxisX.Title = "时间 / s";
-            ChartArea.AxisX.IsLabelAutoFit = true;
-            ChartArea.AxisX.LabelStyle.Angle = 90;
-            ChartArea.AxisX.Minimum = 0;
-            ChartArea.AxisX.Interval = 1;
-            ChartArea.AxisY.Title = "压力 / MPa";
-            ChartArea.AxisY.IsLabelAutoFit = true;
-            var Legend = new Legend();
-            DataChart.Legends.Add(Legend);
-            Legend.Alignment = StringAlignment.Center;
-            DataChart.GetToolTipText += new EventHandler<ToolTipEventArgs>(ShowPointTooltip);
+            lvChart.Series = new LiveCharts.SeriesCollection();
+            lvChart.LegendLocation = LiveCharts.LegendLocation.Top;
+            lvChart.AxisX.Add(new Axis()
+            {
+                Title = "时间/s",
+                MinValue = 0,
+                Separator = new Separator
+                {
+                    Step = 0.5,
+                    IsEnabled = false,
+                }
+            });
+            lvChart.AxisY.Add(new Axis()
+            {
+                Title = "压力/MPa",
+                LabelFormatter = value => string.Format("{0:F5}", value)
+            });
+        }
 
-            gbChart.Controls.Add(DataChart);
-
+        private void CountDownInit()
+        {
+            CountDown = new CountDown();
+            gbTotalChannel.Controls.Add(CountDown);
+            CountDown.Location = new System.Drawing.Point((gbTotalChannel.Width - CountDown.Width) / 2, (gbTotalChannel.Height - CountDown.Height) / 2);
+            CountDown.AfterDone = CountDownAfterDone;
+            CountDown.AfterCancel = CountDownAfterDone;
+            CountDown.BeforeStart = CountDownBeforeStart;
+            CountDown.Hide();
+        }
+        private void CountDownAfterDone()
+        {
+            if (InvokeRequired)
+            {
+                NonParaFun me = new NonParaFun(CountDownAfterDone);
+                Invoke(me);
+                return;
+            }
+            picLoading.Show();
+            CountDown.Hide();
+        }
+        private void CountDownBeforeStart()
+        {
+            if (InvokeRequired)
+            {
+                NonParaFun me = new NonParaFun(CountDownBeforeStart);
+                Invoke(me);
+                return;
+            }
+            picLoading.Hide();
+            CountDown.Show();
         }
         private void WinLoad(object sender, EventArgs e)
         {
             Log("程序初始化...");
-            _Slaver = new Slaver(Log, ChangeStatus, DrawLines);  // 主对象
+            CountDownInit();
+            _Slaver = new Slaver(Log, ChangeStatus, DrawLines, CountDown.Start);  // 主对象
             // 控件放置
             for (int i = 0; i < 6; i ++)
             {
                 tpPressure.Controls.Add(_Slaver.Channels[i].Control);
                 _Slaver.Channels[i].Control.Location = 
-                    new Point(i % 2 == 0 ? 10 : _Slaver.Channels[i].Control.Width + 20,
+                    new System.Drawing.Point(i % 2 == 0 ? 10 : _Slaver.Channels[i].Control.Width + 20,
                     10 + i / 2 * (_Slaver.Channels[i].Control.Height + 10));
                 //_Slaver.Channels[i].Control.Size = new Size(220, 100);
                 _Slaver.Channels[i].Control.TabIndex = i;
                 _Slaver.Channels[i].Control.TabStop = false;
             }
+
             ChartInit();
+
+
             _Slaver.Status = ConnectStatus.Disconnected;
             cbTriggerMode.SelectedIndex = 0;
             timClock.Start();
@@ -325,8 +420,7 @@ namespace ChamberPressureGauge
         }
         private void EventConfig(object sender, EventArgs e)
         {
-            ConfigWindow _ConfigWindow = new ConfigWindow();
-            _ConfigWindow.ShowDialog();
+
         }
         private void timClock_Tick(object sender, EventArgs e)
         {
@@ -341,26 +435,37 @@ namespace ChamberPressureGauge
         {
             if (_Slaver.Status == ConnectStatus.Disconnected)
             {
-                _Slaver.Status = ConnectStatus.Connecting;
-                _Connect = new Thread(new ThreadStart(ConnectControl));
-                _Connect.Start();
+                
+                //_Connect = new Thread(new ThreadStart(ConnectControl));
+                //_Connect.Start();
+                bwConnect.RunWorkerAsync();
             }
-            else
+            else if (_Slaver.Status == ConnectStatus.Connected)
             {
                 timChannelUpdate.Stop();
-                _Connect.Abort();
+                if (bwConnect.IsBusy)
+                {
+                    Log("正在取消...");
+                    bwConnect.CancelAsync();
+                }
+                //_Connect.Abort();
                 _Slaver.Status = ConnectStatus.Disconnected;
                 // 关闭连接
                 _Slaver.Close();
             }
+            else if (_Slaver.Status == ConnectStatus.Connecting)
+            {
+                Log("正在取消...");
+                bwConnect.CancelAsync();
+            }
         }
-        private void Measure()
+        private void Measure(ref BackgroundWorker sender, ref DoWorkEventArgs e)
         {
             _Slaver.Status = ConnectStatus.Measuring;
             Log("关闭通道检测线程.");
             timChannelUpdate.Stop();
             Log("正在准备测量...");
-            _Slaver.StartMeasuring();
+            _Slaver.StartMeasuring(ref sender, ref e);
             //Log("10秒后重新打开通道检测线程.");
             //Thread.Sleep(10000);
             Log("打开通道检测线程.");
@@ -371,22 +476,28 @@ namespace ChamberPressureGauge
         {
             if (_Slaver.Status == ConnectStatus.Connected)
             {
-                _Slaver.Status = ConnectStatus.Measuring;
-                txtMeasuringTime_LostFocus(null, null);
-                _Measure = new Thread(new ThreadStart(Measure));
+                //txtMeasuringTime_LostFocus(null, null);
+                _Slaver.MeasuringTime = int.Parse(txtMeasuringTime.Text.Replace(" ", ""));
                 Log("打开测量线程.");
-                _Measure.Start();
+                bwMeasure.RunWorkerAsync();
+                //_Measure = new Thread(new ThreadStart(Measure));
+                //_Measure.Start();
             }
             else if (_Slaver.Status == ConnectStatus.Measuring)
             {
-                _Slaver.Status = ConnectStatus.Connected;
-                _Slaver.StopMeasuring();
-                Log("测量已取消...");
+                //_Slaver.Status = ConnectStatus.Connected;
+                Log("正在取消...");
+                CountDown.Cancel();
+                bwMeasure.CancelAsync();
+                //tCountDown.Abort();
+                //_Slaver.StopMeasuring();
+                //Log("测量已取消...");
             }
         }
 
         public void DrawLines(Channel[] Channels)  // 根据channels绘制曲线
         {
+            
             if (InvokeRequired)
             {
                 _DrawLines me = new _DrawLines(DrawLines);
@@ -394,27 +505,34 @@ namespace ChamberPressureGauge
                 Invoke(me, arg);
                 return;
             }
-            int PointCount;
-            try
-            {
-                PointCount = int.Parse(System.Text.RegularExpressions.Regex.Replace(txtPointCount.Text, @"[^0-9]+", ""));
-            }
-            catch
-            {
-                PointCount = 0;
-            }
+            
+
+            int PointCount = int.Parse(txtPointCount.Text.Replace(" ", ""));
             for (int i = 0; i < Channels.Length; i++)
             {
                 if (!Channels[i].DeviceExist)
                 {
                     continue;
                 }
-                var Series = new Series();
-                Series.ChartType = SeriesChartType.Spline;
-                Series.BorderWidth = 2;
-                Series.Color = Colors[i];
-                //Series.ToolTip = "压力: #VAL MPa" + Environment.NewLine + "时间: #VALX s";
-                Series.LegendText = Channels[i].Name;
+                // LiveChart
+                
+                //var Values = new LiveCharts.ChartValues<LiveCharts.Defaults.ObservablePoint>();
+                var Values = new GearedValues<LiveCharts.Defaults.ObservablePoint>();
+                Values.Quality = Quality.Low;
+                var LineSeries = new GLineSeries()
+                {
+                    Fill = Brushes.Transparent,
+                    //StrokeThickness = 0.5,
+                    Values = Values,
+                    PointGeometry = null,
+                    LineSmoothness = 1,
+                    Title = Channels[i].Name,
+                };
+                //var Series = new Series();
+                //Series.ChartType = SeriesChartType.Spline;
+                //Series.BorderWidth = 2;
+                //Series.Color = Colors[i];
+                //Series.LegendText = Channels[i].Name;
                 int x = 0;
                 int AvgX;
                 if (PointCount == 0)
@@ -429,36 +547,76 @@ namespace ChamberPressureGauge
                 {
                     if (x % AvgX == 0)
                     {
-                        double SecX = (double)(x - AvgX / 2) / 2000;
+                        double SecX = (double)(x - AvgX / 2) / (2000 * 3);
                         double AvgY = y;
-                        Series.Points.AddXY(SecX, AvgY);
+                        //Series.Points.AddXY(SecX, AvgY);
+                        Values.Add(new LiveCharts.Defaults.ObservablePoint(SecX, AvgY));
                     }
                     x += 1;
                 }
-                DataChart.Series.Add(Series);
+                //DataChart.Series.Add(Series);
+
+                lvChart.Series.Add(LineSeries);
             }
 
             //ChartArea.AxisX.ScrollBar = new AxisScrollBar();
             //ChartArea.AxisY.ScrollBar = new AxisScrollBar();
         }
 
-        private void ShowPointTooltip(object sender, ToolTipEventArgs e)
-        {
-            if (e.HitTestResult.ChartElementType == ChartElementType.DataPoint)
-            {
-                Cursor = Cursors.Cross;
-                int i = e.HitTestResult.PointIndex;
-                DataPoint dp = e.HitTestResult.Series.Points[i];
-                txtX.Text = string.Format("{0:F3} s", dp.XValue);
-                txtY.Text = string.Format("{0:F4} MPa", dp.YValues[0]);
-                e.Text = string.Format("压力: {1}" + Environment.NewLine + "时间: {0}", txtX.Text, txtY.Text);
+        //private void StartCountDown(double value)
+        //{
+        //    CountDownValue = value;
 
-            }
-            else
-            {
-                Cursor = Cursors.Default;
-            }
-        }
+        //    tCountDown = new Thread(new ThreadStart(CountDown));
+        //    tCountDown.Start();
+        //}
+
+        //private void CountDown()
+        //{
+        //    //if (InvokeRequired)
+        //    //{
+        //    //    _NonParaFun me = new _NonParaFun(CountDown);
+        //    //    Invoke(me);
+        //    //    return;
+        //    //}
+        //    picLoading.Hide();
+        //    lblCountDown.Show();
+        //    while (CountDownValue >= 0)
+        //    {
+        //        try
+        //        {
+        //            lblCountDown.Text = string.Format("{0:F2}s", CountDownValue);
+        //            CountDownValue -= 0.01;
+        //            Thread.Sleep(10);
+        //        }
+        //        catch (ThreadAbortException)
+        //        {
+        //            lblCountDown.Hide();
+        //            picLoading.Show();
+        //            return;
+        //        }
+        //    }
+        //    lblCountDown.Hide();
+        //    picLoading.Show();
+        //}
+
+        //private void ShowPointTooltip(object sender, ToolTipEventArgs e)
+        //{
+        //    if (e.HitTestResult.ChartElementType == ChartElementType.DataPoint)
+        //    {
+        //        Cursor = Cursors.Cross;
+        //        int i = e.HitTestResult.PointIndex;
+        //        DataPoint dp = e.HitTestResult.Series.Points[i];
+        //        txtX.Text = string.Format("{0:F3} s", dp.XValue);
+        //        txtY.Text = string.Format("{0:F4} MPa", dp.YValues[0]);
+        //        e.Text = string.Format("压力: {1}" + Environment.NewLine + "时间: {0}", txtX.Text, txtY.Text);
+
+        //    }
+        //    else
+        //    {
+        //        Cursor = Cursors.Default;
+        //    }
+        //}
 
         private void cbTriggerMode_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -493,7 +651,7 @@ namespace ChamberPressureGauge
         {
             if (InvokeRequired)
             {
-                _RefreshTriggerChannel me = new _RefreshTriggerChannel(RefreshTriggerChannel);
+                NonParaFun me = new NonParaFun(RefreshTriggerChannel);
                 Invoke(me);
                 return;
             }
@@ -516,17 +674,77 @@ namespace ChamberPressureGauge
             RefreshTriggerChannel();
         }
 
-        private void txtMeasuringTime_LostFocus(object sender, EventArgs e)
+        private void bwConnect_DoWork(object sender, DoWorkEventArgs e)
         {
-            try
-            {
-                _Slaver.MeasuringTime = int.Parse(txtMeasuringTime.Text);
-            }
-            catch
-            {
-
-            }
-            txtMeasuringTime.Text = string.Format("{0}", _Slaver.MeasuringTime);
+            _Slaver.Status = ConnectStatus.Connecting;
+            ConnectControl(ref e);
         }
+
+        private void bwConnect_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+
+        }
+
+        private void bwConnect_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Cancelled)
+            {
+                Log("连接失败.");
+                _Slaver.Status = ConnectStatus.Disconnected;
+                timChannelUpdate.Close();
+                _Slaver.Close();
+            }
+            else
+            {
+                Log("已连接.");
+                _Slaver.Status = ConnectStatus.Connected;
+                RefreshTriggerChannel();
+            }
+        }
+
+        private void bwMeasure_DoWork(object sender, DoWorkEventArgs e)
+        {
+            _Slaver.Status = ConnectStatus.Measuring;
+            Measure(ref bwMeasure, ref e);
+        }
+
+        private void bwMeasure_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Cancelled)
+            {
+                Log("测量失败.");
+            }
+            else
+            {
+                Log("测量完成.");
+            }
+            _Slaver.Status = ConnectStatus.Connected;
+        }
+
+        private void ShowConfigWindow(object sender, EventArgs e)
+        {
+            ConfigWindow ConfigWindow = new ConfigWindow();
+            ConfigWindow.ShowDialog();
+        }
+
+        private void lvChart_DataHover(object sender, LiveCharts.ChartPoint chartPoint)
+        {
+            txtX.Text = string.Format("{0:F3} s", chartPoint.X);
+            txtY.Text = string.Format("{0:F4} MPa", chartPoint.Y);
+            //e.Text = string.Format("压力: {1}" + Environment.NewLine + "时间: {0}", txtX.Text, txtY.Text);
+        }
+
+        //private void txtMeasuringTime_LostFocus(object sender, EventArgs e)
+        //{
+        //    try
+        //    {
+        //        _Slaver.MeasuringTime = int.Parse(txtMeasuringTime.Text);
+        //    }
+        //    catch
+        //    {
+
+        //    }
+        //    txtMeasuringTime.Text = string.Format("{0}", _Slaver.MeasuringTime);
+        //}
     }
 }

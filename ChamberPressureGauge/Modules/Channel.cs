@@ -4,6 +4,7 @@ using System.Text;
 using ChamberPressureGauge.Controls;
 using System.Threading;
 using System.Drawing;
+using System.ComponentModel;
 
 namespace ChamberPressureGauge.Modules
 {
@@ -89,7 +90,7 @@ namespace ChamberPressureGauge.Modules
         public bool IsTrigger { set; get; }
         public double TriggerIncrement { set; get; }
         public int TriggerGroupCount { set; get; }
-        public bool WaitTriggerSwitch { set; get; }
+        //public bool WaitTriggerSwitch { set; get; }
         public VarChannel Control;
         public List<double> MeasuringData { set; get; }
         public Point[] PointData { set; get; }
@@ -144,7 +145,7 @@ namespace ChamberPressureGauge.Modules
         {
             Control.RefreshData(CurrentData);
         }
-        public bool WaitTriggered(DgtlPanel DgtlPanel, int TriggerIndex)
+        public bool WaitTriggered(DgtlPanel DgtlPanel, int TriggerIndex, ref BackgroundWorker sender, ref DoWorkEventArgs e)
         {
             double Increment = 0;
             int MapIndex = -1;
@@ -157,8 +158,13 @@ namespace ChamberPressureGauge.Modules
                 MapIndex = TriggerIndex - 6;
             }
             //WaitTriggerSwitch = true;
-            while (WaitTriggerSwitch && Increment < TriggerIncrement)
+            while (Increment < TriggerIncrement)
             {
+                if (sender.CancellationPending)
+                {
+                    e.Cancel = true;
+                    return false;
+                }
                 //Increment 
                 //    = GetActualValue(DgtlPanel.CurAverageData[MapIndex]) 
                 //    - GetActualValue(DgtlPanel.PreAverageData[MapIndex]);
@@ -184,15 +190,16 @@ namespace ChamberPressureGauge.Modules
 
                 Thread.Sleep(5);
             }
-            if (WaitTriggerSwitch)
-            {
-                WaitTriggerSwitch = false;
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return true;
+            //if (WaitTriggerSwitch)
+            //{
+            //    WaitTriggerSwitch = false;
+            //    return true;
+            //}
+            //else
+            //{
+            //    return false;
+            //}
         }
         public void Smooth()
         {

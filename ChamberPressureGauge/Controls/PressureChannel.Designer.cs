@@ -29,22 +29,19 @@
         private void InitializeComponent()
         {
             this.gbTitle = new System.Windows.Forms.GroupBox();
-            this.btnDecrease = new System.Windows.Forms.Button();
-            this.btnIncrease = new System.Windows.Forms.Button();
-            this.txtCalibration = new System.Windows.Forms.TextBox();
-            this.lblCalibration = new System.Windows.Forms.Label();
-            this.txtChannelData = new ChamberPressureGauge.Controls.ChannelData();
+            this.sgData = new LiveCharts.WinForms.SolidGauge();
+            this.txtCalibration = new System.Windows.Forms.NumericUpDown();
             this.cbRange = new System.Windows.Forms.ComboBox();
+            this.lblNoDevice = new System.Windows.Forms.Label();
             this.gbTitle.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.txtCalibration)).BeginInit();
             this.SuspendLayout();
             // 
             // gbTitle
             // 
-            this.gbTitle.Controls.Add(this.btnDecrease);
-            this.gbTitle.Controls.Add(this.btnIncrease);
+            this.gbTitle.Controls.Add(this.lblNoDevice);
+            this.gbTitle.Controls.Add(this.sgData);
             this.gbTitle.Controls.Add(this.txtCalibration);
-            this.gbTitle.Controls.Add(this.lblCalibration);
-            this.gbTitle.Controls.Add(this.txtChannelData);
             this.gbTitle.Controls.Add(this.cbRange);
             this.gbTitle.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.gbTitle.Location = new System.Drawing.Point(0, 0);
@@ -53,62 +50,35 @@
             this.gbTitle.TabIndex = 0;
             this.gbTitle.TabStop = false;
             // 
-            // btnDecrease
+            // sgData
             // 
-            this.btnDecrease.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.btnDecrease.Location = new System.Drawing.Point(185, 48);
-            this.btnDecrease.Name = "btnDecrease";
-            this.btnDecrease.Size = new System.Drawing.Size(40, 28);
-            this.btnDecrease.TabIndex = 5;
-            this.btnDecrease.Text = "-";
-            this.btnDecrease.UseVisualStyleBackColor = true;
-            this.btnDecrease.Click += new System.EventHandler(this.Increase);
-            // 
-            // btnIncrease
-            // 
-            this.btnIncrease.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.btnIncrease.Location = new System.Drawing.Point(145, 48);
-            this.btnIncrease.Name = "btnIncrease";
-            this.btnIncrease.Size = new System.Drawing.Size(40, 28);
-            this.btnIncrease.TabIndex = 4;
-            this.btnIncrease.Text = "+";
-            this.btnIncrease.UseVisualStyleBackColor = true;
-            this.btnIncrease.Click += new System.EventHandler(this.Decrease);
+            this.sgData.Location = new System.Drawing.Point(6, 17);
+            this.sgData.Name = "sgData";
+            this.sgData.Size = new System.Drawing.Size(118, 59);
+            this.sgData.TabIndex = 4;
             // 
             // txtCalibration
             // 
-            this.txtCalibration.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.txtCalibration.Location = new System.Drawing.Point(59, 53);
+            this.txtCalibration.Cursor = System.Windows.Forms.Cursors.Default;
+            this.txtCalibration.DecimalPlaces = 4;
+            this.txtCalibration.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            262144});
+            this.txtCalibration.Location = new System.Drawing.Point(130, 53);
+            this.txtCalibration.Minimum = new decimal(new int[] {
+            100,
+            0,
+            0,
+            -2147483648});
             this.txtCalibration.Name = "txtCalibration";
-            this.txtCalibration.Size = new System.Drawing.Size(78, 23);
+            this.txtCalibration.Size = new System.Drawing.Size(94, 23);
             this.txtCalibration.TabIndex = 3;
-            this.txtCalibration.LostFocus += new System.EventHandler(this.txtCalibration_LostFocus);
-            // 
-            // lblCalibration
-            // 
-            this.lblCalibration.AutoSize = true;
-            this.lblCalibration.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.lblCalibration.Location = new System.Drawing.Point(6, 56);
-            this.lblCalibration.Name = "lblCalibration";
-            this.lblCalibration.Size = new System.Drawing.Size(47, 17);
-            this.lblCalibration.TabIndex = 2;
-            this.lblCalibration.Text = "校准值:";
-            // 
-            // txtChannelData
-            // 
-            this.txtChannelData.Font = new System.Drawing.Font("Axure Handwriting", 8.999999F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtChannelData.Location = new System.Drawing.Point(6, 20);
-            this.txtChannelData.Name = "txtChannelData";
-            this.txtChannelData.ReadOnly = true;
-            this.txtChannelData.Size = new System.Drawing.Size(131, 22);
-            this.txtChannelData.TabIndex = 0;
-            this.txtChannelData.TabStop = false;
-            this.txtChannelData.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
             // cbRange
             // 
             this.cbRange.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbRange.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.cbRange.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.cbRange.FormattingEnabled = true;
             this.cbRange.Items.AddRange(new object[] {
@@ -117,11 +87,22 @@
             "5 MPa",
             "10 MPa",
             "40 MPa"});
-            this.cbRange.Location = new System.Drawing.Point(145, 17);
+            this.cbRange.Location = new System.Drawing.Point(130, 17);
             this.cbRange.Name = "cbRange";
-            this.cbRange.Size = new System.Drawing.Size(80, 25);
+            this.cbRange.Size = new System.Drawing.Size(95, 25);
             this.cbRange.TabIndex = 1;
             this.cbRange.SelectedIndexChanged += new System.EventHandler(this.cbRange_SelectedIndexChanged);
+            // 
+            // lblNoDevice
+            // 
+            this.lblNoDevice.AutoSize = true;
+            this.lblNoDevice.Font = new System.Drawing.Font("Cambria", 27.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblNoDevice.ForeColor = System.Drawing.Color.DodgerBlue;
+            this.lblNoDevice.Location = new System.Drawing.Point(3, 17);
+            this.lblNoDevice.Name = "lblNoDevice";
+            this.lblNoDevice.Size = new System.Drawing.Size(203, 43);
+            this.lblNoDevice.TabIndex = 5;
+            this.lblNoDevice.Text = "NO DEVICE";
             // 
             // PressureChannel
             // 
@@ -132,6 +113,7 @@
             this.Size = new System.Drawing.Size(230, 85);
             this.gbTitle.ResumeLayout(false);
             this.gbTitle.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.txtCalibration)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -139,11 +121,9 @@
         #endregion
 
         private System.Windows.Forms.GroupBox gbTitle;
-        private ChannelData txtChannelData;
         private System.Windows.Forms.ComboBox cbRange;
-        private System.Windows.Forms.Button btnIncrease;
-        private System.Windows.Forms.TextBox txtCalibration;
-        private System.Windows.Forms.Label lblCalibration;
-        private System.Windows.Forms.Button btnDecrease;
+        private System.Windows.Forms.NumericUpDown txtCalibration;
+        private LiveCharts.WinForms.SolidGauge sgData;
+        private System.Windows.Forms.Label lblNoDevice;
     }
 }

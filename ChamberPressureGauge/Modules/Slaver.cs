@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Text;
 using System.Threading;
@@ -38,20 +39,27 @@ namespace ChamberPressureGauge.Modules
             get{ return _Status; }
         }
         public TriggerMode TriggerMode { set; get; }
-        private bool StopFlag = false;
+        //private bool StopFlag = false;
         public delegate void ChangeStatusFun(ConnectStatus Status);
         public event ChangeStatusFun ChangeStatus;
         public delegate void LogFun(string LogInfo);
         public event LogFun Log;
         public delegate void DrawLinesFun(Channel[] Channels);
         public event DrawLinesFun DrawLines;
+        public delegate void StartCountDownFun(double value);
+        public event StartCountDownFun StartCountDown;
+        public delegate void NonParaFun();
+        public NonParaFun CancelCountDown;
+
+        public int TriggerInterval { set; get; }
         private Channel[] _Channels;  // 通道
         public Channel[] Channels { set { _Channels = value; } get { return _Channels; } }
-        public Slaver(LogFun Log, ChangeStatusFun ChangeStatus, DrawLinesFun DrawLines)
+        public Slaver(LogFun Log, ChangeStatusFun ChangeStatus, DrawLinesFun DrawLines, StartCountDownFun StartCountDown)
         {
             this.ChangeStatus = ChangeStatus;
             this.Log = Log;
             this.DrawLines = DrawLines;
+            this.StartCountDown = StartCountDown;
             _Channels = new Channel[12];
             for (int i = 0; i < _Channels.Length; i ++)
             {
@@ -120,15 +128,21 @@ namespace ChamberPressureGauge.Modules
         public void Close()
         {
             Log("正在断开连接...");
-            _DgtlPanel.DataReceived -= new Comm.EventHandle(_DgtlPanel.DataUpdate);
-            _DgtlPanel.StopReading();
-            _DgtlPanel.Close();
-            _DgtlPanel = null;
-            Log("已断开数位板连接.");
-            _CtrlPanel.StopReading();
-            _CtrlPanel.Close();
-            _CtrlPanel = null;
-            Log("已断开主控板连接.");
+            if (_DgtlPanel != null)
+            {
+                _DgtlPanel.DataReceived -= new Comm.EventHandle(_DgtlPanel.DataUpdate);
+                _DgtlPanel.StopReading();
+                _DgtlPanel.Close();
+                _DgtlPanel = null;
+                Log("已断开数位板连接.");
+            }
+            if (_CtrlPanel != null)
+            {
+                _CtrlPanel.StopReading();
+                _CtrlPanel.Close();
+                _CtrlPanel = null;
+                Log("已断开主控板连接.");
+            }
             Thread.Sleep(500);
         }
         public bool CheckClockStatus()
@@ -243,9 +257,9 @@ namespace ChamberPressureGauge.Modules
                 Log("发送自检失败命令.");
             _CtrlPanel.SelfTest(Result);
         }
-        public void StartMeasuring()
+        public void StartMeasuring(ref BackgroundWorker sender, ref DoWorkEventArgs e)
         {
-            StopFlag = false;
+            //StopFlag = false;
             if (TriggerMode == TriggerMode.Auto)
             {
                 int TriggerIndex = GetTriggerChannel(ChannelType.Pressure);
@@ -255,20 +269,23 @@ namespace ChamberPressureGauge.Modules
                     return;
                 }
                 Log("等待触发...");
-                Channels[TriggerIndex].WaitTriggerSwitch = !StopFlag;
-                if (Channels[TriggerIndex].WaitTriggered(_DgtlPanel, TriggerIndex))
+                //Channels[TriggerIndex].WaitTriggerSwitch = !StopFlag;
+                if (Channels[TriggerIndex].WaitTriggered(_DgtlPanel, TriggerIndex, ref sender, ref e))
                 {
+                    StartCountDown(MeasuringTime / 1000);
                     Log(string.Format("{0}触发.", Channels[TriggerIndex].Name));
-                    if(Measure())
+                    if(Measure(ref sender, ref e))
                     {
                         Log("正在绘制图表...");
                         DrawLines(Channels);
+                        Log("正在显示图表...");
                     }
                 }
             }
             else if (TriggerMode == TriggerMode.manual)
             {
-                if (Measure())
+                StartCountDown(MeasuringTime / 1000);
+                if (Measure(ref sender, ref e))
                 {
                     Log("正在绘制图表...");
                     DrawLines(Channels);
@@ -276,38 +293,51 @@ namespace ChamberPressureGauge.Modules
                 }
             }
         }
-        public void StopMeasuring()
-        {
-            StopFlag = true;
-            int TriggerIndex = GetTriggerChannel(ChannelType.Pressure);
-            Channels[TriggerIndex].WaitTriggerSwitch = false;
-            Log("正在取消当前测量...");
-        }
-        private bool Measure()
+        //public void StopMeasuring()
+        //{
+        //    StopFlag = true;
+        //    int TriggerIndex = GetTriggerChannel(ChannelType.Pressure);
+        //    Channels[TriggerIndex].WaitTriggerSwitch = false;
+        //    Log("正在取消当前测量...");
+        //}
+        private bool Measure(ref BackgroundWorker sender, ref DoWorkEventArgs e)
         {
             Log("正在记录数据...");
+            //var ByteData = _DgtlPanel.DataStoreByTime(MeasuringTime);
             var ByteData = _DgtlPanel.DataStoreByTime(MeasuringTime);
             Log("正在处理数据...");
             foreach (var Item in Channels)
             {
-                if (StopFlag)
+                if (sender.CancellationPending)
                 {
+                    e.Cancel = true;
                     return false;
                 }
                 Item.MeasuringData = new List<double>();
             }
             foreach (var Item in ByteData)
             {
-                if (StopFlag)
+                if (sender.CancellationPending)
                 {
+                    e.Cancel = true;
                     return false;
                 }
                 for (int i = 0; i < 6; i++)
                 {
+                    if (sender.CancellationPending)
+                    {
+                        e.Cancel = true;
+                        return false;
+                    }
                     _Channels[i].MeasuringData.Add(Channels[i].GetActualValue(Item[i + 9]));
                 }
                 for (int i = 6; i < 10; i++)
                 {
+                    if (sender.CancellationPending)
+                    {
+                        e.Cancel = true;
+                        return false;
+                    }
                     _Channels[i].MeasuringData.Add(Channels[i].GetActualValue(Item[i - 6]));
                 }
             }

@@ -50,6 +50,13 @@ namespace ChamberPressureGauge
             this.miOtherReport = new System.Windows.Forms.ToolStripMenuItem();
             this.menHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.tbMain = new System.Windows.Forms.ToolStrip();
+            this.tbConnet = new System.Windows.Forms.ToolStripButton();
+            this.tbStart = new System.Windows.Forms.ToolStripButton();
+            this.tbReset = new System.Windows.Forms.ToolStripButton();
+            this.tbChart = new System.Windows.Forms.ToolStripButton();
+            this.tbReport = new System.Windows.Forms.ToolStripButton();
+            this.tbConfig = new System.Windows.Forms.ToolStripButton();
+            this.tbExit = new System.Windows.Forms.ToolStripButton();
             this.staMain = new System.Windows.Forms.StatusStrip();
             this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.lblNone = new System.Windows.Forms.ToolStripStatusLabel();
@@ -60,32 +67,29 @@ namespace ChamberPressureGauge
             this.gbTotalChannel = new System.Windows.Forms.GroupBox();
             this.tcChannel = new System.Windows.Forms.TabControl();
             this.tpPressure = new System.Windows.Forms.TabPage();
+            this.txtMeasuringTime = new System.Windows.Forms.MaskedTextBox();
             this.lblSecond = new System.Windows.Forms.Label();
-            this.txtMeasuringTime = new System.Windows.Forms.TextBox();
             this.lblMeasuringTime = new System.Windows.Forms.Label();
+            this.btnRefreshTriggerChannel = new System.Windows.Forms.Button();
             this.cbTriggerChannel = new System.Windows.Forms.ComboBox();
             this.lblTriggerChannel = new System.Windows.Forms.Label();
             this.cbTriggerMode = new System.Windows.Forms.ComboBox();
             this.lblTriggerMode = new System.Windows.Forms.Label();
             this.tpDigital = new System.Windows.Forms.TabPage();
+            this.picLoading = new System.Windows.Forms.PictureBox();
             this.gbChart = new System.Windows.Forms.GroupBox();
+            this.lvChart = new LiveCharts.WinForms.CartesianChart();
             this.txtY = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.txtX = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.txtPointCount = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.timChannelUpdate = new System.Timers.Timer();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.txtPointCount = new System.Windows.Forms.MaskedTextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.btnRefreshTriggerChannel = new System.Windows.Forms.Button();
-            this.picLoading = new System.Windows.Forms.PictureBox();
-            this.tbConnet = new System.Windows.Forms.ToolStripButton();
-            this.tbStart = new System.Windows.Forms.ToolStripButton();
-            this.tbReset = new System.Windows.Forms.ToolStripButton();
-            this.tbChart = new System.Windows.Forms.ToolStripButton();
-            this.tbReport = new System.Windows.Forms.ToolStripButton();
-            this.tbExit = new System.Windows.Forms.ToolStripButton();
+            this.bwConnect = new System.ComponentModel.BackgroundWorker();
+            this.bwMeasure = new System.ComponentModel.BackgroundWorker();
             this.menuMain.SuspendLayout();
             this.tbMain.SuspendLayout();
             this.staMain.SuspendLayout();
@@ -93,10 +97,11 @@ namespace ChamberPressureGauge
             this.gbTotalChannel.SuspendLayout();
             this.tcChannel.SuspendLayout();
             this.tpPressure.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.picLoading)).BeginInit();
+            this.gbChart.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.timChannelUpdate)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.picLoading)).BeginInit();
             this.SuspendLayout();
             // 
             // menuMain
@@ -109,7 +114,7 @@ namespace ChamberPressureGauge
             this.menuMain.Location = new System.Drawing.Point(0, 0);
             this.menuMain.Name = "menuMain";
             this.menuMain.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
-            this.menuMain.Size = new System.Drawing.Size(1167, 25);
+            this.menuMain.Size = new System.Drawing.Size(1043, 25);
             this.menuMain.TabIndex = 0;
             this.menuMain.Text = "menuStrip1";
             // 
@@ -231,328 +236,14 @@ namespace ChamberPressureGauge
             this.tbReset,
             this.tbChart,
             this.tbReport,
+            this.tbConfig,
             this.tbExit});
             this.tbMain.Location = new System.Drawing.Point(0, 25);
             this.tbMain.Name = "tbMain";
             this.tbMain.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
-            this.tbMain.Size = new System.Drawing.Size(1167, 87);
+            this.tbMain.Size = new System.Drawing.Size(1043, 87);
             this.tbMain.TabIndex = 1;
             this.tbMain.Text = "toolStrip1";
-            // 
-            // staMain
-            // 
-            this.staMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.lblStatus,
-            this.lblNone,
-            this.lblTime});
-            this.staMain.Location = new System.Drawing.Point(0, 719);
-            this.staMain.Name = "staMain";
-            this.staMain.Size = new System.Drawing.Size(1167, 22);
-            this.staMain.TabIndex = 2;
-            // 
-            // lblStatus
-            // 
-            this.lblStatus.Name = "lblStatus";
-            this.lblStatus.Size = new System.Drawing.Size(0, 17);
-            this.lblStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // lblNone
-            // 
-            this.lblNone.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right)));
-            this.lblNone.Name = "lblNone";
-            this.lblNone.Size = new System.Drawing.Size(1152, 17);
-            this.lblNone.Spring = true;
-            // 
-            // lblTime
-            // 
-            this.lblTime.Name = "lblTime";
-            this.lblTime.Size = new System.Drawing.Size(0, 17);
-            this.lblTime.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
-            // grpLog
-            // 
-            this.grpLog.Controls.Add(this.txtLog);
-            this.grpLog.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.grpLog.Location = new System.Drawing.Point(6, 578);
-            this.grpLog.Name = "grpLog";
-            this.grpLog.Size = new System.Drawing.Size(628, 138);
-            this.grpLog.TabIndex = 3;
-            this.grpLog.TabStop = false;
-            this.grpLog.Text = "日志";
-            // 
-            // txtLog
-            // 
-            this.txtLog.BackColor = System.Drawing.Color.White;
-            this.txtLog.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txtLog.Location = new System.Drawing.Point(3, 19);
-            this.txtLog.Multiline = true;
-            this.txtLog.Name = "txtLog";
-            this.txtLog.ReadOnly = true;
-            this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtLog.Size = new System.Drawing.Size(622, 116);
-            this.txtLog.TabIndex = 0;
-            // 
-            // timClock
-            // 
-            this.timClock.Interval = 1000;
-            this.timClock.Tick += new System.EventHandler(this.timClock_Tick);
-            // 
-            // gbTotalChannel
-            // 
-            this.gbTotalChannel.Controls.Add(this.tcChannel);
-            this.gbTotalChannel.Controls.Add(this.picLoading);
-            this.gbTotalChannel.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.gbTotalChannel.Location = new System.Drawing.Point(6, 115);
-            this.gbTotalChannel.Name = "gbTotalChannel";
-            this.gbTotalChannel.Size = new System.Drawing.Size(628, 457);
-            this.gbTotalChannel.TabIndex = 4;
-            this.gbTotalChannel.TabStop = false;
-            this.gbTotalChannel.Text = "通道监测";
-            // 
-            // tcChannel
-            // 
-            this.tcChannel.Controls.Add(this.tpPressure);
-            this.tcChannel.Controls.Add(this.tpDigital);
-            this.tcChannel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tcChannel.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.tcChannel.Location = new System.Drawing.Point(3, 19);
-            this.tcChannel.Name = "tcChannel";
-            this.tcChannel.SelectedIndex = 0;
-            this.tcChannel.Size = new System.Drawing.Size(622, 435);
-            this.tcChannel.TabIndex = 0;
-            // 
-            // tpPressure
-            // 
-            this.tpPressure.BackColor = System.Drawing.Color.White;
-            this.tpPressure.Controls.Add(this.lblSecond);
-            this.tpPressure.Controls.Add(this.txtMeasuringTime);
-            this.tpPressure.Controls.Add(this.lblMeasuringTime);
-            this.tpPressure.Controls.Add(this.btnRefreshTriggerChannel);
-            this.tpPressure.Controls.Add(this.cbTriggerChannel);
-            this.tpPressure.Controls.Add(this.lblTriggerChannel);
-            this.tpPressure.Controls.Add(this.cbTriggerMode);
-            this.tpPressure.Controls.Add(this.lblTriggerMode);
-            this.tpPressure.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.tpPressure.Location = new System.Drawing.Point(4, 26);
-            this.tpPressure.Name = "tpPressure";
-            this.tpPressure.Padding = new System.Windows.Forms.Padding(3);
-            this.tpPressure.Size = new System.Drawing.Size(614, 405);
-            this.tpPressure.TabIndex = 0;
-            this.tpPressure.Text = "压力";
-            // 
-            // lblSecond
-            // 
-            this.lblSecond.AutoSize = true;
-            this.lblSecond.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.lblSecond.Location = new System.Drawing.Point(566, 347);
-            this.lblSecond.Name = "lblSecond";
-            this.lblSecond.Size = new System.Drawing.Size(32, 17);
-            this.lblSecond.TabIndex = 7;
-            this.lblSecond.Text = "毫秒";
-            // 
-            // txtMeasuringTime
-            // 
-            this.txtMeasuringTime.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.txtMeasuringTime.Location = new System.Drawing.Point(485, 344);
-            this.txtMeasuringTime.Name = "txtMeasuringTime";
-            this.txtMeasuringTime.Size = new System.Drawing.Size(75, 23);
-            this.txtMeasuringTime.TabIndex = 6;
-            this.txtMeasuringTime.Text = "1000";
-            this.txtMeasuringTime.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.txtMeasuringTime.LostFocus += new System.EventHandler(this.txtMeasuringTime_LostFocus);
-            // 
-            // lblMeasuringTime
-            // 
-            this.lblMeasuringTime.AutoSize = true;
-            this.lblMeasuringTime.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.lblMeasuringTime.Location = new System.Drawing.Point(420, 347);
-            this.lblMeasuringTime.Name = "lblMeasuringTime";
-            this.lblMeasuringTime.Size = new System.Drawing.Size(59, 17);
-            this.lblMeasuringTime.TabIndex = 5;
-            this.lblMeasuringTime.Text = "测量时间:";
-            // 
-            // cbTriggerChannel
-            // 
-            this.cbTriggerChannel.BackColor = System.Drawing.Color.White;
-            this.cbTriggerChannel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbTriggerChannel.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.cbTriggerChannel.FormattingEnabled = true;
-            this.cbTriggerChannel.Location = new System.Drawing.Point(263, 344);
-            this.cbTriggerChannel.Name = "cbTriggerChannel";
-            this.cbTriggerChannel.Size = new System.Drawing.Size(121, 25);
-            this.cbTriggerChannel.TabIndex = 3;
-            this.cbTriggerChannel.SelectedIndexChanged += new System.EventHandler(this.cbTriggerChannel_SelectedIndexChanged);
-            // 
-            // lblTriggerChannel
-            // 
-            this.lblTriggerChannel.AutoSize = true;
-            this.lblTriggerChannel.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.lblTriggerChannel.Location = new System.Drawing.Point(198, 347);
-            this.lblTriggerChannel.Name = "lblTriggerChannel";
-            this.lblTriggerChannel.Size = new System.Drawing.Size(59, 17);
-            this.lblTriggerChannel.TabIndex = 2;
-            this.lblTriggerChannel.Text = "计量通道:";
-            // 
-            // cbTriggerMode
-            // 
-            this.cbTriggerMode.BackColor = System.Drawing.Color.White;
-            this.cbTriggerMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbTriggerMode.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.cbTriggerMode.FormattingEnabled = true;
-            this.cbTriggerMode.Items.AddRange(new object[] {
-            "自动触发(推荐)",
-            "手动触发",
-            "外触发"});
-            this.cbTriggerMode.Location = new System.Drawing.Point(71, 344);
-            this.cbTriggerMode.Name = "cbTriggerMode";
-            this.cbTriggerMode.Size = new System.Drawing.Size(121, 25);
-            this.cbTriggerMode.TabIndex = 1;
-            this.cbTriggerMode.SelectedIndexChanged += new System.EventHandler(this.cbTriggerMode_SelectedIndexChanged);
-            // 
-            // lblTriggerMode
-            // 
-            this.lblTriggerMode.AutoSize = true;
-            this.lblTriggerMode.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.lblTriggerMode.Location = new System.Drawing.Point(6, 347);
-            this.lblTriggerMode.Name = "lblTriggerMode";
-            this.lblTriggerMode.Size = new System.Drawing.Size(59, 17);
-            this.lblTriggerMode.TabIndex = 0;
-            this.lblTriggerMode.Text = "触发方式:";
-            // 
-            // tpDigital
-            // 
-            this.tpDigital.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.tpDigital.Location = new System.Drawing.Point(4, 26);
-            this.tpDigital.Name = "tpDigital";
-            this.tpDigital.Padding = new System.Windows.Forms.Padding(3);
-            this.tpDigital.Size = new System.Drawing.Size(614, 405);
-            this.tpDigital.TabIndex = 1;
-            this.tpDigital.Text = "数字量/计时";
-            this.tpDigital.UseVisualStyleBackColor = true;
-            // 
-            // gbChart
-            // 
-            this.gbChart.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.gbChart.Location = new System.Drawing.Point(640, 115);
-            this.gbChart.Name = "gbChart";
-            this.gbChart.Size = new System.Drawing.Size(515, 457);
-            this.gbChart.TabIndex = 5;
-            this.gbChart.TabStop = false;
-            this.gbChart.Text = "图表";
-            // 
-            // txtY
-            // 
-            this.txtY.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.txtY.Location = new System.Drawing.Point(39, 69);
-            this.txtY.Name = "txtY";
-            this.txtY.ReadOnly = true;
-            this.txtY.Size = new System.Drawing.Size(74, 23);
-            this.txtY.TabIndex = 5;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label3.Location = new System.Drawing.Point(14, 72);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(18, 17);
-            this.label3.TabIndex = 4;
-            this.label3.Text = "Y:";
-            // 
-            // txtX
-            // 
-            this.txtX.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.txtX.Location = new System.Drawing.Point(39, 40);
-            this.txtX.Name = "txtX";
-            this.txtX.ReadOnly = true;
-            this.txtX.Size = new System.Drawing.Size(74, 23);
-            this.txtX.TabIndex = 3;
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label2.Location = new System.Drawing.Point(14, 43);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(19, 17);
-            this.label2.TabIndex = 2;
-            this.label2.Text = "X:";
-            // 
-            // txtPointCount
-            // 
-            this.txtPointCount.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.txtPointCount.Location = new System.Drawing.Point(206, 30);
-            this.txtPointCount.Name = "txtPointCount";
-            this.txtPointCount.Size = new System.Drawing.Size(59, 23);
-            this.txtPointCount.TabIndex = 1;
-            this.txtPointCount.Text = "50";
-            this.txtPointCount.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label1.Location = new System.Drawing.Point(141, 32);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(59, 17);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "绘点数量:";
-            // 
-            // timChannelUpdate
-            // 
-            this.timChannelUpdate.Interval = 500D;
-            this.timChannelUpdate.SynchronizingObject = this;
-            this.timChannelUpdate.Elapsed += new System.Timers.ElapsedEventHandler(this.timChannelUpdate_Tick);
-            // 
-            // groupBox1
-            // 
-            this.groupBox1.Controls.Add(this.txtPointCount);
-            this.groupBox1.Controls.Add(this.groupBox2);
-            this.groupBox1.Controls.Add(this.label1);
-            this.groupBox1.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.groupBox1.Location = new System.Drawing.Point(640, 578);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(515, 138);
-            this.groupBox1.TabIndex = 6;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "图表参数";
-            // 
-            // groupBox2
-            // 
-            this.groupBox2.Controls.Add(this.txtX);
-            this.groupBox2.Controls.Add(this.txtY);
-            this.groupBox2.Controls.Add(this.label2);
-            this.groupBox2.Controls.Add(this.label3);
-            this.groupBox2.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.groupBox2.Location = new System.Drawing.Point(6, 20);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(129, 112);
-            this.groupBox2.TabIndex = 6;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "坐标值";
-            // 
-            // btnRefreshTriggerChannel
-            // 
-            this.btnRefreshTriggerChannel.BackColor = System.Drawing.SystemColors.Control;
-            this.btnRefreshTriggerChannel.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.btnRefreshTriggerChannel.Image = global::ChamberPressureGauge.Properties.Resources.Refresh;
-            this.btnRefreshTriggerChannel.Location = new System.Drawing.Point(390, 344);
-            this.btnRefreshTriggerChannel.Name = "btnRefreshTriggerChannel";
-            this.btnRefreshTriggerChannel.Size = new System.Drawing.Size(24, 24);
-            this.btnRefreshTriggerChannel.TabIndex = 4;
-            this.btnRefreshTriggerChannel.UseVisualStyleBackColor = false;
-            this.btnRefreshTriggerChannel.Click += new System.EventHandler(this.btnRefreshTriggerChannel_Click);
-            // 
-            // picLoading
-            // 
-            this.picLoading.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.picLoading.Image = global::ChamberPressureGauge.Properties.Resources.toobar_loading;
-            this.picLoading.Location = new System.Drawing.Point(3, 19);
-            this.picLoading.Name = "picLoading";
-            this.picLoading.Size = new System.Drawing.Size(622, 435);
-            this.picLoading.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
-            this.picLoading.TabIndex = 8;
-            this.picLoading.TabStop = false;
             // 
             // tbConnet
             // 
@@ -617,6 +308,19 @@ namespace ChamberPressureGauge
             this.tbReport.Text = "toolStripButton6";
             this.tbReport.ToolTipText = "查看当前报告";
             // 
+            // tbConfig
+            // 
+            this.tbConfig.AutoSize = false;
+            this.tbConfig.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbConfig.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_config;
+            this.tbConfig.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.tbConfig.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tbConfig.Name = "tbConfig";
+            this.tbConfig.Size = new System.Drawing.Size(84, 84);
+            this.tbConfig.Text = "toolStripButton1";
+            this.tbConfig.ToolTipText = "配置";
+            this.tbConfig.Click += new System.EventHandler(this.ShowConfigWindow);
+            // 
             // tbExit
             // 
             this.tbExit.AutoSize = false;
@@ -630,12 +334,354 @@ namespace ChamberPressureGauge
             this.tbExit.ToolTipText = "退出";
             this.tbExit.Click += new System.EventHandler(this.WinClosing);
             // 
+            // staMain
+            // 
+            this.staMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.lblStatus,
+            this.lblNone,
+            this.lblTime});
+            this.staMain.Location = new System.Drawing.Point(0, 719);
+            this.staMain.Name = "staMain";
+            this.staMain.Size = new System.Drawing.Size(1043, 22);
+            this.staMain.TabIndex = 2;
+            // 
+            // lblStatus
+            // 
+            this.lblStatus.Name = "lblStatus";
+            this.lblStatus.Size = new System.Drawing.Size(0, 17);
+            this.lblStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // lblNone
+            // 
+            this.lblNone.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right)));
+            this.lblNone.Name = "lblNone";
+            this.lblNone.Size = new System.Drawing.Size(1028, 17);
+            this.lblNone.Spring = true;
+            // 
+            // lblTime
+            // 
+            this.lblTime.Name = "lblTime";
+            this.lblTime.Size = new System.Drawing.Size(0, 17);
+            this.lblTime.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // grpLog
+            // 
+            this.grpLog.Controls.Add(this.txtLog);
+            this.grpLog.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.grpLog.Location = new System.Drawing.Point(12, 578);
+            this.grpLog.Name = "grpLog";
+            this.grpLog.Size = new System.Drawing.Size(500, 138);
+            this.grpLog.TabIndex = 3;
+            this.grpLog.TabStop = false;
+            this.grpLog.Text = "日志";
+            // 
+            // txtLog
+            // 
+            this.txtLog.BackColor = System.Drawing.Color.White;
+            this.txtLog.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txtLog.Location = new System.Drawing.Point(3, 19);
+            this.txtLog.Multiline = true;
+            this.txtLog.Name = "txtLog";
+            this.txtLog.ReadOnly = true;
+            this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txtLog.Size = new System.Drawing.Size(494, 116);
+            this.txtLog.TabIndex = 0;
+            // 
+            // timClock
+            // 
+            this.timClock.Interval = 1000;
+            this.timClock.Tick += new System.EventHandler(this.timClock_Tick);
+            // 
+            // gbTotalChannel
+            // 
+            this.gbTotalChannel.Controls.Add(this.tcChannel);
+            this.gbTotalChannel.Controls.Add(this.picLoading);
+            this.gbTotalChannel.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.gbTotalChannel.Location = new System.Drawing.Point(12, 115);
+            this.gbTotalChannel.Name = "gbTotalChannel";
+            this.gbTotalChannel.Size = new System.Drawing.Size(500, 457);
+            this.gbTotalChannel.TabIndex = 4;
+            this.gbTotalChannel.TabStop = false;
+            this.gbTotalChannel.Text = "通道监测";
+            // 
+            // tcChannel
+            // 
+            this.tcChannel.Controls.Add(this.tpPressure);
+            this.tcChannel.Controls.Add(this.tpDigital);
+            this.tcChannel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tcChannel.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.tcChannel.Location = new System.Drawing.Point(3, 19);
+            this.tcChannel.Name = "tcChannel";
+            this.tcChannel.SelectedIndex = 0;
+            this.tcChannel.Size = new System.Drawing.Size(494, 435);
+            this.tcChannel.TabIndex = 0;
+            // 
+            // tpPressure
+            // 
+            this.tpPressure.BackColor = System.Drawing.Color.White;
+            this.tpPressure.Controls.Add(this.txtMeasuringTime);
+            this.tpPressure.Controls.Add(this.lblSecond);
+            this.tpPressure.Controls.Add(this.lblMeasuringTime);
+            this.tpPressure.Controls.Add(this.btnRefreshTriggerChannel);
+            this.tpPressure.Controls.Add(this.cbTriggerChannel);
+            this.tpPressure.Controls.Add(this.lblTriggerChannel);
+            this.tpPressure.Controls.Add(this.cbTriggerMode);
+            this.tpPressure.Controls.Add(this.lblTriggerMode);
+            this.tpPressure.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.tpPressure.Location = new System.Drawing.Point(4, 26);
+            this.tpPressure.Name = "tpPressure";
+            this.tpPressure.Padding = new System.Windows.Forms.Padding(3);
+            this.tpPressure.Size = new System.Drawing.Size(486, 405);
+            this.tpPressure.TabIndex = 0;
+            this.tpPressure.Text = "压力";
+            // 
+            // txtMeasuringTime
+            // 
+            this.txtMeasuringTime.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.txtMeasuringTime.Location = new System.Drawing.Point(80, 367);
+            this.txtMeasuringTime.Mask = "99999";
+            this.txtMeasuringTime.Name = "txtMeasuringTime";
+            this.txtMeasuringTime.PromptChar = ' ';
+            this.txtMeasuringTime.Size = new System.Drawing.Size(75, 23);
+            this.txtMeasuringTime.TabIndex = 8;
+            this.txtMeasuringTime.Text = "3700";
+            this.txtMeasuringTime.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.txtMeasuringTime.ValidatingType = typeof(int);
+            // 
+            // lblSecond
+            // 
+            this.lblSecond.AutoSize = true;
+            this.lblSecond.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.lblSecond.Location = new System.Drawing.Point(161, 368);
+            this.lblSecond.Name = "lblSecond";
+            this.lblSecond.Size = new System.Drawing.Size(32, 17);
+            this.lblSecond.TabIndex = 7;
+            this.lblSecond.Text = "毫秒";
+            // 
+            // lblMeasuringTime
+            // 
+            this.lblMeasuringTime.AutoSize = true;
+            this.lblMeasuringTime.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.lblMeasuringTime.Location = new System.Drawing.Point(15, 368);
+            this.lblMeasuringTime.Name = "lblMeasuringTime";
+            this.lblMeasuringTime.Size = new System.Drawing.Size(59, 17);
+            this.lblMeasuringTime.TabIndex = 5;
+            this.lblMeasuringTime.Text = "测量时间:";
+            // 
+            // btnRefreshTriggerChannel
+            // 
+            this.btnRefreshTriggerChannel.BackColor = System.Drawing.SystemColors.Control;
+            this.btnRefreshTriggerChannel.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.btnRefreshTriggerChannel.Image = global::ChamberPressureGauge.Properties.Resources.Refresh;
+            this.btnRefreshTriggerChannel.Location = new System.Drawing.Point(399, 334);
+            this.btnRefreshTriggerChannel.Name = "btnRefreshTriggerChannel";
+            this.btnRefreshTriggerChannel.Size = new System.Drawing.Size(24, 24);
+            this.btnRefreshTriggerChannel.TabIndex = 4;
+            this.btnRefreshTriggerChannel.UseVisualStyleBackColor = false;
+            this.btnRefreshTriggerChannel.Click += new System.EventHandler(this.btnRefreshTriggerChannel_Click);
+            // 
+            // cbTriggerChannel
+            // 
+            this.cbTriggerChannel.BackColor = System.Drawing.Color.White;
+            this.cbTriggerChannel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbTriggerChannel.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.cbTriggerChannel.FormattingEnabled = true;
+            this.cbTriggerChannel.Location = new System.Drawing.Point(272, 334);
+            this.cbTriggerChannel.Name = "cbTriggerChannel";
+            this.cbTriggerChannel.Size = new System.Drawing.Size(121, 25);
+            this.cbTriggerChannel.TabIndex = 3;
+            this.cbTriggerChannel.SelectedIndexChanged += new System.EventHandler(this.cbTriggerChannel_SelectedIndexChanged);
+            // 
+            // lblTriggerChannel
+            // 
+            this.lblTriggerChannel.AutoSize = true;
+            this.lblTriggerChannel.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.lblTriggerChannel.Location = new System.Drawing.Point(207, 337);
+            this.lblTriggerChannel.Name = "lblTriggerChannel";
+            this.lblTriggerChannel.Size = new System.Drawing.Size(59, 17);
+            this.lblTriggerChannel.TabIndex = 2;
+            this.lblTriggerChannel.Text = "计量通道:";
+            // 
+            // cbTriggerMode
+            // 
+            this.cbTriggerMode.BackColor = System.Drawing.Color.White;
+            this.cbTriggerMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbTriggerMode.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.cbTriggerMode.FormattingEnabled = true;
+            this.cbTriggerMode.Items.AddRange(new object[] {
+            "自动触发(推荐)",
+            "手动触发",
+            "外触发"});
+            this.cbTriggerMode.Location = new System.Drawing.Point(80, 334);
+            this.cbTriggerMode.Name = "cbTriggerMode";
+            this.cbTriggerMode.Size = new System.Drawing.Size(121, 25);
+            this.cbTriggerMode.TabIndex = 1;
+            this.cbTriggerMode.SelectedIndexChanged += new System.EventHandler(this.cbTriggerMode_SelectedIndexChanged);
+            // 
+            // lblTriggerMode
+            // 
+            this.lblTriggerMode.AutoSize = true;
+            this.lblTriggerMode.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.lblTriggerMode.Location = new System.Drawing.Point(15, 337);
+            this.lblTriggerMode.Name = "lblTriggerMode";
+            this.lblTriggerMode.Size = new System.Drawing.Size(59, 17);
+            this.lblTriggerMode.TabIndex = 0;
+            this.lblTriggerMode.Text = "触发方式:";
+            // 
+            // tpDigital
+            // 
+            this.tpDigital.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.tpDigital.Location = new System.Drawing.Point(4, 26);
+            this.tpDigital.Name = "tpDigital";
+            this.tpDigital.Padding = new System.Windows.Forms.Padding(3);
+            this.tpDigital.Size = new System.Drawing.Size(486, 405);
+            this.tpDigital.TabIndex = 1;
+            this.tpDigital.Text = "数字量/计时";
+            this.tpDigital.UseVisualStyleBackColor = true;
+            // 
+            // picLoading
+            // 
+            this.picLoading.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.picLoading.Image = global::ChamberPressureGauge.Properties.Resources.toobar_loading;
+            this.picLoading.Location = new System.Drawing.Point(3, 19);
+            this.picLoading.Name = "picLoading";
+            this.picLoading.Size = new System.Drawing.Size(494, 435);
+            this.picLoading.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.picLoading.TabIndex = 8;
+            this.picLoading.TabStop = false;
+            // 
+            // gbChart
+            // 
+            this.gbChart.Controls.Add(this.lvChart);
+            this.gbChart.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.gbChart.Location = new System.Drawing.Point(518, 115);
+            this.gbChart.Name = "gbChart";
+            this.gbChart.Size = new System.Drawing.Size(515, 457);
+            this.gbChart.TabIndex = 5;
+            this.gbChart.TabStop = false;
+            this.gbChart.Text = "图表";
+            // 
+            // lvChart
+            // 
+            this.lvChart.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lvChart.Location = new System.Drawing.Point(3, 19);
+            this.lvChart.Name = "lvChart";
+            this.lvChart.Size = new System.Drawing.Size(509, 435);
+            this.lvChart.TabIndex = 0;
+            this.lvChart.DataHover += new LiveCharts.Events.DataHoverHandler(this.lvChart_DataHover);
+            // 
+            // txtY
+            // 
+            this.txtY.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.txtY.Location = new System.Drawing.Point(39, 69);
+            this.txtY.Name = "txtY";
+            this.txtY.ReadOnly = true;
+            this.txtY.Size = new System.Drawing.Size(74, 23);
+            this.txtY.TabIndex = 5;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label3.Location = new System.Drawing.Point(14, 72);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(18, 17);
+            this.label3.TabIndex = 4;
+            this.label3.Text = "Y:";
+            // 
+            // txtX
+            // 
+            this.txtX.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.txtX.Location = new System.Drawing.Point(39, 40);
+            this.txtX.Name = "txtX";
+            this.txtX.ReadOnly = true;
+            this.txtX.Size = new System.Drawing.Size(74, 23);
+            this.txtX.TabIndex = 3;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label2.Location = new System.Drawing.Point(14, 43);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(19, 17);
+            this.label2.TabIndex = 2;
+            this.label2.Text = "X:";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label1.Location = new System.Drawing.Point(141, 32);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(59, 17);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "绘点数量:";
+            // 
+            // timChannelUpdate
+            // 
+            this.timChannelUpdate.Interval = 500D;
+            this.timChannelUpdate.SynchronizingObject = this;
+            this.timChannelUpdate.Elapsed += new System.Timers.ElapsedEventHandler(this.timChannelUpdate_Tick);
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.txtPointCount);
+            this.groupBox1.Controls.Add(this.groupBox2);
+            this.groupBox1.Controls.Add(this.label1);
+            this.groupBox1.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.groupBox1.Location = new System.Drawing.Point(518, 578);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(515, 138);
+            this.groupBox1.TabIndex = 6;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "图表参数";
+            // 
+            // txtPointCount
+            // 
+            this.txtPointCount.Location = new System.Drawing.Point(206, 29);
+            this.txtPointCount.Mask = "999";
+            this.txtPointCount.Name = "txtPointCount";
+            this.txtPointCount.PromptChar = ' ';
+            this.txtPointCount.Size = new System.Drawing.Size(70, 23);
+            this.txtPointCount.TabIndex = 7;
+            this.txtPointCount.Text = "50";
+            this.txtPointCount.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.txtX);
+            this.groupBox2.Controls.Add(this.txtY);
+            this.groupBox2.Controls.Add(this.label2);
+            this.groupBox2.Controls.Add(this.label3);
+            this.groupBox2.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.groupBox2.Location = new System.Drawing.Point(6, 20);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(129, 112);
+            this.groupBox2.TabIndex = 6;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "坐标值";
+            // 
+            // bwConnect
+            // 
+            this.bwConnect.WorkerSupportsCancellation = true;
+            this.bwConnect.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bwConnect_DoWork);
+            this.bwConnect.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.bwConnect_ProgressChanged);
+            this.bwConnect.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bwConnect_RunWorkerCompleted);
+            // 
+            // bwMeasure
+            // 
+            this.bwMeasure.WorkerReportsProgress = true;
+            this.bwMeasure.WorkerSupportsCancellation = true;
+            this.bwMeasure.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bwMeasure_DoWork);
+            this.bwMeasure.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bwMeasure_RunWorkerCompleted);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(1167, 741);
+            this.ClientSize = new System.Drawing.Size(1043, 741);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.gbChart);
             this.Controls.Add(this.gbTotalChannel);
@@ -662,12 +708,13 @@ namespace ChamberPressureGauge
             this.tcChannel.ResumeLayout(false);
             this.tpPressure.ResumeLayout(false);
             this.tpPressure.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.picLoading)).EndInit();
+            this.gbChart.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.timChannelUpdate)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.picLoading)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -718,10 +765,8 @@ namespace ChamberPressureGauge
         private System.Windows.Forms.Label lblTriggerMode;
         private System.Windows.Forms.Button btnRefreshTriggerChannel;
         private System.Windows.Forms.Label lblSecond;
-        private System.Windows.Forms.TextBox txtMeasuringTime;
         private System.Windows.Forms.Label lblMeasuringTime;
         private System.Windows.Forms.PictureBox picLoading;
-        private System.Windows.Forms.TextBox txtPointCount;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox txtY;
         private System.Windows.Forms.Label label3;
@@ -729,6 +774,13 @@ namespace ChamberPressureGauge
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox groupBox2;
+        private System.ComponentModel.BackgroundWorker bwConnect;
+        private System.ComponentModel.BackgroundWorker bwMeasure;
+        private System.Windows.Forms.MaskedTextBox txtMeasuringTime;
+        private System.Windows.Forms.MaskedTextBox txtPointCount;
+        private System.Windows.Forms.ToolStripButton tbConfig;
+        //private CountDown lblCountDown;
+        private LiveCharts.WinForms.CartesianChart lvChart;
         //private System.Windows.Forms.DataVisualization.Charting.Chart DataChart;
         //private System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1;
         //private System.Windows.Forms.DataVisualization.Charting.Legend legend1;

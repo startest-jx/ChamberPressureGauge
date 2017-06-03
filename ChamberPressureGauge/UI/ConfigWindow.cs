@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Text;
-using System.Threading;
 using System.Windows.Forms;
 
 namespace ChamberPressureGauge.UI
@@ -16,14 +15,27 @@ namespace ChamberPressureGauge.UI
             InitializeComponent();
         }
 
-        private void btnCancel_Click(object sender, EventArgs e)
+        private void CheckIP(object sender, KeyEventArgs e)
         {
-            Close();
-        }
+            if (e.KeyCode == Keys.Decimal)
+            {
+                int pos = ((MaskedTextBox)sender).SelectionStart;
+                int max = (((MaskedTextBox)sender).MaskedTextProvider.Length - ((MaskedTextBox)sender).MaskedTextProvider.EditPositionCount);
+                int nextField = 0;
 
-        private void ConfigWindow_Load(object sender, EventArgs e)
-        {
+                for (int i = 0; i < ((MaskedTextBox)sender).MaskedTextProvider.Length; i++)
+                {
+                    if (!((MaskedTextBox)sender).MaskedTextProvider.IsEditPosition(i) && (pos + max) >= i)
+                        nextField = i;
+                }
+                nextField += 1;
 
+                // We're done, enable the TabStop property again     
+
+
+                ((MaskedTextBox)sender).SelectionStart = nextField;
+
+            }
         }
     }
 }

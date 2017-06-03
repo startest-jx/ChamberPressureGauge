@@ -373,7 +373,7 @@ namespace ChamberPressureGauge.Modules
                 StockLock.WaitOne();
                 StockLength = DataStock.Count;
                 StockLock.ReleaseMutex();
-                Thread.Sleep(200);
+                //Thread.Sleep(200);
             }
             //DataStoreCount = 0;
             return DataStock;
