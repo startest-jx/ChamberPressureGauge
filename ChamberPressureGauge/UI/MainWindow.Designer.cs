@@ -1,6 +1,4 @@
-﻿using ChamberPressureGauge.Controls;
-
-namespace ChamberPressureGauge
+﻿namespace ChamberPressureGauge.UI
 {
     partial class MainWindow
     {
@@ -77,6 +75,7 @@ namespace ChamberPressureGauge
             this.lblTriggerMode = new System.Windows.Forms.Label();
             this.tpDigital = new System.Windows.Forms.TabPage();
             this.picLoading = new System.Windows.Forms.PictureBox();
+            this.CountDown = new Controls.Other.CountDown();
             this.gbChart = new System.Windows.Forms.GroupBox();
             this.lvChart = new LiveCharts.WinForms.CartesianChart();
             this.txtY = new System.Windows.Forms.TextBox();
@@ -90,6 +89,7 @@ namespace ChamberPressureGauge
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.bwConnect = new System.ComponentModel.BackgroundWorker();
             this.bwMeasure = new System.ComponentModel.BackgroundWorker();
+            this.bwBuildReport = new System.ComponentModel.BackgroundWorker();
             this.menuMain.SuspendLayout();
             this.tbMain.SuspendLayout();
             this.staMain.SuspendLayout();
@@ -305,8 +305,8 @@ namespace ChamberPressureGauge
             this.tbReport.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tbReport.Name = "tbReport";
             this.tbReport.Size = new System.Drawing.Size(84, 84);
-            this.tbReport.Text = "toolStripButton6";
-            this.tbReport.ToolTipText = "查看当前报告";
+            this.tbReport.ToolTipText = "导出...";
+            this.tbReport.Click += new System.EventHandler(this.Report);
             // 
             // tbConfig
             // 
@@ -340,7 +340,7 @@ namespace ChamberPressureGauge
             this.lblStatus,
             this.lblNone,
             this.lblTime});
-            this.staMain.Location = new System.Drawing.Point(0, 719);
+            this.staMain.Location = new System.Drawing.Point(0, 697);
             this.staMain.Name = "staMain";
             this.staMain.Size = new System.Drawing.Size(1043, 22);
             this.staMain.TabIndex = 2;
@@ -368,9 +368,9 @@ namespace ChamberPressureGauge
             // 
             this.grpLog.Controls.Add(this.txtLog);
             this.grpLog.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.grpLog.Location = new System.Drawing.Point(12, 578);
+            this.grpLog.Location = new System.Drawing.Point(12, 554);
             this.grpLog.Name = "grpLog";
-            this.grpLog.Size = new System.Drawing.Size(500, 138);
+            this.grpLog.Size = new System.Drawing.Size(509, 138);
             this.grpLog.TabIndex = 3;
             this.grpLog.TabStop = false;
             this.grpLog.Text = "日志";
@@ -384,7 +384,7 @@ namespace ChamberPressureGauge
             this.txtLog.Name = "txtLog";
             this.txtLog.ReadOnly = true;
             this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtLog.Size = new System.Drawing.Size(494, 116);
+            this.txtLog.Size = new System.Drawing.Size(503, 116);
             this.txtLog.TabIndex = 0;
             // 
             // timClock
@@ -396,10 +396,11 @@ namespace ChamberPressureGauge
             // 
             this.gbTotalChannel.Controls.Add(this.tcChannel);
             this.gbTotalChannel.Controls.Add(this.picLoading);
+            this.gbTotalChannel.Controls.Add(this.CountDown);
             this.gbTotalChannel.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.gbTotalChannel.Location = new System.Drawing.Point(12, 115);
             this.gbTotalChannel.Name = "gbTotalChannel";
-            this.gbTotalChannel.Size = new System.Drawing.Size(500, 457);
+            this.gbTotalChannel.Size = new System.Drawing.Size(509, 436);
             this.gbTotalChannel.TabIndex = 4;
             this.gbTotalChannel.TabStop = false;
             this.gbTotalChannel.Text = "通道监测";
@@ -413,7 +414,7 @@ namespace ChamberPressureGauge
             this.tcChannel.Location = new System.Drawing.Point(3, 19);
             this.tcChannel.Name = "tcChannel";
             this.tcChannel.SelectedIndex = 0;
-            this.tcChannel.Size = new System.Drawing.Size(494, 435);
+            this.tcChannel.Size = new System.Drawing.Size(503, 414);
             this.tcChannel.TabIndex = 0;
             // 
             // tpPressure
@@ -431,14 +432,14 @@ namespace ChamberPressureGauge
             this.tpPressure.Location = new System.Drawing.Point(4, 26);
             this.tpPressure.Name = "tpPressure";
             this.tpPressure.Padding = new System.Windows.Forms.Padding(3);
-            this.tpPressure.Size = new System.Drawing.Size(486, 405);
+            this.tpPressure.Size = new System.Drawing.Size(495, 384);
             this.tpPressure.TabIndex = 0;
             this.tpPressure.Text = "压力";
             // 
             // txtMeasuringTime
             // 
             this.txtMeasuringTime.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.txtMeasuringTime.Location = new System.Drawing.Point(80, 367);
+            this.txtMeasuringTime.Location = new System.Drawing.Point(77, 347);
             this.txtMeasuringTime.Mask = "99999";
             this.txtMeasuringTime.Name = "txtMeasuringTime";
             this.txtMeasuringTime.PromptChar = ' ';
@@ -452,7 +453,7 @@ namespace ChamberPressureGauge
             // 
             this.lblSecond.AutoSize = true;
             this.lblSecond.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.lblSecond.Location = new System.Drawing.Point(161, 368);
+            this.lblSecond.Location = new System.Drawing.Point(158, 348);
             this.lblSecond.Name = "lblSecond";
             this.lblSecond.Size = new System.Drawing.Size(32, 17);
             this.lblSecond.TabIndex = 7;
@@ -462,7 +463,7 @@ namespace ChamberPressureGauge
             // 
             this.lblMeasuringTime.AutoSize = true;
             this.lblMeasuringTime.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.lblMeasuringTime.Location = new System.Drawing.Point(15, 368);
+            this.lblMeasuringTime.Location = new System.Drawing.Point(12, 348);
             this.lblMeasuringTime.Name = "lblMeasuringTime";
             this.lblMeasuringTime.Size = new System.Drawing.Size(59, 17);
             this.lblMeasuringTime.TabIndex = 5;
@@ -473,7 +474,7 @@ namespace ChamberPressureGauge
             this.btnRefreshTriggerChannel.BackColor = System.Drawing.SystemColors.Control;
             this.btnRefreshTriggerChannel.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.btnRefreshTriggerChannel.Image = global::ChamberPressureGauge.Properties.Resources.Refresh;
-            this.btnRefreshTriggerChannel.Location = new System.Drawing.Point(399, 334);
+            this.btnRefreshTriggerChannel.Location = new System.Drawing.Point(396, 314);
             this.btnRefreshTriggerChannel.Name = "btnRefreshTriggerChannel";
             this.btnRefreshTriggerChannel.Size = new System.Drawing.Size(24, 24);
             this.btnRefreshTriggerChannel.TabIndex = 4;
@@ -486,7 +487,7 @@ namespace ChamberPressureGauge
             this.cbTriggerChannel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbTriggerChannel.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.cbTriggerChannel.FormattingEnabled = true;
-            this.cbTriggerChannel.Location = new System.Drawing.Point(272, 334);
+            this.cbTriggerChannel.Location = new System.Drawing.Point(269, 314);
             this.cbTriggerChannel.Name = "cbTriggerChannel";
             this.cbTriggerChannel.Size = new System.Drawing.Size(121, 25);
             this.cbTriggerChannel.TabIndex = 3;
@@ -496,7 +497,7 @@ namespace ChamberPressureGauge
             // 
             this.lblTriggerChannel.AutoSize = true;
             this.lblTriggerChannel.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.lblTriggerChannel.Location = new System.Drawing.Point(207, 337);
+            this.lblTriggerChannel.Location = new System.Drawing.Point(204, 317);
             this.lblTriggerChannel.Name = "lblTriggerChannel";
             this.lblTriggerChannel.Size = new System.Drawing.Size(59, 17);
             this.lblTriggerChannel.TabIndex = 2;
@@ -512,7 +513,7 @@ namespace ChamberPressureGauge
             "自动触发(推荐)",
             "手动触发",
             "外触发"});
-            this.cbTriggerMode.Location = new System.Drawing.Point(80, 334);
+            this.cbTriggerMode.Location = new System.Drawing.Point(77, 314);
             this.cbTriggerMode.Name = "cbTriggerMode";
             this.cbTriggerMode.Size = new System.Drawing.Size(121, 25);
             this.cbTriggerMode.TabIndex = 1;
@@ -522,7 +523,7 @@ namespace ChamberPressureGauge
             // 
             this.lblTriggerMode.AutoSize = true;
             this.lblTriggerMode.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.lblTriggerMode.Location = new System.Drawing.Point(15, 337);
+            this.lblTriggerMode.Location = new System.Drawing.Point(12, 317);
             this.lblTriggerMode.Name = "lblTriggerMode";
             this.lblTriggerMode.Size = new System.Drawing.Size(59, 17);
             this.lblTriggerMode.TabIndex = 0;
@@ -534,7 +535,7 @@ namespace ChamberPressureGauge
             this.tpDigital.Location = new System.Drawing.Point(4, 26);
             this.tpDigital.Name = "tpDigital";
             this.tpDigital.Padding = new System.Windows.Forms.Padding(3);
-            this.tpDigital.Size = new System.Drawing.Size(486, 405);
+            this.tpDigital.Size = new System.Drawing.Size(495, 384);
             this.tpDigital.TabIndex = 1;
             this.tpDigital.Text = "数字量/计时";
             this.tpDigital.UseVisualStyleBackColor = true;
@@ -545,18 +546,29 @@ namespace ChamberPressureGauge
             this.picLoading.Image = global::ChamberPressureGauge.Properties.Resources.toobar_loading;
             this.picLoading.Location = new System.Drawing.Point(3, 19);
             this.picLoading.Name = "picLoading";
-            this.picLoading.Size = new System.Drawing.Size(494, 435);
+            this.picLoading.Size = new System.Drawing.Size(503, 414);
             this.picLoading.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.picLoading.TabIndex = 8;
             this.picLoading.TabStop = false;
+            // 
+            // CountDown
+            // 
+            this.CountDown.AfterCancel = null;
+            this.CountDown.AfterDone = null;
+            this.CountDown.AutoSize = true;
+            this.CountDown.BeforeStart = null;
+            this.CountDown.Location = new System.Drawing.Point(101, 71);
+            this.CountDown.Name = "CountDown";
+            this.CountDown.Size = new System.Drawing.Size(302, 205);
+            this.CountDown.TabIndex = 9;
             // 
             // gbChart
             // 
             this.gbChart.Controls.Add(this.lvChart);
             this.gbChart.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.gbChart.Location = new System.Drawing.Point(518, 115);
+            this.gbChart.Location = new System.Drawing.Point(527, 115);
             this.gbChart.Name = "gbChart";
-            this.gbChart.Size = new System.Drawing.Size(515, 457);
+            this.gbChart.Size = new System.Drawing.Size(506, 436);
             this.gbChart.TabIndex = 5;
             this.gbChart.TabStop = false;
             this.gbChart.Text = "图表";
@@ -566,7 +578,7 @@ namespace ChamberPressureGauge
             this.lvChart.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lvChart.Location = new System.Drawing.Point(3, 19);
             this.lvChart.Name = "lvChart";
-            this.lvChart.Size = new System.Drawing.Size(509, 435);
+            this.lvChart.Size = new System.Drawing.Size(500, 414);
             this.lvChart.TabIndex = 0;
             this.lvChart.DataHover += new LiveCharts.Events.DataHoverHandler(this.lvChart_DataHover);
             // 
@@ -630,9 +642,9 @@ namespace ChamberPressureGauge
             this.groupBox1.Controls.Add(this.groupBox2);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.groupBox1.Location = new System.Drawing.Point(518, 578);
+            this.groupBox1.Location = new System.Drawing.Point(527, 554);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(515, 138);
+            this.groupBox1.Size = new System.Drawing.Size(506, 138);
             this.groupBox1.TabIndex = 6;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "图表参数";
@@ -645,7 +657,7 @@ namespace ChamberPressureGauge
             this.txtPointCount.PromptChar = ' ';
             this.txtPointCount.Size = new System.Drawing.Size(70, 23);
             this.txtPointCount.TabIndex = 7;
-            this.txtPointCount.Text = "50";
+            this.txtPointCount.Text = "500";
             this.txtPointCount.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
             // groupBox2
@@ -676,12 +688,17 @@ namespace ChamberPressureGauge
             this.bwMeasure.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bwMeasure_DoWork);
             this.bwMeasure.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bwMeasure_RunWorkerCompleted);
             // 
+            // bwBuildReport
+            // 
+            this.bwBuildReport.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bwBuildReport_DoWork);
+            this.bwBuildReport.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bwBuildReport_RunWorkerCompleted);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(1043, 741);
+            this.ClientSize = new System.Drawing.Size(1043, 719);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.gbChart);
             this.Controls.Add(this.gbTotalChannel);
@@ -705,6 +722,7 @@ namespace ChamberPressureGauge
             this.grpLog.ResumeLayout(false);
             this.grpLog.PerformLayout();
             this.gbTotalChannel.ResumeLayout(false);
+            this.gbTotalChannel.PerformLayout();
             this.tcChannel.ResumeLayout(false);
             this.tpPressure.ResumeLayout(false);
             this.tpPressure.PerformLayout();
@@ -781,6 +799,8 @@ namespace ChamberPressureGauge
         private System.Windows.Forms.ToolStripButton tbConfig;
         //private CountDown lblCountDown;
         private LiveCharts.WinForms.CartesianChart lvChart;
+        private Controls.Other.CountDown CountDown;
+        private System.ComponentModel.BackgroundWorker bwBuildReport;
         //private System.Windows.Forms.DataVisualization.Charting.Chart DataChart;
         //private System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1;
         //private System.Windows.Forms.DataVisualization.Charting.Legend legend1;

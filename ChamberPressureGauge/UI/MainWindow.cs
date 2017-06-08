@@ -1,5 +1,9 @@
-﻿using ChamberPressureGauge.Modules;
-using ChamberPressureGauge.Controls;
+﻿//using ChamberPressureGauge.Modules;
+//using ChamberPressureGauge.Controls;
+using Report.iTextSharp;
+using Slaver;
+using Slaver.Channel;
+using Controls;
 using ChamberPressureGauge.UI;
 using System;
 using System.Collections.Generic;
@@ -11,10 +15,16 @@ using System.Windows.Forms;
 using System.Threading;
 using System.Windows;
 using ChamberPressureGauge.Properties;
+
 //using System.Windows.Media;
 using LiveCharts.Geared;
 using LiveCharts.Wpf;
 using Brushes = System.Windows.Media.Brushes;
+using DColor = System.Drawing.Color;
+using MColor = System.Windows.Media.Color;
+using System.Windows.Media;
+using LiveCharts;
+
 //using LiveCharts;
 //using LiveCharts.Defaults;
 //using LiveCharts.Wpf;
@@ -22,36 +32,36 @@ using Brushes = System.Windows.Media.Brushes;
 //using LiveCharts.Wpf; //The WPF controls
 //using LiveCharts.WinForms; //the WinForm wrappers
 
-namespace ChamberPressureGauge
+namespace ChamberPressureGauge.UI
 {
     public partial class MainWindow : Form
     {
-        Color[] Colors = new Color[10]
+        DColor[] Colors = new DColor[10]
         {
-                Color.Black,
-                Color.Red,
-                Color.LightBlue,
-                Color.Green,
-                Color.Yellow,
-                Color.Purple,
-                Color.Brown,
-                Color.DarkBlue,
-                Color.Pink,
-                Color.Gray,
+                DColor.Black,
+                DColor.Red,
+                DColor.LightBlue,
+                DColor.Green,
+                DColor.Yellow,
+                DColor.Purple,
+                DColor.Brown,
+                DColor.DarkBlue,
+                DColor.Pink,
+                DColor.Gray,
         };
         // 全局变量
         private delegate void _Log(string LogInfo);
         private delegate void _ChangeStatus(ConnectStatus Status);
         private delegate void NonParaFun();
-        private delegate void _DrawLines(Channel[] Channels);
+        private delegate void _DrawLines(BaseChannel[] Channels);
         private delegate void _StartCountDown(double value);
         
-        Slaver _Slaver;  // 下位机
+        SlaverDevice _Slaver;  // 下位机
         bool ChannelUpdating = false;  // 通道检测Timer是否被占用
         //private Chart DataChart;
         //private double CountDownValue;  // 倒计时
         //private Thread tCountDown;
-        private CountDown CountDown;
+        //private CountDown CountDown;
 
         public void Log(string LogInfo)  // 日志输出
         {
@@ -63,7 +73,7 @@ namespace ChamberPressureGauge
             }
             else
             {
-                txtLog.AppendText(string.Format("{0} {1}", DateTime.Now.ToString(), LogInfo) + Environment.NewLine);
+                txtLog.AppendText(string.Format("{0} {1}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:ffff"), LogInfo) + Environment.NewLine);
             }
                 
         }
@@ -318,18 +328,26 @@ namespace ChamberPressureGauge
         }
         private void ChartInit()
         {
-            lvChart.Series = new LiveCharts.SeriesCollection();
-            lvChart.LegendLocation = LiveCharts.LegendLocation.Top;
+            lvChart.Series = new SeriesCollection();
+            lvChart.LegendLocation = LegendLocation.Top;
+            lvChart.Zoom = ZoomingOptions.X;
+            lvChart.DisableAnimations = true;
+            lvChart.Hoverable = false;
+            //lvChart.ScrollMode = ScrollMode.XY;
+            //lvChart.ScrollBarFill = new SolidColorBrush(MColor.FromArgb(37, 48, 48, 48));
+            lvChart.AxisX.Clear();
             lvChart.AxisX.Add(new Axis()
             {
                 Title = "时间/s",
                 MinValue = 0,
+                LabelFormatter = value => string.Format("{0:F2}", value),
                 Separator = new Separator
                 {
-                    Step = 0.5,
+                    Step = 1d,
                     IsEnabled = false,
                 }
             });
+            lvChart.AxisY.Clear();
             lvChart.AxisY.Add(new Axis()
             {
                 Title = "压力/MPa",
@@ -339,8 +357,8 @@ namespace ChamberPressureGauge
 
         private void CountDownInit()
         {
-            CountDown = new CountDown();
-            gbTotalChannel.Controls.Add(CountDown);
+            //CountDown = new CountDown();
+            //gbTotalChannel.Controls.Add(CountDown);
             CountDown.Location = new System.Drawing.Point((gbTotalChannel.Width - CountDown.Width) / 2, (gbTotalChannel.Height - CountDown.Height) / 2);
             CountDown.AfterDone = CountDownAfterDone;
             CountDown.AfterCancel = CountDownAfterDone;
@@ -373,7 +391,7 @@ namespace ChamberPressureGauge
         {
             Log("程序初始化...");
             CountDownInit();
-            _Slaver = new Slaver(Log, ChangeStatus, DrawLines, CountDown.Start);  // 主对象
+            _Slaver = new SlaverDevice(Log, ChangeStatus, DrawLines, CountDown.Start);  // 主对象
             // 控件放置
             for (int i = 0; i < 6; i ++)
             {
@@ -435,9 +453,8 @@ namespace ChamberPressureGauge
         {
             if (_Slaver.Status == ConnectStatus.Disconnected)
             {
-                
-                //_Connect = new Thread(new ThreadStart(ConnectControl));
-                //_Connect.Start();
+                Log("正在准备连接...");
+                Thread.Sleep(500);
                 bwConnect.RunWorkerAsync();
             }
             else if (_Slaver.Status == ConnectStatus.Connected)
@@ -495,7 +512,7 @@ namespace ChamberPressureGauge
             }
         }
 
-        public void DrawLines(Channel[] Channels)  // 根据channels绘制曲线
+        public void DrawLines(BaseChannel[] Channels)  // 根据channels绘制曲线
         {
             
             if (InvokeRequired)
@@ -515,19 +532,38 @@ namespace ChamberPressureGauge
                     continue;
                 }
                 // LiveChart
-                
+                object LineSeries;
                 //var Values = new LiveCharts.ChartValues<LiveCharts.Defaults.ObservablePoint>();
                 var Values = new GearedValues<LiveCharts.Defaults.ObservablePoint>();
                 Values.Quality = Quality.Low;
-                var LineSeries = new GLineSeries()
+                if (Channels[i].Type == ChannelType.Pressure)
                 {
-                    Fill = Brushes.Transparent,
-                    //StrokeThickness = 0.5,
-                    Values = Values,
-                    PointGeometry = null,
-                    LineSmoothness = 1,
-                    Title = Channels[i].Name,
-                };
+                    LineSeries = new GLineSeries()
+                    {
+                        Fill = Brushes.Transparent,
+                        //StrokeThickness = 0.5,
+                        Values = Values,
+                        PointGeometry = null,
+                        LineSmoothness = 1,
+                        Title = Channels[i].Name,
+                        AreaLimit = 0,
+                    };
+                }
+                else if (Channels[i].Type == ChannelType.Digital)
+                {
+                    LineSeries = new GStepLineSeries()
+                    {
+                        Fill = Brushes.Transparent,
+                        //StrokeThickness = 0.5,
+                        Values = Values,
+                        PointGeometry = null,
+                        Title = Channels[i].Name,
+                    };
+                }
+                else
+                {
+                    LineSeries = new GLineSeries();
+                }
                 //var Series = new Series();
                 //Series.ChartType = SeriesChartType.Spline;
                 //Series.BorderWidth = 2;
@@ -547,7 +583,7 @@ namespace ChamberPressureGauge
                 {
                     if (x % AvgX == 0)
                     {
-                        double SecX = (double)(x - AvgX / 2) / (2000 * 3);
+                        double SecX = (double)(x - AvgX / 2d) / (2000d * 3.2d);
                         double AvgY = y;
                         //Series.Points.AddXY(SecX, AvgY);
                         Values.Add(new LiveCharts.Defaults.ObservablePoint(SecX, AvgY));
@@ -556,7 +592,7 @@ namespace ChamberPressureGauge
                 }
                 //DataChart.Series.Add(Series);
 
-                lvChart.Series.Add(LineSeries);
+                lvChart.Series.Add((LiveCharts.Definitions.Series.ISeriesView)LineSeries);
             }
 
             //ChartArea.AxisX.ScrollBar = new AxisScrollBar();
@@ -734,17 +770,56 @@ namespace ChamberPressureGauge
             //e.Text = string.Format("压力: {1}" + Environment.NewLine + "时间: {0}", txtX.Text, txtY.Text);
         }
 
-        //private void txtMeasuringTime_LostFocus(object sender, EventArgs e)
-        //{
-        //    try
-        //    {
-        //        _Slaver.MeasuringTime = int.Parse(txtMeasuringTime.Text);
-        //    }
-        //    catch
-        //    {
+        private void Report(object sender, EventArgs e)
+        {
+            tbReport.Enabled = false;
+            bwBuildReport.RunWorkerAsync();
+        }
 
-        //    }
-        //    txtMeasuringTime.Text = string.Format("{0}", _Slaver.MeasuringTime);
-        //}
+        private void bwBuildReport_DoWork(object sender, DoWorkEventArgs e)
+        {
+            Log("正在导出报告...");
+            Bitmap ChartBitmap = new Bitmap(lvChart.Width, lvChart.Height);
+            lvChart.Invoke(new Action(() =>
+            {
+                lvChart.DrawToBitmap(ChartBitmap, new Rectangle(0, 0, lvChart.Width, lvChart.Height));
+            }));
+            //lvChart.DrawToBitmap(ChartBitmap, new Rectangle(0, 0, lvChart.Width, lvChart.Height));
+            ChartBitmap.Save(System.Windows.Forms.Application.StartupPath + "/report/img.jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
+
+            PDFReport Report = new PDFReport();
+            Report.FilePath = string.Format("{0}/report/{1}.pdf", System.Windows.Forms.Application.StartupPath, DateTime.Now.ToString("yyyyMMddHHmmss"));
+            Report.AddTitle("测量报告");
+            Report.AddEmptyLine();
+            Report.AddText(string.Format("测量日期: {0}", DateTime.Now));
+            Report.AddText(string.Format("测量时间: {0} 毫秒", _Slaver.MeasuringTime));
+            if (_Slaver.TriggerMode == TriggerMode.Auto)
+            {
+                BaseChannel TriggerChannel = _Slaver.Channels[_Slaver.GetTriggerChannel(ChannelType.Pressure)];
+                Report.AddText("触发方式: 自动触发");
+                Report.AddText(string.Format("触发通道: {0}", TriggerChannel.Name));
+                Report.AddText(string.Format("触发值: {0} MPa", TriggerChannel.TriggerIncrement));
+            }
+            else if (_Slaver.TriggerMode == TriggerMode.manual)
+            {
+                Report.AddText("触发方式: 手动触发");
+            }
+            else if (_Slaver.TriggerMode == TriggerMode.External)
+            {
+                Report.AddText("触发方式: 外触发");
+            }
+            Report.AddEmptyLine();
+            Report.AddText("测量结果:");
+            Report.AddImage(ChartBitmap);
+            Report.Print();
+            string WaterMarkPDFPath = string.Format("report/Report{0}.pdf", DateTime.Now.ToString("yyyyMMddHHmmss"));
+            Log("导出报告完成，正在打开...");
+            Report.Open();
+        }
+
+        private void bwBuildReport_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            tbReport.Enabled = true; ;
+        }
     }
 }

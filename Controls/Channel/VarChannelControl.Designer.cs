@@ -1,6 +1,6 @@
-﻿namespace ChamberPressureGauge.Controls
+﻿namespace Controls.Channel
 {
-    partial class VarChannel
+    partial class VarChannelControl
     {
         /// <summary> 
         /// 必需的设计器变量。

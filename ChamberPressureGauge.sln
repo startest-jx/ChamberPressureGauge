@@ -4,6 +4,23 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.26430.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChamberPressureGauge", "ChamberPressureGauge\ChamberPressureGauge.csproj", "{EAD796EB-6559-48CF-AB45-74540A4C37DA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A373AB19-E78F-4791-8371-A9BC1F53869D} = {A373AB19-E78F-4791-8371-A9BC1F53869D}
+		{D754C55D-69C4-403B-86AA-5D45B2BD1A73} = {D754C55D-69C4-403B-86AA-5D45B2BD1A73}
+		{2E5205A3-173F-4CC7-A806-487B1F0403E6} = {2E5205A3-173F-4CC7-A806-487B1F0403E6}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Communication", "Communication\Communication.csproj", "{FD3C58FA-4727-407F-BEED-1122974638CD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slaver", "Slaver\Slaver.csproj", "{A373AB19-E78F-4791-8371-A9BC1F53869D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D754C55D-69C4-403B-86AA-5D45B2BD1A73} = {D754C55D-69C4-403B-86AA-5D45B2BD1A73}
+		{FD3C58FA-4727-407F-BEED-1122974638CD} = {FD3C58FA-4727-407F-BEED-1122974638CD}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Controls", "Controls\Controls.csproj", "{D754C55D-69C4-403B-86AA-5D45B2BD1A73}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Report", "Report\Report.csproj", "{2E5205A3-173F-4CC7-A806-487B1F0403E6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +32,22 @@ Global
 		{EAD796EB-6559-48CF-AB45-74540A4C37DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EAD796EB-6559-48CF-AB45-74540A4C37DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EAD796EB-6559-48CF-AB45-74540A4C37DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD3C58FA-4727-407F-BEED-1122974638CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD3C58FA-4727-407F-BEED-1122974638CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD3C58FA-4727-407F-BEED-1122974638CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD3C58FA-4727-407F-BEED-1122974638CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A373AB19-E78F-4791-8371-A9BC1F53869D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A373AB19-E78F-4791-8371-A9BC1F53869D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A373AB19-E78F-4791-8371-A9BC1F53869D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A373AB19-E78F-4791-8371-A9BC1F53869D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D754C55D-69C4-403B-86AA-5D45B2BD1A73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D754C55D-69C4-403B-86AA-5D45B2BD1A73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D754C55D-69C4-403B-86AA-5D45B2BD1A73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D754C55D-69C4-403B-86AA-5D45B2BD1A73}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E5205A3-173F-4CC7-A806-487B1F0403E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E5205A3-173F-4CC7-A806-487B1F0403E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E5205A3-173F-4CC7-A806-487B1F0403E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E5205A3-173F-4CC7-A806-487B1F0403E6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

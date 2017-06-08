@@ -7,12 +7,11 @@ using System.Text;
 using System.Windows.Forms;
 using System.Threading;
 
-namespace ChamberPressureGauge.Controls
+namespace Controls.Channel
 {
-    public partial class VarChannel : UserControl
+    public partial class VarChannelControl : UserControl
     {
-        private Mutex DataLock = new Mutex(), 
-            CalLock = new Mutex();
+        private Mutex DataLock = new Mutex();
         private int _OriginData;
         public int OriginData {
             set
@@ -33,28 +32,16 @@ namespace ChamberPressureGauge.Controls
                 return temp;
             }
         }
-        private double _Calibration;
-        public double Calibration
-        {
-            set
-            {
-                CalLock.WaitOne();
-                _Calibration = value;
-                CalLock.ReleaseMutex();
-            }
-            get
-            {
-                CalLock.WaitOne();
-                var temp = _Calibration;
-                CalLock.ReleaseMutex();
-                return temp;
-            }
-        }
-        public VarChannel()
+
+        public VarChannelControl()
         {
             InitializeComponent();
         }
-        public virtual void RefreshData(int CurrentData)
+        public virtual void SetTitle(string Title)
+        {
+
+        }
+        public virtual void RefreshData(double CurrentData)
         {
 
         }

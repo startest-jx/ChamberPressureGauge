@@ -11,50 +11,110 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>D:\Product\CPG\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <AutorunEnabled>true</AutorunEnabled>
+    <ApplicationRevision>2</ApplicationRevision>
+    <ApplicationVersion>1.0.0.2</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <GenerateSerializationAssemblies>On</GenerateSerializationAssemblies>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Images\monitor.ico</ApplicationIcon>
+    <ApplicationIcon>Images\soft.ico</ApplicationIcon>
   </PropertyGroup>
-  <PropertyGroup>
-    <NoWin32Manifest>true</NoWin32Manifest>
-  </PropertyGroup>
+  <PropertyGroup />
   <PropertyGroup>
     <StartupObject>ChamberPressureGauge.Program</StartupObject>
   </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>3821BEF3B83EA02BE2415E9F94FBFAF7F76CD032</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>ChamberPressureGauge_TemporaryKey.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>false</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>false</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetZone>LocalIntranet</TargetZone>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Communication, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Release\bin\comm\Communication.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Controls">
+      <HintPath>..\Release\bin\controls\Controls.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="LiveCharts, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
-      <HintPath>..\packages\LiveCharts.0.9.6\lib\net40\LiveCharts.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Release\bin\controls\LiveCharts.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="LiveCharts.Geared, Version=1.2.8.0, Culture=neutral, PublicKeyToken=7292f245d14ab8bf, processorArchitecture=MSIL">
-      <HintPath>..\packages\LiveCharts.Geared.1.2.8\lib\net40\LiveCharts.Geared.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Release\bin\controls\LiveCharts.Geared.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="LiveCharts.WinForms, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
-      <HintPath>..\packages\LiveCharts.WinForms.0.9.6\lib\net40\LiveCharts.WinForms.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Release\bin\controls\LiveCharts.WinForms.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="LiveCharts.Wpf, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
-      <HintPath>..\packages\LiveCharts.Wpf.0.9.6\lib\net40\LiveCharts.Wpf.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Release\bin\controls\LiveCharts.Wpf.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="Report, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Release\bin\Report.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Slaver">
+      <HintPath>..\Release\bin\slaver\Slaver.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
@@ -66,31 +126,7 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controls\ChannelData.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Controls\CountDown.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Controls\CountDown.Designer.cs">
-      <DependentUpon>CountDown.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\PressureChannel.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Controls\PressureChannel.Designer.cs">
-      <DependentUpon>PressureChannel.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\VarChannel.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Controls\VarChannel.Designer.cs">
-      <DependentUpon>VarChannel.cs</DependentUpon>
-    </Compile>
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="Modules\Channel.cs" />
-    <Compile Include="Modules\Slaver.cs" />
-    <Compile Include="Modules\Comm.cs" />
     <Compile Include="UI\ConfigWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -105,12 +141,12 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Controls\CountDown.resx">
-      <DependentUpon>CountDown.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\PressureChannel.resx">
-      <DependentUpon>PressureChannel.cs</DependentUpon>
-    </EmbeddedResource>
+    <Compile Include="UI\test.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\test.Designer.cs">
+      <DependentUpon>test.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="UI\ConfigWindow.resx">
       <DependentUpon>ConfigWindow.cs</DependentUpon>
     </EmbeddedResource>
@@ -127,8 +163,14 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <None Include="app.config" />
+    <EmbeddedResource Include="UI\test.resx">
+      <DependentUpon>test.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
+    <None Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -170,11 +212,22 @@
     <None Include="Images\toolbar_stop_listening.ico" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\Logo.bmp" />
     <None Include="Images\toolbar_cancel.ico" />
     <None Include="Images\Refresh.ico" />
+    <None Include="Images\logo.png" />
     <Content Include="Images\monitor.ico" />
     <None Include="Images\monitor.png" />
+    <None Include="Images\soft.ico" />
     <Content Include="Images\toobar_loading.gif" />
   </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

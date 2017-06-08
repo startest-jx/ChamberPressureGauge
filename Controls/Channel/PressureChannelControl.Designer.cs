@@ -1,6 +1,6 @@
-﻿namespace ChamberPressureGauge.Controls
+﻿namespace Controls.Channel
 {
-    partial class PressureChannel
+    partial class PressureChannelControl
     {
         /// <summary> 
         /// 必需的设计器变量。
@@ -29,33 +29,45 @@
         private void InitializeComponent()
         {
             this.gbTitle = new System.Windows.Forms.GroupBox();
-            this.sgData = new LiveCharts.WinForms.SolidGauge();
+            this.agMain = new LiveCharts.WinForms.AngularGauge();
+            this.lblNoDevice = new System.Windows.Forms.Label();
             this.txtCalibration = new System.Windows.Forms.NumericUpDown();
             this.cbRange = new System.Windows.Forms.ComboBox();
-            this.lblNoDevice = new System.Windows.Forms.Label();
             this.gbTitle.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtCalibration)).BeginInit();
             this.SuspendLayout();
             // 
             // gbTitle
             // 
+            this.gbTitle.Controls.Add(this.agMain);
             this.gbTitle.Controls.Add(this.lblNoDevice);
-            this.gbTitle.Controls.Add(this.sgData);
             this.gbTitle.Controls.Add(this.txtCalibration);
             this.gbTitle.Controls.Add(this.cbRange);
             this.gbTitle.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.gbTitle.Location = new System.Drawing.Point(0, 0);
             this.gbTitle.Name = "gbTitle";
-            this.gbTitle.Size = new System.Drawing.Size(230, 85);
+            this.gbTitle.Size = new System.Drawing.Size(239, 85);
             this.gbTitle.TabIndex = 0;
             this.gbTitle.TabStop = false;
             // 
-            // sgData
+            // agMain
             // 
-            this.sgData.Location = new System.Drawing.Point(6, 17);
-            this.sgData.Name = "sgData";
-            this.sgData.Size = new System.Drawing.Size(118, 59);
-            this.sgData.TabIndex = 4;
+            this.agMain.BackColorTransparent = true;
+            this.agMain.Location = new System.Drawing.Point(6, 17);
+            this.agMain.Name = "agMain";
+            this.agMain.Size = new System.Drawing.Size(118, 115);
+            this.agMain.TabIndex = 6;
+            // 
+            // lblNoDevice
+            // 
+            this.lblNoDevice.AutoSize = true;
+            this.lblNoDevice.Font = new System.Drawing.Font("Cambria", 27.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblNoDevice.ForeColor = System.Drawing.Color.DodgerBlue;
+            this.lblNoDevice.Location = new System.Drawing.Point(194, 7);
+            this.lblNoDevice.Name = "lblNoDevice";
+            this.lblNoDevice.Size = new System.Drawing.Size(203, 43);
+            this.lblNoDevice.TabIndex = 5;
+            this.lblNoDevice.Text = "NO DEVICE";
             // 
             // txtCalibration
             // 
@@ -93,24 +105,13 @@
             this.cbRange.TabIndex = 1;
             this.cbRange.SelectedIndexChanged += new System.EventHandler(this.cbRange_SelectedIndexChanged);
             // 
-            // lblNoDevice
-            // 
-            this.lblNoDevice.AutoSize = true;
-            this.lblNoDevice.Font = new System.Drawing.Font("Cambria", 27.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblNoDevice.ForeColor = System.Drawing.Color.DodgerBlue;
-            this.lblNoDevice.Location = new System.Drawing.Point(3, 17);
-            this.lblNoDevice.Name = "lblNoDevice";
-            this.lblNoDevice.Size = new System.Drawing.Size(203, 43);
-            this.lblNoDevice.TabIndex = 5;
-            this.lblNoDevice.Text = "NO DEVICE";
-            // 
-            // PressureChannel
+            // PressureChannelControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.gbTitle);
-            this.Name = "PressureChannel";
-            this.Size = new System.Drawing.Size(230, 85);
+            this.Name = "PressureChannelControl";
+            this.Size = new System.Drawing.Size(239, 85);
             this.gbTitle.ResumeLayout(false);
             this.gbTitle.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtCalibration)).EndInit();
@@ -123,7 +124,7 @@
         private System.Windows.Forms.GroupBox gbTitle;
         private System.Windows.Forms.ComboBox cbRange;
         private System.Windows.Forms.NumericUpDown txtCalibration;
-        private LiveCharts.WinForms.SolidGauge sgData;
         private System.Windows.Forms.Label lblNoDevice;
+        private LiveCharts.WinForms.AngularGauge agMain;
     }
 }
