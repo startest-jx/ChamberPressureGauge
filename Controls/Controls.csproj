@@ -73,6 +73,12 @@
     <Compile Include="Channel\DigitalChannelControl.Designer.cs">
       <DependentUpon>DigitalChannelControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="Chart\MyChart.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Chart\MyChart.Designer.cs">
+      <DependentUpon>MyChart.cs</DependentUpon>
+    </Compile>
     <Compile Include="Other\CountDown.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -111,6 +117,9 @@
     <EmbeddedResource Include="Channel\DigitalChannelControl.resx">
       <DependentUpon>DigitalChannelControl.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Chart\MyChart.resx">
+      <DependentUpon>MyChart.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Other\CountDown.resx">
       <DependentUpon>CountDown.cs</DependentUpon>
     </EmbeddedResource>
@@ -128,9 +137,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Chart\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="Resources\toobar_loading.gif" />
   </ItemGroup>

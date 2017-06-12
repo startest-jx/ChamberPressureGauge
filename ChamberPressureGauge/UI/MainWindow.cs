@@ -110,7 +110,7 @@ namespace ChamberPressureGauge.UI
 
                     lblDisconnected.Show();
                     tcChannel.Hide();
-                    picLoading.Hide();
+                    //picLoading.Hide();
  
                     //foreach (var Item in _Slaver.Channels)
                     //{
@@ -136,7 +136,7 @@ namespace ChamberPressureGauge.UI
 
                     lblDisconnected.Hide();
                     tcChannel.Hide();
-                    picLoading.Show();
+                    //picLoading.Show();
 
                     break;
                 case ConnectStatus.Connected:
@@ -158,7 +158,7 @@ namespace ChamberPressureGauge.UI
 
                     lblDisconnected.Hide();
                     tcChannel.Show();
-                    picLoading.Hide();
+                    //picLoading.Hide();
 
                     break;
                 case ConnectStatus.Measuring:
@@ -179,14 +179,16 @@ namespace ChamberPressureGauge.UI
                     lblStatus.Text = @"正在测量...";
 
                     lblDisconnected.Hide();
-                    tcChannel.Hide();
-                    picLoading.Show();
+                    tcChannel.Show();
+                    //picLoading.Show();
 
                     break;
             }
         }
         public void ConnectControl(ref DoWorkEventArgs e)
         {
+            _log.Print("正在准备连接...");
+            Thread.Sleep(500);
             if (bwConnect.CancellationPending)
             {
                 e.Cancel = true;
@@ -304,7 +306,7 @@ namespace ChamberPressureGauge.UI
         //        return false;
         //    }
         //}
-        private void TimChannelUpdate_Tick(object sender, EventArgs e)
+        private void timChannelUpdate_Tick(object sender, EventArgs e)
         {
             if (_channelUpdating)
                 return;
@@ -374,7 +376,7 @@ namespace ChamberPressureGauge.UI
                 Invoke(new Action(CountDownAfterDone));
                 return;
             }
-            picLoading.Show();
+            //picLoading.Show();
             CountDown.Hide();
         }
         private void CountDownBeforeStart()
@@ -384,7 +386,7 @@ namespace ChamberPressureGauge.UI
                 Invoke(new Action(CountDownBeforeStart));
                 return;
             }
-            picLoading.Hide();
+            //picLoading.Hide();
             CountDown.Show();
         }
         private void WinLoad(object sender, EventArgs e)
@@ -471,33 +473,38 @@ namespace ChamberPressureGauge.UI
             _slaver.Reset();
             ChartInit();
         }
+
+        private void StartConnect()
+        {
+            bwConnect.RunWorkerAsync();
+            ShowLoadWindow();
+        }
+
+        private void DisConnect()
+        {
+            timChannelUpdate.Stop();
+            if (bwConnect.IsBusy)
+            {
+                _log.Print("正在取消...");
+                bwConnect.CancelAsync();
+            }
+            _slaver.Status = ConnectStatus.Disconnected;
+            _slaver.Close();
+        }
         private void Connect(object sender, EventArgs e)
         {
             switch (_slaver.Status)
             {
                 case ConnectStatus.Disconnected:
-                    _log.Print("正在准备连接...");
-                    Thread.Sleep(500);
-                    bwConnect.RunWorkerAsync();
+                    StartConnect();
                     break;
                 case ConnectStatus.Connected:
-                    timChannelUpdate.Stop();
-                    if (bwConnect.IsBusy)
-                    {
-                        _log.Print("正在取消...");
-                        bwConnect.CancelAsync();
-                    }
-                    //_Connect.Abort();
-                    _slaver.Status = ConnectStatus.Disconnected;
-                    // 关闭连接
-                    _slaver.Close();
-                    break;
                 case ConnectStatus.Connecting:
-                    _log.Print("正在取消...");
-                    bwConnect.CancelAsync();
+                    DisConnect();
                     break;
+                default:
+                    return;
             }
-            ShowLoadWindow();
         }
         private void Measure(ref BackgroundWorker sender, ref DoWorkEventArgs e)
         {
@@ -512,26 +519,28 @@ namespace ChamberPressureGauge.UI
             timChannelUpdate.Start();
             _slaver.Status = ConnectStatus.Connected;
         }
+
+        private void StartMeasure()
+        {
+            bwMeasure.RunWorkerAsync();
+            ShowLoadWindow();
+        }
+
+        private void StopMeasure()
+        {
+            _log.Print("正在取消...");
+            CountDown.Cancel();
+            bwMeasure.CancelAsync();
+        }
         private void Start(object sender, EventArgs e)
         {
             switch (_slaver.Status)
             {
                 case ConnectStatus.Connected:
-                    //txtMeasuringTime_LostFocus(null, null);
-                    _slaver.MeasuringTime = int.Parse(txtMeasuringTime.Text.Replace(" ", ""));
-                    _log.Print("打开测量线程.");
-                    bwMeasure.RunWorkerAsync();
-                    //_Measure = new Thread(new ThreadStart(Measure));
-                    //_Measure.Start();
+                    StartMeasure();
                     break;
                 case ConnectStatus.Measuring:
-                    //_Slaver.Status = ConnectStatus.Connected;
-                    _log.Print("正在取消...");
-                    CountDown.Cancel();
-                    bwMeasure.CancelAsync();
-                    //tCountDown.Abort();
-                    //_Slaver.StopMeasuring();
-                    //Log("测量已取消...");
+                    StopMeasure();
                     break;
             }
         }
@@ -621,61 +630,6 @@ namespace ChamberPressureGauge.UI
             //ChartArea.AxisY.ScrollBar = new AxisScrollBar();
         }
 
-        //private void StartCountDown(double value)
-        //{
-        //    CountDownValue = value;
-
-        //    tCountDown = new Thread(new ThreadStart(CountDown));
-        //    tCountDown.Start();
-        //}
-
-        //private void CountDown()
-        //{
-        //    //if (InvokeRequired)
-        //    //{
-        //    //    _NonParaFun me = new _NonParaFun(CountDown);
-        //    //    Invoke(me);
-        //    //    return;
-        //    //}
-        //    picLoading.Hide();
-        //    lblCountDown.Show();
-        //    while (CountDownValue >= 0)
-        //    {
-        //        try
-        //        {
-        //            lblCountDown.Text = string.Format("{0:F2}s", CountDownValue);
-        //            CountDownValue -= 0.01;
-        //            Thread.Sleep(10);
-        //        }
-        //        catch (ThreadAbortException)
-        //        {
-        //            lblCountDown.Hide();
-        //            picLoading.Show();
-        //            return;
-        //        }
-        //    }
-        //    lblCountDown.Hide();
-        //    picLoading.Show();
-        //}
-
-        //private void ShowPointTooltip(object sender, ToolTipEventArgs e)
-        //{
-        //    if (e.HitTestResult.ChartElementType == ChartElementType.DataPoint)
-        //    {
-        //        Cursor = Cursors.Cross;
-        //        int i = e.HitTestResult.PointIndex;
-        //        DataPoint dp = e.HitTestResult.Series.Points[i];
-        //        txtX.Text = string.Format("{0:F3} s", dp.XValue);
-        //        txtY.Text = string.Format("{0:F4} MPa", dp.YValues[0]);
-        //        e.Text = string.Format("压力: {1}" + Environment.NewLine + "时间: {0}", txtX.Text, txtY.Text);
-
-        //    }
-        //    else
-        //    {
-        //        Cursor = Cursors.Default;
-        //    }
-        //}
-
         private void cbTriggerMode_SelectedIndexChanged(object sender, EventArgs e)
         {
             _slaver.TriggerMode = (TriggerMode)cbTriggerMode.SelectedIndex;
@@ -737,6 +691,7 @@ namespace ChamberPressureGauge.UI
 
         private void bwConnect_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            CloseLoadWindow();
             if (e.Cancelled)
             {
                 _log.Print("连接失败.");
@@ -755,11 +710,14 @@ namespace ChamberPressureGauge.UI
         private void bwMeasure_DoWork(object sender, DoWorkEventArgs e)
         {
             _slaver.Status = ConnectStatus.Measuring;
+            _slaver.MeasuringTime = int.Parse(txtMeasuringTime.Text.Replace(" ", ""));
+            _log.Print("打开测量线程.");
             Measure(ref bwMeasure, ref e);
         }
 
         private void bwMeasure_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            CloseLoadWindow();
             _log.Print(e.Cancelled ? "测量失败." : "测量完成.");
             _slaver.Status = ConnectStatus.Connected;
         }
@@ -781,6 +739,7 @@ namespace ChamberPressureGauge.UI
         {
             tbReport.Enabled = false;
             bwBuildReport.RunWorkerAsync();
+            ShowLoadWindow();
         }
 
         private void bwBuildReport_DoWork(object sender, DoWorkEventArgs e)
@@ -832,6 +791,7 @@ namespace ChamberPressureGauge.UI
 
         private void bwBuildReport_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            CloseLoadWindow();
             tbReport.Enabled = true;
         }
     }

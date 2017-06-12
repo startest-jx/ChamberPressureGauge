@@ -86,8 +86,8 @@
             this.dcc3 = new Controls.Channel.DigitalChannelControl();
             this.dcc2 = new Controls.Channel.DigitalChannelControl();
             this.dcc1 = new Controls.Channel.DigitalChannelControl();
-            this.picLoading = new System.Windows.Forms.PictureBox();
             this.CountDown = new Controls.Other.CountDown();
+            this.lblDisconnected = new System.Windows.Forms.Label();
             this.gbChart = new System.Windows.Forms.GroupBox();
             this.lvChart = new LiveCharts.WinForms.CartesianChart();
             this.txtY = new System.Windows.Forms.TextBox();
@@ -102,7 +102,6 @@
             this.bwConnect = new System.ComponentModel.BackgroundWorker();
             this.bwMeasure = new System.ComponentModel.BackgroundWorker();
             this.bwBuildReport = new System.ComponentModel.BackgroundWorker();
-            this.lblDisconnected = new System.Windows.Forms.Label();
             this.menuMain.SuspendLayout();
             this.tbMain.SuspendLayout();
             this.staMain.SuspendLayout();
@@ -111,7 +110,6 @@
             this.tcChannel.SuspendLayout();
             this.tpPressure.SuspendLayout();
             this.tpDigital.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.picLoading)).BeginInit();
             this.gbChart.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.timChannelUpdate)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -409,7 +407,6 @@
             // gbTotalChannel
             // 
             this.gbTotalChannel.Controls.Add(this.tcChannel);
-            this.gbTotalChannel.Controls.Add(this.picLoading);
             this.gbTotalChannel.Controls.Add(this.CountDown);
             this.gbTotalChannel.Controls.Add(this.lblDisconnected);
             this.gbTotalChannel.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
@@ -675,17 +672,6 @@
             this.dcc1.Size = new System.Drawing.Size(239, 85);
             this.dcc1.TabIndex = 0;
             // 
-            // picLoading
-            // 
-            this.picLoading.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.picLoading.Image = global::ChamberPressureGauge.Properties.Resources.toobar_loading;
-            this.picLoading.Location = new System.Drawing.Point(3, 19);
-            this.picLoading.Name = "picLoading";
-            this.picLoading.Size = new System.Drawing.Size(503, 414);
-            this.picLoading.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
-            this.picLoading.TabIndex = 8;
-            this.picLoading.TabStop = false;
-            // 
             // CountDown
             // 
             this.CountDown.AutoSize = true;
@@ -693,6 +679,17 @@
             this.CountDown.Name = "CountDown";
             this.CountDown.Size = new System.Drawing.Size(302, 205);
             this.CountDown.TabIndex = 9;
+            // 
+            // lblDisconnected
+            // 
+            this.lblDisconnected.AutoSize = true;
+            this.lblDisconnected.Font = new System.Drawing.Font("Cambria", 48F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblDisconnected.ForeColor = System.Drawing.Color.DodgerBlue;
+            this.lblDisconnected.Location = new System.Drawing.Point(40, 180);
+            this.lblDisconnected.Name = "lblDisconnected";
+            this.lblDisconnected.Size = new System.Drawing.Size(428, 75);
+            this.lblDisconnected.TabIndex = 15;
+            this.lblDisconnected.Text = "Disconnected";
             // 
             // gbChart
             // 
@@ -766,7 +763,7 @@
             // 
             this.timChannelUpdate.Interval = 500D;
             this.timChannelUpdate.SynchronizingObject = this;
-            this.timChannelUpdate.Elapsed += new System.Timers.ElapsedEventHandler(this.TimChannelUpdate_Tick);
+            this.timChannelUpdate.Elapsed += new System.Timers.ElapsedEventHandler(this.timChannelUpdate_Tick);
             // 
             // groupBox1
             // 
@@ -825,17 +822,6 @@
             this.bwBuildReport.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bwBuildReport_DoWork);
             this.bwBuildReport.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bwBuildReport_RunWorkerCompleted);
             // 
-            // lblDisconnected
-            // 
-            this.lblDisconnected.AutoSize = true;
-            this.lblDisconnected.Font = new System.Drawing.Font("Cambria", 48F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblDisconnected.ForeColor = System.Drawing.Color.DodgerBlue;
-            this.lblDisconnected.Location = new System.Drawing.Point(40, 180);
-            this.lblDisconnected.Name = "lblDisconnected";
-            this.lblDisconnected.Size = new System.Drawing.Size(428, 75);
-            this.lblDisconnected.TabIndex = 15;
-            this.lblDisconnected.Text = "Disconnected";
-            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -870,7 +856,6 @@
             this.tpPressure.ResumeLayout(false);
             this.tpPressure.PerformLayout();
             this.tpDigital.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.picLoading)).EndInit();
             this.gbChart.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.timChannelUpdate)).EndInit();
             this.groupBox1.ResumeLayout(false);
@@ -928,7 +913,7 @@
         private System.Windows.Forms.Button btnRefreshTriggerChannel;
         private System.Windows.Forms.Label lblSecond;
         private System.Windows.Forms.Label lblMeasuringTime;
-        private System.Windows.Forms.PictureBox picLoading;
+        //private System.Windows.Forms.PictureBox picLoading;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox txtY;
         private System.Windows.Forms.Label label3;
