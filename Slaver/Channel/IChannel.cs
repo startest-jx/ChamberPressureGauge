@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-
-namespace Slaver.Channel
+﻿namespace Slaver.Channel
 {
     public interface IChannel
     {
-        double Formula(int OriginData);
+        double Formula(int originData);
         void RefreshData();
         //bool WaitTrigger(ref BackgroundWorker sender, ref DoWorkEventArgs e);
     }

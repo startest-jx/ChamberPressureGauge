@@ -1,19 +1,14 @@
 ﻿//using ChamberPressureGauge.Modules;
 //using ChamberPressureGauge.Controls;
 using Report.iTextSharp;
-using Slaver;
+using Slaver.Slaver;
 using Slaver.Channel;
-using Controls;
-using ChamberPressureGauge.UI;
+using Tools.Log;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 using System.Threading;
-using System.Windows;
 using ChamberPressureGauge.Properties;
 
 //using System.Windows.Media;
@@ -22,8 +17,8 @@ using LiveCharts.Wpf;
 using Brushes = System.Windows.Media.Brushes;
 using DColor = System.Drawing.Color;
 using MColor = System.Windows.Media.Color;
-using System.Windows.Media;
 using LiveCharts;
+using Controls.Other;
 
 //using LiveCharts;
 //using LiveCharts.Defaults;
@@ -36,142 +31,154 @@ namespace ChamberPressureGauge.UI
 {
     public partial class MainWindow : Form
     {
-        DColor[] Colors = new DColor[10]
-        {
-                DColor.Black,
-                DColor.Red,
-                DColor.LightBlue,
-                DColor.Green,
-                DColor.Yellow,
-                DColor.Purple,
-                DColor.Brown,
-                DColor.DarkBlue,
-                DColor.Pink,
-                DColor.Gray,
-        };
+        //DColor[] Colors = new DColor[10]
+        //{
+        //        DColor.Black,
+        //        DColor.Red,
+        //        DColor.LightBlue,
+        //        DColor.Green,
+        //        DColor.Yellow,
+        //        DColor.Purple,
+        //        DColor.Brown,
+        //        DColor.DarkBlue,
+        //        DColor.Pink,
+        //        DColor.Gray,
+        //};
         // 全局变量
-        private delegate void _Log(string LogInfo);
-        private delegate void _ChangeStatus(ConnectStatus Status);
-        private delegate void NonParaFun();
-        private delegate void _DrawLines(BaseChannel[] Channels);
-        private delegate void _StartCountDown(double value);
-        
-        SlaverDevice _Slaver;  // 下位机
-        bool ChannelUpdating = false;  // 通道检测Timer是否被占用
+        private LoadWindow _loadWindow;
+        private Log _log;  // 日志对象
+        private SlaverDevice _slaver;  // 下位机
+        private bool _channelUpdating;  // 通道检测Timer是否被占用
+
+        private Thread _loadingThread;
         //private Chart DataChart;
         //private double CountDownValue;  // 倒计时
         //private Thread tCountDown;
         //private CountDown CountDown;
 
-        public void Log(string LogInfo)  // 日志输出
+        public void LogPrint(string logInfo)  // 日志输出
         {
             if (InvokeRequired)
             {
-                _Log me = new _Log(Log);
-                object[] arg = new object[] { LogInfo };
-                Invoke(me, arg);
-            }
-            else
-            {
-                txtLog.AppendText(string.Format("{0} {1}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:ffff"), LogInfo) + Environment.NewLine);
-            }
-                
-        }
-        public void ChangeStatus(ConnectStatus Status)
-        {
-            if (InvokeRequired)
-            {
-                _ChangeStatus me = new _ChangeStatus(ChangeStatus);
-                object[] arg = new object[] { Status };
-                Invoke(me, arg);
+                Invoke(new Action(() => { LogPrint(logInfo); }));
                 return;
             }
-            switch (Status)
+            txtLog.AppendText($"{DateTime.Now:yyyy-MM-dd HH:mm:ss:ffff} {logInfo}" + Environment.NewLine);
+        }
+
+        private void ShowLoadWindow()
+        {
+            _log.ShowLogFun += _loadWindow.Message;
+            _loadWindow.TopMost = true;
+            _loadWindow.StartPosition = FormStartPosition.CenterParent;
+            _loadWindow.ShowDialog();
+            //_loadingThread = new Thread(() => { _loadWindow.ShowDialog(); });
+            //_loadingThread.Start();
+        }
+
+        private void CloseLoadWindow()
+        {
+            _log.ShowLogFun -= _loadWindow.Message;
+            _loadWindow.Hide();
+        }
+
+        public void ChangeStatus(ConnectStatus status)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => { ChangeStatus(status); }));
+                return;
+            }
+            switch (status)
             {
                 case ConnectStatus.Disconnected:
                     tbConnet.Enabled = true;
-                    tbConnet.ToolTipText = "连接";
+                    tbConnet.ToolTipText = @"连接";
                     tbConnet.Image = Resources.toolbar_connect;
 
                     tbStart.Enabled = false;
-                    tbStart.ToolTipText = "开始测量(需要先连接)";
+                    tbStart.ToolTipText = @"开始测量(需要先连接)";
                     tbStart.Image = Resources.toolbar_start_listening;
 
                     tbReset.Enabled = false;
-                    tbReset.ToolTipText = "复位(需要先连接)";
+                    tbReset.ToolTipText = @"复位(需要先连接)";
 
                     tbChart.Enabled = false;
-                    tbChart.ToolTipText = "查看图表(需要先连接)";
+                    tbChart.ToolTipText = @"查看图表(需要先连接)";
 
-                    lblStatus.Text = "断开";
+                    lblStatus.Text = @"断开";
 
-                    tcChannel.Show();
+                    lblDisconnected.Show();
+                    tcChannel.Hide();
                     picLoading.Hide();
  
-                    foreach (var Item in _Slaver.Channels)
-                    {
-                        Item.DeviceExist = false;
-                    }
+                    //foreach (var Item in _Slaver.Channels)
+                    //{
+                    //    Item.DeviceExist = false;
+                    //}
                     break;
                 case ConnectStatus.Connecting:
-                    Log("开始连接...");
+                    _log.Show("开始连接...");
                     tbConnet.Enabled = true;
-                    tbConnet.ToolTipText = "取消";
+                    tbConnet.ToolTipText = @"取消";
                     tbConnet.Image = Resources.toolbar_cancel;
 
                     tbStart.Enabled = false;
-                    tbStart.ToolTipText = "开始测量(需要先连接)";
+                    tbStart.ToolTipText = @"开始测量(需要先连接)";
 
                     tbReset.Enabled = false;
-                    tbReset.ToolTipText = "复位(需要先连接)";
+                    tbReset.ToolTipText = @"复位(需要先连接)";
 
                     tbChart.Enabled = false;
-                    tbChart.ToolTipText = "查看图表(需要先连接)";
+                    tbChart.ToolTipText = @"查看图表(需要先连接)";
 
-                    lblStatus.Text = "正在连接...";
+                    lblStatus.Text = @"正在连接...";
 
-                    tcChannel.Show();
-                    picLoading.Hide();
+                    lblDisconnected.Hide();
+                    tcChannel.Hide();
+                    picLoading.Show();
 
                     break;
                 case ConnectStatus.Connected:
                     tbConnet.Enabled = true;
-                    tbConnet.ToolTipText = "断开连接";
+                    tbConnet.ToolTipText = @"断开连接";
                     tbConnet.Image = Resources.toolbar_disconnect;
 
                     tbStart.Enabled = true;
-                    tbStart.ToolTipText = "开始测量";
+                    tbStart.ToolTipText = @"开始测量";
                     tbStart.Image = Resources.toolbar_start_listening;
 
                     tbReset.Enabled = true;
-                    tbReset.ToolTipText = "复位";
+                    tbReset.ToolTipText = @"复位";
 
                     tbChart.Enabled = true;
-                    tbChart.ToolTipText = "查看图表";
+                    tbChart.ToolTipText = @"查看图表";
 
-                    lblStatus.Text = "已连接";
+                    lblStatus.Text = @"已连接";
 
+                    lblDisconnected.Hide();
                     tcChannel.Show();
                     picLoading.Hide();
 
                     break;
                 case ConnectStatus.Measuring:
                     tbConnet.Enabled = false;
-                    tbConnet.ToolTipText = "断开连接";
+                    tbConnet.ToolTipText = @"断开连接";
                     tbConnet.Image = Resources.toolbar_disconnect;
 
                     tbStart.Enabled = true;
-                    tbStart.ToolTipText = "停止测量";
+                    tbStart.ToolTipText = @"停止测量";
                     tbStart.Image = Resources.toolbar_stop_listening;
 
                     tbReset.Enabled = false;
-                    tbReset.ToolTipText = "复位";
+                    tbReset.ToolTipText = @"复位";
 
                     tbChart.Enabled = false;
-                    tbChart.ToolTipText = "查看图表";
+                    tbChart.ToolTipText = @"查看图表";
 
-                    lblStatus.Text = "正在测量...";
+                    lblStatus.Text = @"正在测量...";
 
+                    lblDisconnected.Hide();
                     tcChannel.Hide();
                     picLoading.Show();
 
@@ -186,7 +193,7 @@ namespace ChamberPressureGauge.UI
                 return;
             }
             // 连接
-            if(!_Slaver.Connect())
+            if(!_slaver.Connect())
             {
                 bwConnect.CancelAsync();
                 //_Slaver.Close();
@@ -198,20 +205,20 @@ namespace ChamberPressureGauge.UI
                 return;
             }
             // 复位
-            _Slaver.Reset();
+            _slaver.Reset();
             if (bwConnect.CancellationPending)
             {
                 e.Cancel = true;
                 return;
             }
             // 自检
-            _Slaver.CheckClockStatus();
+            _slaver.CheckClockStatus();
             if (bwConnect.CancellationPending)
             {
                 e.Cancel = true;
                 return;
             }
-            _Slaver.SelfTest();
+            _slaver.SelfTest();
             if (bwConnect.CancellationPending)
             {
                 e.Cancel = true;
@@ -224,7 +231,7 @@ namespace ChamberPressureGauge.UI
                 return;
             }
             // 开始接收
-            _Slaver.StartReceiving();
+            _slaver.StartReceiving();
             if (bwConnect.CancellationPending)
             {
                 e.Cancel = true;
@@ -237,44 +244,39 @@ namespace ChamberPressureGauge.UI
                 return;
             }
             // 检查通道是否正常
-            _Slaver.UpdateChannelHealth();
+            //Invoke(new Action(() => { _slaver.UpdateChannelHealth(); }));
+            Invoke(new Action(_slaver.UpdateChannelHealth));
+            //_slaver.UpdateChannelHealth();
             if (bwConnect.CancellationPending)
             {
                 e.Cancel = true;
                 return;
             }
-            _Slaver.SelfTest(true);
+            _slaver.SelfTest(true);
             if (bwConnect.CancellationPending)
             {
                 e.Cancel = true;
                 return;
             }
-            _Slaver.Reset();
+            _slaver.Reset();
             if (bwConnect.CancellationPending)
             {
                 e.Cancel = true;
                 return;
             }
-            _Slaver.UpdateChannelExist();
+            Invoke(new Action(() => { _slaver.UpdateChannelExist(); }));
             if (bwConnect.CancellationPending)
             {
                 e.Cancel = true;
                 return;
             }
             // 通道检测
-            Log("打开通道检测线程.");
+            _log.Print("打开通道检测线程.");
             timChannelUpdate.Start();
             if (bwConnect.CancellationPending)
             {
                 e.Cancel = true;
-                return;
             }
-            //Thread.Sleep(2000);
-            //if (bwConnect.CancellationPending)
-            //{
-            //    e.Cancel = true;
-            //    return;
-            //}
         }
         //public bool ConnectCtrl()
         //{
@@ -302,23 +304,23 @@ namespace ChamberPressureGauge.UI
         //        return false;
         //    }
         //}
-        private void timChannelUpdate_Tick(object sender, EventArgs e)
+        private void TimChannelUpdate_Tick(object sender, EventArgs e)
         {
-            if (ChannelUpdating)
+            if (_channelUpdating)
                 return;
-            ChannelUpdating = true;
+            _channelUpdating = true;
             ChannelCheck();
-            ChannelUpdating = false;
+            _channelUpdating = false;
         }
         public void ChannelCheck()
         {
-            if (_Slaver.Status == ConnectStatus.Connected || _Slaver.Status == ConnectStatus.Measuring)
+            if (_slaver.Status == ConnectStatus.Connected || _slaver.Status == ConnectStatus.Measuring)
             {
-                if (!_Slaver.UpdateChannelExist())
+                if (!_slaver.UpdateChannelExist())
                 {
                     return;
                 }
-                _Slaver.UpdateChannelData();
+                _slaver.UpdateChannelData();
             }
         }
         public MainWindow()
@@ -340,7 +342,7 @@ namespace ChamberPressureGauge.UI
             {
                 Title = "时间/s",
                 MinValue = 0,
-                LabelFormatter = value => string.Format("{0:F2}", value),
+                LabelFormatter = value => $"{value:F2}",
                 Separator = new Separator
                 {
                     Step = 1d,
@@ -351,7 +353,7 @@ namespace ChamberPressureGauge.UI
             lvChart.AxisY.Add(new Axis()
             {
                 Title = "压力/MPa",
-                LabelFormatter = value => string.Format("{0:F5}", value)
+                LabelFormatter = value => $"{value:F5}"
             });
         }
 
@@ -359,18 +361,17 @@ namespace ChamberPressureGauge.UI
         {
             //CountDown = new CountDown();
             //gbTotalChannel.Controls.Add(CountDown);
-            CountDown.Location = new System.Drawing.Point((gbTotalChannel.Width - CountDown.Width) / 2, (gbTotalChannel.Height - CountDown.Height) / 2);
-            CountDown.AfterDone = CountDownAfterDone;
-            CountDown.AfterCancel = CountDownAfterDone;
-            CountDown.BeforeStart = CountDownBeforeStart;
+            CountDown.Location = new Point((gbTotalChannel.Width - CountDown.Width) / 2, (gbTotalChannel.Height - CountDown.Height) / 2);
+            CountDown.AfterDone += CountDownAfterDone;
+            CountDown.AfterCancel += CountDownAfterDone;
+            CountDown.BeforeStart += CountDownBeforeStart;
             CountDown.Hide();
         }
         private void CountDownAfterDone()
         {
             if (InvokeRequired)
             {
-                NonParaFun me = new NonParaFun(CountDownAfterDone);
-                Invoke(me);
+                Invoke(new Action(CountDownAfterDone));
                 return;
             }
             picLoading.Show();
@@ -380,8 +381,7 @@ namespace ChamberPressureGauge.UI
         {
             if (InvokeRequired)
             {
-                NonParaFun me = new NonParaFun(CountDownBeforeStart);
-                Invoke(me);
+                Invoke(new Action(CountDownBeforeStart));
                 return;
             }
             picLoading.Hide();
@@ -389,37 +389,59 @@ namespace ChamberPressureGauge.UI
         }
         private void WinLoad(object sender, EventArgs e)
         {
-            Log("程序初始化...");
+            // 注册日志对象
+            _log = new Log();
+            _log.ShowLogFun += LogPrint;
+
+            _log.Print("程序初始化...");
             CountDownInit();
-            _Slaver = new SlaverDevice(Log, ChangeStatus, DrawLines, CountDown.Start);  // 主对象
-            // 控件放置
-            for (int i = 0; i < 6; i ++)
-            {
-                tpPressure.Controls.Add(_Slaver.Channels[i].Control);
-                _Slaver.Channels[i].Control.Location = 
-                    new System.Drawing.Point(i % 2 == 0 ? 10 : _Slaver.Channels[i].Control.Width + 20,
-                    10 + i / 2 * (_Slaver.Channels[i].Control.Height + 10));
-                //_Slaver.Channels[i].Control.Size = new Size(220, 100);
-                _Slaver.Channels[i].Control.TabIndex = i;
-                _Slaver.Channels[i].Control.TabStop = false;
-            }
+            _slaver = new SlaverDevice(_log, ChangeStatus, DrawLines, CountDown.Start);  // 主对象
+            // 控件注册
+            _loadWindow = new LoadWindow();
+            
+            _slaver.Channels[0].Control = pcc1;
+            _slaver.Channels[1].Control = pcc2;
+            _slaver.Channels[2].Control = pcc3;
+            _slaver.Channels[3].Control = pcc4;
+            _slaver.Channels[4].Control = pcc5;
+            _slaver.Channels[5].Control = pcc6;
+
+            _slaver.Channels[6].Control = dcc1;
+            _slaver.Channels[7].Control = dcc2;
+            _slaver.Channels[8].Control = dcc3;
+            _slaver.Channels[9].Control = dcc4;
+
+            _slaver.Channels[10].Control = scc;
+            _slaver.Channels[11].Control = ecc;
+           
+            //for (int i = 0; i < 6; i ++)
+            //{
+
+            //tpPressure.Controls.Add(_Slaver.Channels[i].Control);
+            //_Slaver.Channels[i].Control.Location = 
+            //    new System.Drawing.Point(i % 2 == 0 ? 10 : _Slaver.Channels[i].Control.Width + 20,
+            //    10 + i / 2 * (_Slaver.Channels[i].Control.Height + 10));
+            ////_Slaver.Channels[i].Control.Size = new Size(220, 100);
+            //_Slaver.Channels[i].Control.TabIndex = i;
+            //_Slaver.Channels[i].Control.TabStop = false;
+            //}
 
             ChartInit();
 
 
-            _Slaver.Status = ConnectStatus.Disconnected;
+            _slaver.Status = ConnectStatus.Disconnected;
             cbTriggerMode.SelectedIndex = 0;
             timClock.Start();
-            Log("初始化完成.");
+            _log.Print("初始化完成.");
         }
         private void WinClosing(object sender, FormClosingEventArgs e)
         {
-            if (_Slaver.Status == ConnectStatus.Measuring)
+            if (_slaver.Status == ConnectStatus.Measuring)
             {
                 Start(null, null);
                 Thread.Sleep(1000);
             }
-            if (_Slaver.Status == ConnectStatus.Connected)
+            if (_slaver.Status == ConnectStatus.Connected)
             {
                 Connect(null, null);
             }
@@ -446,153 +468,153 @@ namespace ChamberPressureGauge.UI
         }
         private void Reset(object sender, EventArgs e)
         {
-            _Slaver.Reset();
+            _slaver.Reset();
             ChartInit();
         }
         private void Connect(object sender, EventArgs e)
         {
-            if (_Slaver.Status == ConnectStatus.Disconnected)
+            switch (_slaver.Status)
             {
-                Log("正在准备连接...");
-                Thread.Sleep(500);
-                bwConnect.RunWorkerAsync();
-            }
-            else if (_Slaver.Status == ConnectStatus.Connected)
-            {
-                timChannelUpdate.Stop();
-                if (bwConnect.IsBusy)
-                {
-                    Log("正在取消...");
+                case ConnectStatus.Disconnected:
+                    _log.Print("正在准备连接...");
+                    Thread.Sleep(500);
+                    bwConnect.RunWorkerAsync();
+                    break;
+                case ConnectStatus.Connected:
+                    timChannelUpdate.Stop();
+                    if (bwConnect.IsBusy)
+                    {
+                        _log.Print("正在取消...");
+                        bwConnect.CancelAsync();
+                    }
+                    //_Connect.Abort();
+                    _slaver.Status = ConnectStatus.Disconnected;
+                    // 关闭连接
+                    _slaver.Close();
+                    break;
+                case ConnectStatus.Connecting:
+                    _log.Print("正在取消...");
                     bwConnect.CancelAsync();
-                }
-                //_Connect.Abort();
-                _Slaver.Status = ConnectStatus.Disconnected;
-                // 关闭连接
-                _Slaver.Close();
+                    break;
             }
-            else if (_Slaver.Status == ConnectStatus.Connecting)
-            {
-                Log("正在取消...");
-                bwConnect.CancelAsync();
-            }
+            ShowLoadWindow();
         }
         private void Measure(ref BackgroundWorker sender, ref DoWorkEventArgs e)
         {
-            _Slaver.Status = ConnectStatus.Measuring;
-            Log("关闭通道检测线程.");
+            _slaver.Status = ConnectStatus.Measuring;
+            _log.Print("关闭通道检测线程.");
             timChannelUpdate.Stop();
-            Log("正在准备测量...");
-            _Slaver.StartMeasuring(ref sender, ref e);
+            _log.Print("正在准备测量...");
+            _slaver.StartMeasuring(ref sender, ref e);
             //Log("10秒后重新打开通道检测线程.");
             //Thread.Sleep(10000);
-            Log("打开通道检测线程.");
+            _log.Print("打开通道检测线程.");
             timChannelUpdate.Start();
-            _Slaver.Status = ConnectStatus.Connected;
+            _slaver.Status = ConnectStatus.Connected;
         }
         private void Start(object sender, EventArgs e)
         {
-            if (_Slaver.Status == ConnectStatus.Connected)
+            switch (_slaver.Status)
             {
-                //txtMeasuringTime_LostFocus(null, null);
-                _Slaver.MeasuringTime = int.Parse(txtMeasuringTime.Text.Replace(" ", ""));
-                Log("打开测量线程.");
-                bwMeasure.RunWorkerAsync();
-                //_Measure = new Thread(new ThreadStart(Measure));
-                //_Measure.Start();
-            }
-            else if (_Slaver.Status == ConnectStatus.Measuring)
-            {
-                //_Slaver.Status = ConnectStatus.Connected;
-                Log("正在取消...");
-                CountDown.Cancel();
-                bwMeasure.CancelAsync();
-                //tCountDown.Abort();
-                //_Slaver.StopMeasuring();
-                //Log("测量已取消...");
+                case ConnectStatus.Connected:
+                    //txtMeasuringTime_LostFocus(null, null);
+                    _slaver.MeasuringTime = int.Parse(txtMeasuringTime.Text.Replace(" ", ""));
+                    _log.Print("打开测量线程.");
+                    bwMeasure.RunWorkerAsync();
+                    //_Measure = new Thread(new ThreadStart(Measure));
+                    //_Measure.Start();
+                    break;
+                case ConnectStatus.Measuring:
+                    //_Slaver.Status = ConnectStatus.Connected;
+                    _log.Print("正在取消...");
+                    CountDown.Cancel();
+                    bwMeasure.CancelAsync();
+                    //tCountDown.Abort();
+                    //_Slaver.StopMeasuring();
+                    //Log("测量已取消...");
+                    break;
             }
         }
 
-        public void DrawLines(BaseChannel[] Channels)  // 根据channels绘制曲线
+        public void DrawLines(BaseChannel[] channels)  // 根据channels绘制曲线
         {
-            
+
             if (InvokeRequired)
             {
-                _DrawLines me = new _DrawLines(DrawLines);
-                object[] arg = new object[] { Channels };
-                Invoke(me, arg);
+                Invoke(new Action(() => { DrawLines(channels); }));
                 return;
             }
-            
 
-            int PointCount = int.Parse(txtPointCount.Text.Replace(" ", ""));
-            for (int i = 0; i < Channels.Length; i++)
+            var pointCount = int.Parse(txtPointCount.Text.Replace(" ", ""));
+            foreach (var t in channels)
             {
-                if (!Channels[i].DeviceExist)
+                if (!t.DeviceExist)
                 {
                     continue;
                 }
                 // LiveChart
-                object LineSeries;
+                object lineSeries = null;
                 //var Values = new LiveCharts.ChartValues<LiveCharts.Defaults.ObservablePoint>();
-                var Values = new GearedValues<LiveCharts.Defaults.ObservablePoint>();
-                Values.Quality = Quality.Low;
-                if (Channels[i].Type == ChannelType.Pressure)
+                var values = new GearedValues<LiveCharts.Defaults.ObservablePoint> {Quality = Quality.Low};
+                switch (t.Type)
                 {
-                    LineSeries = new GLineSeries()
-                    {
-                        Fill = Brushes.Transparent,
-                        //StrokeThickness = 0.5,
-                        Values = Values,
-                        PointGeometry = null,
-                        LineSmoothness = 1,
-                        Title = Channels[i].Name,
-                        AreaLimit = 0,
-                    };
-                }
-                else if (Channels[i].Type == ChannelType.Digital)
-                {
-                    LineSeries = new GStepLineSeries()
-                    {
-                        Fill = Brushes.Transparent,
-                        //StrokeThickness = 0.5,
-                        Values = Values,
-                        PointGeometry = null,
-                        Title = Channels[i].Name,
-                    };
-                }
-                else
-                {
-                    LineSeries = new GLineSeries();
+                    case ChannelType.Pressure:
+                        lineSeries = new GLineSeries
+                        {
+                            Fill = Brushes.Transparent,
+                            //StrokeThickness = 0.5,
+                            Values = values,
+                            PointGeometry = null,
+                            LineSmoothness = 1,
+                            Title = t.Name,
+                            AreaLimit = 0,
+                        };
+                        break;
+                    case ChannelType.Digital:
+                        lineSeries = new GStepLineSeries()
+                        {
+                            Fill = Brushes.Transparent,
+                            //StrokeThickness = 0.5,
+                            Values = values,
+                            PointGeometry = null,
+                            Title = t.Name,
+                        };
+                        break;
+                    case ChannelType.Speed:
+                        break;
+                    default:
+                        lineSeries = new GLineSeries();
+                        break;
                 }
                 //var Series = new Series();
                 //Series.ChartType = SeriesChartType.Spline;
                 //Series.BorderWidth = 2;
                 //Series.Color = Colors[i];
                 //Series.LegendText = Channels[i].Name;
-                int x = 0;
-                int AvgX;
-                if (PointCount == 0)
+                var x = 0;
+                int avgX;
+                if (pointCount == 0)
                 {
-                    AvgX = Channels[i].MeasuringData.Count;
+                    avgX = t.MeasuringData.Count;
                 }
                 else
                 {
-                    AvgX = Channels[i].MeasuringData.Count / PointCount;
+                    avgX = t.MeasuringData.Count / pointCount;
                 }
-                foreach (var y in Channels[i].MeasuringData)
+                foreach (var y in t.MeasuringData)
                 {
-                    if (x % AvgX == 0)
+                    if (x % avgX == 0)
                     {
-                        double SecX = (double)(x - AvgX / 2d) / (2000d * 3.2d);
-                        double AvgY = y;
+                        var secX = (x - avgX / 2d) / (2000d * 3.2d);
+                        var avgY = y;
                         //Series.Points.AddXY(SecX, AvgY);
-                        Values.Add(new LiveCharts.Defaults.ObservablePoint(SecX, AvgY));
+                        values.Add(new LiveCharts.Defaults.ObservablePoint(secX, avgY));
                     }
                     x += 1;
                 }
                 //DataChart.Series.Add(Series);
 
-                lvChart.Series.Add((LiveCharts.Definitions.Series.ISeriesView)LineSeries);
+                lvChart.Series.Add((LiveCharts.Definitions.Series.ISeriesView)lineSeries);
             }
 
             //ChartArea.AxisX.ScrollBar = new AxisScrollBar();
@@ -656,15 +678,8 @@ namespace ChamberPressureGauge.UI
 
         private void cbTriggerMode_SelectedIndexChanged(object sender, EventArgs e)
         {
-            _Slaver.TriggerMode = (TriggerMode)cbTriggerMode.SelectedIndex;
-            if (cbTriggerMode.SelectedIndex == 0)
-            {
-                AutoTrigger(true);
-            }
-            else
-            {
-                AutoTrigger(false);
-            }
+            _slaver.TriggerMode = (TriggerMode)cbTriggerMode.SelectedIndex;
+            AutoTrigger(cbTriggerMode.SelectedIndex == 0);
         }
         private void cbTriggerChannel_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -672,31 +687,30 @@ namespace ChamberPressureGauge.UI
             {
                 return;
             }
-            _Slaver.SetTriggerChannel(int.Parse(System.Text.RegularExpressions.Regex.Replace(cbTriggerChannel.SelectedItem.ToString(), @"[^0-9]+", "")) - 1);
+            _slaver.SetTriggerChannel(int.Parse(System.Text.RegularExpressions.Regex.Replace(cbTriggerChannel.SelectedItem.ToString(), @"[^0-9]+", "")) - 1);
         }
 
-        private void AutoTrigger(bool IsOrNot)
+        private void AutoTrigger(bool enable)
         {
-            lblTriggerChannel.Enabled = IsOrNot;
-            cbTriggerChannel.Enabled = IsOrNot;
-            btnRefreshTriggerChannel.Enabled = IsOrNot;
-            if (IsOrNot)
+            lblTriggerChannel.Enabled = enable;
+            cbTriggerChannel.Enabled = enable;
+            btnRefreshTriggerChannel.Enabled = enable;
+            if (enable)
                 RefreshTriggerChannel();
         }
         private void RefreshTriggerChannel()
         {
             if (InvokeRequired)
             {
-                NonParaFun me = new NonParaFun(RefreshTriggerChannel);
-                Invoke(me);
+                Invoke(new Action(RefreshTriggerChannel));
                 return;
             }
             cbTriggerChannel.Items.Clear();
-            for (int i = 0; i < 6; i++)
+            for (var i = 0; i < 6; i++)
             {
-                if (_Slaver.Channels[i].DeviceExist)
+                if (_slaver.Channels[i].DeviceExist)
                 {
-                    cbTriggerChannel.Items.Add(_Slaver.Channels[i].Name);
+                    cbTriggerChannel.Items.Add(_slaver.Channels[i].Name);
                 }
             }
             if (cbTriggerChannel.SelectedIndex == -1 && cbTriggerChannel.Items.Count != 0)
@@ -712,7 +726,7 @@ namespace ChamberPressureGauge.UI
 
         private void bwConnect_DoWork(object sender, DoWorkEventArgs e)
         {
-            _Slaver.Status = ConnectStatus.Connecting;
+            _slaver.Status = ConnectStatus.Connecting;
             ConnectControl(ref e);
         }
 
@@ -725,48 +739,41 @@ namespace ChamberPressureGauge.UI
         {
             if (e.Cancelled)
             {
-                Log("连接失败.");
-                _Slaver.Status = ConnectStatus.Disconnected;
+                _log.Print("连接失败.");
+                _slaver.Status = ConnectStatus.Disconnected;
                 timChannelUpdate.Close();
-                _Slaver.Close();
+                _slaver.Close();
             }
             else
             {
-                Log("已连接.");
-                _Slaver.Status = ConnectStatus.Connected;
+                _log.Print("已连接.");
+                _slaver.Status = ConnectStatus.Connected;
                 RefreshTriggerChannel();
             }
         }
 
         private void bwMeasure_DoWork(object sender, DoWorkEventArgs e)
         {
-            _Slaver.Status = ConnectStatus.Measuring;
+            _slaver.Status = ConnectStatus.Measuring;
             Measure(ref bwMeasure, ref e);
         }
 
         private void bwMeasure_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            if (e.Cancelled)
-            {
-                Log("测量失败.");
-            }
-            else
-            {
-                Log("测量完成.");
-            }
-            _Slaver.Status = ConnectStatus.Connected;
+            _log.Print(e.Cancelled ? "测量失败." : "测量完成.");
+            _slaver.Status = ConnectStatus.Connected;
         }
 
         private void ShowConfigWindow(object sender, EventArgs e)
         {
-            ConfigWindow ConfigWindow = new ConfigWindow();
-            ConfigWindow.ShowDialog();
+            ConfigWindow configWindow = new ConfigWindow();
+            configWindow.ShowDialog();
         }
 
-        private void lvChart_DataHover(object sender, LiveCharts.ChartPoint chartPoint)
+        private void lvChart_DataHover(object sender, ChartPoint chartPoint)
         {
-            txtX.Text = string.Format("{0:F3} s", chartPoint.X);
-            txtY.Text = string.Format("{0:F4} MPa", chartPoint.Y);
+            txtX.Text = $@"{chartPoint.X:F3} s";
+            txtY.Text = $@"{chartPoint.Y:F4} MPa";
             //e.Text = string.Format("压力: {1}" + Environment.NewLine + "时间: {0}", txtX.Text, txtY.Text);
         }
 
@@ -778,48 +785,54 @@ namespace ChamberPressureGauge.UI
 
         private void bwBuildReport_DoWork(object sender, DoWorkEventArgs e)
         {
-            Log("正在导出报告...");
-            Bitmap ChartBitmap = new Bitmap(lvChart.Width, lvChart.Height);
-            lvChart.Invoke(new Action(() =>
+            _log.Print("正在导出报告...");
+            var chartBitmap = new Bitmap(lvChart.Width, lvChart.Height);
+            Invoke(new Action(() =>
             {
-                lvChart.DrawToBitmap(ChartBitmap, new Rectangle(0, 0, lvChart.Width, lvChart.Height));
+                lvChart.DrawToBitmap(chartBitmap, new Rectangle(0, 0, lvChart.Width, lvChart.Height));
             }));
             //lvChart.DrawToBitmap(ChartBitmap, new Rectangle(0, 0, lvChart.Width, lvChart.Height));
-            ChartBitmap.Save(System.Windows.Forms.Application.StartupPath + "/report/img.jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
+            chartBitmap.Save(Application.StartupPath + "/report/img.jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
 
-            PDFReport Report = new PDFReport();
-            Report.FilePath = string.Format("{0}/report/{1}.pdf", System.Windows.Forms.Application.StartupPath, DateTime.Now.ToString("yyyyMMddHHmmss"));
-            Report.AddTitle("测量报告");
-            Report.AddEmptyLine();
-            Report.AddText(string.Format("测量日期: {0}", DateTime.Now));
-            Report.AddText(string.Format("测量时间: {0} 毫秒", _Slaver.MeasuringTime));
-            if (_Slaver.TriggerMode == TriggerMode.Auto)
+            var report = new PdfReport
             {
-                BaseChannel TriggerChannel = _Slaver.Channels[_Slaver.GetTriggerChannel(ChannelType.Pressure)];
-                Report.AddText("触发方式: 自动触发");
-                Report.AddText(string.Format("触发通道: {0}", TriggerChannel.Name));
-                Report.AddText(string.Format("触发值: {0} MPa", TriggerChannel.TriggerIncrement));
-            }
-            else if (_Slaver.TriggerMode == TriggerMode.manual)
+                FilePath =
+                    $"{Application.StartupPath}/report/{DateTime.Now:yyyyMMddHHmmss}.pdf"
+            };
+            report.AddTitle("测量报告");
+            report.AddEmptyLine();
+            report.AddText($"测量日期: {DateTime.Now}");
+            report.AddText($"测量时间: {_slaver.MeasuringTime} 毫秒");
+            switch (_slaver.TriggerMode)
             {
-                Report.AddText("触发方式: 手动触发");
+                case TriggerMode.Auto:
+                    var triggerChannel = _slaver.Channels[_slaver.GetTriggerChannel(ChannelType.Pressure)];
+                    report.AddText("触发方式: 自动触发");
+                    report.AddText($"触发通道: {triggerChannel.Name}");
+                    report.AddText($"触发值: {triggerChannel.TriggerIncrement} MPa");
+                    break;
+                case TriggerMode.Manual:
+                    report.AddText("触发方式: 手动触发");
+                    break;
+                case TriggerMode.External:
+                    report.AddText("触发方式: 外触发");
+                    break;
+                default:
+                    report.AddText("触发方式: 异常");
+                    break;
             }
-            else if (_Slaver.TriggerMode == TriggerMode.External)
-            {
-                Report.AddText("触发方式: 外触发");
-            }
-            Report.AddEmptyLine();
-            Report.AddText("测量结果:");
-            Report.AddImage(ChartBitmap);
-            Report.Print();
-            string WaterMarkPDFPath = string.Format("report/Report{0}.pdf", DateTime.Now.ToString("yyyyMMddHHmmss"));
-            Log("导出报告完成，正在打开...");
-            Report.Open();
+            report.AddEmptyLine();
+            report.AddText("测量结果:");
+            report.AddImage(chartBitmap);
+            report.Print();
+            //var waterMarkPdfPath = $"report/Report{DateTime.Now:yyyyMMddHHmmss}.pdf";
+            _log.Print("导出报告完成，正在打开...");
+            report.Open();
         }
 
         private void bwBuildReport_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            tbReport.Enabled = true; ;
+            tbReport.Enabled = true;
         }
     }
 }

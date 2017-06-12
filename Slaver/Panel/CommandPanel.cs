@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
-using Communication;
-using Communication.Ethernet;
+using Communication.Base;
 using Slaver.Channel;
+using Device = Communication.Ethernet.Device;
 
 namespace Slaver.Panel
 {
@@ -11,32 +10,30 @@ namespace Slaver.Panel
     {
         public CommandPanel(string host, int port) : base (host, port)
         {
-
+            ReceiveTimeOut = 500;
+            ReceiveBufferSize = 1024;
         }
-        public bool StartRead()
+        public bool StartReading() => base.StartReading(16);
+        public string SendCmd(string send, bool rtExist = false, int timeOut = -1)
         {
-            return StartReading(16);
-        }
-        public string SendCmd(string send, bool rtExist = false, int TimeOut = -1)
-        {
-            string FormatSend = string.Format("#{0}\n", send);
-            byte[] SendBytes = Encoding.Default.GetBytes(FormatSend);
-            Send(SendBytes, SendBytes.Length, 0);
-            string ReturnString = null;
-            long PreSec = DateTime.Now.ToBinary();
-            long CurSec = DateTime.Now.ToBinary();
-            while (rtExist && ReturnString == null && (CurSec - PreSec <= TimeOut || TimeOut < 0))
+            var formatSend = $"#{send}\n";
+            var sendBytes = Encoding.Default.GetBytes(formatSend);
+            Send(sendBytes, sendBytes.Length, 0);
+            string returnString = null;
+            var preSec = DateTime.Now.ToBinary();
+            var curSec = DateTime.Now.ToBinary();
+            while (rtExist && returnString == null && (curSec - preSec <= timeOut || timeOut < 0))
             {
-                ReturnString = ReadReceived();
+                returnString = ReadReceived();
             }
-            return ReturnString;
+            return returnString;
         }
         public string ReadReceived()
         {
             BufferLock.WaitOne();
             if (ReveivedBuffer != null)
             {
-                string str = Encoding.Default.GetString(ReveivedBuffer);
+                var str = Encoding.Default.GetString(ReveivedBuffer);
                 if (str[0] == 0x23 && str[str.Length - 1] == 0x0A)
                 {
                     ReveivedBuffer = null;  // 清除原有接收数据
@@ -47,53 +44,21 @@ namespace Slaver.Panel
             BufferLock.ReleaseMutex();
             return null;
         }
-        public void SelfTest()
-        {
-            SendCmd("SELFTEST");
-        }
-        public void SelfTest(bool IsSuccess)
-        {
-            if (IsSuccess)
-                SendCmd("TESTPASSED");
-            else
-                SendCmd("TESTFAILED");
-        }
-        public bool CheckChannelStatus(ref BaseChannel[] Channels)
+        public void SelfTest() => SendCmd("SELFTEST");
+        public void SelfTest(bool isSuccess) => SendCmd(isSuccess ? "TESTPASSED" : "TESTFAILED");
+        public bool CheckChannelStatus(ref BaseChannel[] channels)
         {
             //bool[] ChannelStatus = new bool[12] { false, false, false, false, false, false, false, false, false, false, false, false, };
-            string ChannelStatusString = SendCmd("LINESTATUE", true, 500);
-            if (ChannelStatusString != null)
-            {
-                for (int i = 0; i < ChannelStatusString.Length; i++)
-                {
-                    if (ChannelStatusString[i] == '0')
-                    {
-                        Channels[i].DeviceExist = true;
-                    }
-                    else
-                    {
-                        Channels[i].DeviceExist = false;
-                    }
-                }
-                return true;
-            }
-            return false;
-        }
-        public bool CheckClockStatus()
-        {
-            string ClockStatus = SendCmd("CLOCKSTA", true);
-            if (ClockStatus == "CLKSUCCEED")
-            {
-                return true;
-            }
-            else
-            {
+            var channelStatusString = SendCmd("LINESTATUE", true, 500);
+            if (channelStatusString == null)
                 return false;
+            for (var i = 0; i < channelStatusString.Length; i++)
+            {
+                channels[i].DeviceExist = channelStatusString[i] == '0';
             }
+            return true;
         }
-        public void Reset()
-        {
-            SendCmd("RESET");
-        }
+        public bool CheckClockStatus() => SendCmd("CLOCKSTA", true) == "CLKSUCCEED";
+        public void Reset() => SendCmd("RESET");
     }
 }

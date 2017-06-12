@@ -65,6 +65,12 @@
             this.gbTotalChannel = new System.Windows.Forms.GroupBox();
             this.tcChannel = new System.Windows.Forms.TabControl();
             this.tpPressure = new System.Windows.Forms.TabPage();
+            this.pcc6 = new Controls.Channel.PressureChannelControl();
+            this.pcc5 = new Controls.Channel.PressureChannelControl();
+            this.pcc4 = new Controls.Channel.PressureChannelControl();
+            this.pcc3 = new Controls.Channel.PressureChannelControl();
+            this.pcc2 = new Controls.Channel.PressureChannelControl();
+            this.pcc1 = new Controls.Channel.PressureChannelControl();
             this.txtMeasuringTime = new System.Windows.Forms.MaskedTextBox();
             this.lblSecond = new System.Windows.Forms.Label();
             this.lblMeasuringTime = new System.Windows.Forms.Label();
@@ -74,6 +80,12 @@
             this.cbTriggerMode = new System.Windows.Forms.ComboBox();
             this.lblTriggerMode = new System.Windows.Forms.Label();
             this.tpDigital = new System.Windows.Forms.TabPage();
+            this.ecc = new Controls.Channel.SpeedChannelControl();
+            this.scc = new Controls.Channel.SpeedChannelControl();
+            this.dcc4 = new Controls.Channel.DigitalChannelControl();
+            this.dcc3 = new Controls.Channel.DigitalChannelControl();
+            this.dcc2 = new Controls.Channel.DigitalChannelControl();
+            this.dcc1 = new Controls.Channel.DigitalChannelControl();
             this.picLoading = new System.Windows.Forms.PictureBox();
             this.CountDown = new Controls.Other.CountDown();
             this.gbChart = new System.Windows.Forms.GroupBox();
@@ -90,6 +102,7 @@
             this.bwConnect = new System.ComponentModel.BackgroundWorker();
             this.bwMeasure = new System.ComponentModel.BackgroundWorker();
             this.bwBuildReport = new System.ComponentModel.BackgroundWorker();
+            this.lblDisconnected = new System.Windows.Forms.Label();
             this.menuMain.SuspendLayout();
             this.tbMain.SuspendLayout();
             this.staMain.SuspendLayout();
@@ -97,6 +110,7 @@
             this.gbTotalChannel.SuspendLayout();
             this.tcChannel.SuspendLayout();
             this.tpPressure.SuspendLayout();
+            this.tpDigital.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picLoading)).BeginInit();
             this.gbChart.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.timChannelUpdate)).BeginInit();
@@ -397,6 +411,7 @@
             this.gbTotalChannel.Controls.Add(this.tcChannel);
             this.gbTotalChannel.Controls.Add(this.picLoading);
             this.gbTotalChannel.Controls.Add(this.CountDown);
+            this.gbTotalChannel.Controls.Add(this.lblDisconnected);
             this.gbTotalChannel.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.gbTotalChannel.Location = new System.Drawing.Point(12, 115);
             this.gbTotalChannel.Name = "gbTotalChannel";
@@ -420,6 +435,12 @@
             // tpPressure
             // 
             this.tpPressure.BackColor = System.Drawing.Color.White;
+            this.tpPressure.Controls.Add(this.pcc6);
+            this.tpPressure.Controls.Add(this.pcc5);
+            this.tpPressure.Controls.Add(this.pcc4);
+            this.tpPressure.Controls.Add(this.pcc3);
+            this.tpPressure.Controls.Add(this.pcc2);
+            this.tpPressure.Controls.Add(this.pcc1);
             this.tpPressure.Controls.Add(this.txtMeasuringTime);
             this.tpPressure.Controls.Add(this.lblSecond);
             this.tpPressure.Controls.Add(this.lblMeasuringTime);
@@ -435,6 +456,66 @@
             this.tpPressure.Size = new System.Drawing.Size(495, 384);
             this.tpPressure.TabIndex = 0;
             this.tpPressure.Text = "压力";
+            // 
+            // pcc6
+            // 
+            this.pcc6.Calibration = 0D;
+            this.pcc6.Location = new System.Drawing.Point(250, 188);
+            this.pcc6.Name = "pcc6";
+            this.pcc6.OriginData = 0;
+            this.pcc6.Range = 1;
+            this.pcc6.Size = new System.Drawing.Size(239, 85);
+            this.pcc6.TabIndex = 14;
+            // 
+            // pcc5
+            // 
+            this.pcc5.Calibration = 0D;
+            this.pcc5.Location = new System.Drawing.Point(6, 188);
+            this.pcc5.Name = "pcc5";
+            this.pcc5.OriginData = 0;
+            this.pcc5.Range = 1;
+            this.pcc5.Size = new System.Drawing.Size(239, 85);
+            this.pcc5.TabIndex = 13;
+            // 
+            // pcc4
+            // 
+            this.pcc4.Calibration = 0D;
+            this.pcc4.Location = new System.Drawing.Point(250, 97);
+            this.pcc4.Name = "pcc4";
+            this.pcc4.OriginData = 0;
+            this.pcc4.Range = 1;
+            this.pcc4.Size = new System.Drawing.Size(239, 85);
+            this.pcc4.TabIndex = 12;
+            // 
+            // pcc3
+            // 
+            this.pcc3.Calibration = 0D;
+            this.pcc3.Location = new System.Drawing.Point(6, 97);
+            this.pcc3.Name = "pcc3";
+            this.pcc3.OriginData = 0;
+            this.pcc3.Range = 1;
+            this.pcc3.Size = new System.Drawing.Size(239, 85);
+            this.pcc3.TabIndex = 11;
+            // 
+            // pcc2
+            // 
+            this.pcc2.Calibration = 0D;
+            this.pcc2.Location = new System.Drawing.Point(250, 6);
+            this.pcc2.Name = "pcc2";
+            this.pcc2.OriginData = 0;
+            this.pcc2.Range = 1;
+            this.pcc2.Size = new System.Drawing.Size(239, 85);
+            this.pcc2.TabIndex = 10;
+            // 
+            // pcc1
+            // 
+            this.pcc1.Calibration = 0D;
+            this.pcc1.Location = new System.Drawing.Point(6, 6);
+            this.pcc1.Name = "pcc1";
+            this.pcc1.OriginData = 0;
+            this.pcc1.Range = 1;
+            this.pcc1.Size = new System.Drawing.Size(239, 85);
+            this.pcc1.TabIndex = 9;
             // 
             // txtMeasuringTime
             // 
@@ -531,6 +612,12 @@
             // 
             // tpDigital
             // 
+            this.tpDigital.Controls.Add(this.ecc);
+            this.tpDigital.Controls.Add(this.scc);
+            this.tpDigital.Controls.Add(this.dcc4);
+            this.tpDigital.Controls.Add(this.dcc3);
+            this.tpDigital.Controls.Add(this.dcc2);
+            this.tpDigital.Controls.Add(this.dcc1);
             this.tpDigital.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.tpDigital.Location = new System.Drawing.Point(4, 26);
             this.tpDigital.Name = "tpDigital";
@@ -539,6 +626,54 @@
             this.tpDigital.TabIndex = 1;
             this.tpDigital.Text = "数字量/计时";
             this.tpDigital.UseVisualStyleBackColor = true;
+            // 
+            // ecc
+            // 
+            this.ecc.Location = new System.Drawing.Point(250, 219);
+            this.ecc.Name = "ecc";
+            this.ecc.OriginData = 0;
+            this.ecc.Size = new System.Drawing.Size(239, 85);
+            this.ecc.TabIndex = 5;
+            // 
+            // scc
+            // 
+            this.scc.Location = new System.Drawing.Point(6, 219);
+            this.scc.Name = "scc";
+            this.scc.OriginData = 0;
+            this.scc.Size = new System.Drawing.Size(239, 85);
+            this.scc.TabIndex = 4;
+            // 
+            // dcc4
+            // 
+            this.dcc4.Location = new System.Drawing.Point(250, 97);
+            this.dcc4.Name = "dcc4";
+            this.dcc4.OriginData = 0;
+            this.dcc4.Size = new System.Drawing.Size(239, 85);
+            this.dcc4.TabIndex = 3;
+            // 
+            // dcc3
+            // 
+            this.dcc3.Location = new System.Drawing.Point(6, 97);
+            this.dcc3.Name = "dcc3";
+            this.dcc3.OriginData = 0;
+            this.dcc3.Size = new System.Drawing.Size(239, 85);
+            this.dcc3.TabIndex = 2;
+            // 
+            // dcc2
+            // 
+            this.dcc2.Location = new System.Drawing.Point(250, 6);
+            this.dcc2.Name = "dcc2";
+            this.dcc2.OriginData = 0;
+            this.dcc2.Size = new System.Drawing.Size(239, 85);
+            this.dcc2.TabIndex = 1;
+            // 
+            // dcc1
+            // 
+            this.dcc1.Location = new System.Drawing.Point(6, 6);
+            this.dcc1.Name = "dcc1";
+            this.dcc1.OriginData = 0;
+            this.dcc1.Size = new System.Drawing.Size(239, 85);
+            this.dcc1.TabIndex = 0;
             // 
             // picLoading
             // 
@@ -553,10 +688,7 @@
             // 
             // CountDown
             // 
-            this.CountDown.AfterCancel = null;
-            this.CountDown.AfterDone = null;
             this.CountDown.AutoSize = true;
-            this.CountDown.BeforeStart = null;
             this.CountDown.Location = new System.Drawing.Point(101, 71);
             this.CountDown.Name = "CountDown";
             this.CountDown.Size = new System.Drawing.Size(302, 205);
@@ -634,7 +766,7 @@
             // 
             this.timChannelUpdate.Interval = 500D;
             this.timChannelUpdate.SynchronizingObject = this;
-            this.timChannelUpdate.Elapsed += new System.Timers.ElapsedEventHandler(this.timChannelUpdate_Tick);
+            this.timChannelUpdate.Elapsed += new System.Timers.ElapsedEventHandler(this.TimChannelUpdate_Tick);
             // 
             // groupBox1
             // 
@@ -693,6 +825,17 @@
             this.bwBuildReport.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bwBuildReport_DoWork);
             this.bwBuildReport.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bwBuildReport_RunWorkerCompleted);
             // 
+            // lblDisconnected
+            // 
+            this.lblDisconnected.AutoSize = true;
+            this.lblDisconnected.Font = new System.Drawing.Font("Cambria", 48F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblDisconnected.ForeColor = System.Drawing.Color.DodgerBlue;
+            this.lblDisconnected.Location = new System.Drawing.Point(40, 180);
+            this.lblDisconnected.Name = "lblDisconnected";
+            this.lblDisconnected.Size = new System.Drawing.Size(428, 75);
+            this.lblDisconnected.TabIndex = 15;
+            this.lblDisconnected.Text = "Disconnected";
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -726,6 +869,7 @@
             this.tcChannel.ResumeLayout(false);
             this.tpPressure.ResumeLayout(false);
             this.tpPressure.PerformLayout();
+            this.tpDigital.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.picLoading)).EndInit();
             this.gbChart.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.timChannelUpdate)).EndInit();
@@ -801,6 +945,19 @@
         private LiveCharts.WinForms.CartesianChart lvChart;
         private Controls.Other.CountDown CountDown;
         private System.ComponentModel.BackgroundWorker bwBuildReport;
+        private Controls.Channel.PressureChannelControl pcc6;
+        private Controls.Channel.PressureChannelControl pcc5;
+        private Controls.Channel.PressureChannelControl pcc4;
+        private Controls.Channel.PressureChannelControl pcc3;
+        private Controls.Channel.PressureChannelControl pcc2;
+        private Controls.Channel.PressureChannelControl pcc1;
+        private Controls.Channel.DigitalChannelControl dcc4;
+        private Controls.Channel.DigitalChannelControl dcc3;
+        private Controls.Channel.DigitalChannelControl dcc2;
+        private Controls.Channel.DigitalChannelControl dcc1;
+        private Controls.Channel.SpeedChannelControl scc;
+        private Controls.Channel.SpeedChannelControl ecc;
+        private System.Windows.Forms.Label lblDisconnected;
         //private System.Windows.Forms.DataVisualization.Charting.Chart DataChart;
         //private System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1;
         //private System.Windows.Forms.DataVisualization.Charting.Legend legend1;

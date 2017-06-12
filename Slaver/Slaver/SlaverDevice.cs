@@ -1,13 +1,12 @@
-﻿using Communication.Ethernet;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Text;
 using System.Threading;
 using Slaver.Channel;
 using Slaver.Panel;
+using Tools.Log;
 
-namespace Slaver
+namespace Slaver.Slaver
 {
     public enum ConnectStatus  // 连接状态
     {
@@ -19,109 +18,109 @@ namespace Slaver
     public enum TriggerMode  // 触发方式
     {
         Auto,
-        manual,
+        Manual,
         External,
     }
     public class SlaverDevice  // 下位机
     {
-
-        CommandPanel CommandPanel;
-        DataPanel DataPanel;
-        private ConnectStatus _Status;
+        private CommandPanel _commandPanel;
+        private DataPanel _dataPanel;
+        private ConnectStatus _status;
         public ConnectStatus Status
         {
             set
             {
-                _Status = value;
-                ChangeStatus?.Invoke(_Status);
+                _status = value;
+                ChangeStatus?.Invoke(_status);
             }
-            get { return _Status; }
+            get => _status;
         }
         public TriggerMode TriggerMode { set; get; }
-        //private bool StopFlag = false;
-        public delegate void ChangeStatusFun(ConnectStatus Status);
-        public event ChangeStatusFun ChangeStatus;
-        public delegate void LogFun(string LogInfo);
-        public event LogFun Log;
-        public delegate void DrawLinesFun(BaseChannel[] Channels);
-        public event DrawLinesFun DrawLines;
-        public delegate void StartCountDownFun(double value);
-        public event StartCountDownFun StartCountDown;
-        public delegate void NonParaFun();
-        public NonParaFun CancelCountDown;
+        public Action<ConnectStatus> ChangeStatus;
+        public Log Log{ set; get; }
+        public Action<BaseChannel[]> DrawLines;
+        public Action<double> StartCountDown;
+        public Action CancelCountDown;
 
         public int TriggerInterval { set; get; }
-        private BaseChannel[] _Channels;  // 通道
-        public BaseChannel[] Channels { set { _Channels = value; } get { return _Channels; } }
-        public SlaverDevice(LogFun Log, ChangeStatusFun ChangeStatus, DrawLinesFun DrawLines, StartCountDownFun StartCountDown)
+        private BaseChannel[] _channels;  // 通道
+        public BaseChannel[] Channels
         {
-            this.ChangeStatus = ChangeStatus;
-            this.Log = Log;
-            this.DrawLines = DrawLines;
-            this.StartCountDown = StartCountDown;
-            _Channels = new BaseChannel[12];
-            for (int i = 0; i < _Channels.Length; i++)
+            set => _channels = value;
+            get => _channels;
+        }
+        public SlaverDevice(Log log,
+            Action<ConnectStatus> changeStatus, 
+            Action<BaseChannel[]> drawLines, 
+            Action<double> startCountDown)
+        {
+            ChangeStatus = changeStatus;
+            Log = log;
+            DrawLines = drawLines;
+            StartCountDown = startCountDown;
+            _channels = new BaseChannel[12];
+            for (var i = 0; i < _channels.Length; i++)
             {
                 if (i < 6)
                 {
-                    _Channels[i] = new PressureChannel(string.Format("压力通道<{0}>", i + 1));
+                    _channels[i] = new PressureChannel($"压力通道<{i + 1}>");
                 }
                 else if (i >=6 && i < 10)
                 {
-                    _Channels[i] = new DigitalChannel(string.Format("数字量/计时通道<{0}>", i - 5));
+                    _channels[i] = new DigitalChannel($"数字量/计时通道<{i - 5}>");
                 }
                 else if (i == 10)
                 {
-                    _Channels[i] = new SpeedChannel(string.Format("速度通道<{0}>", i - 9));
+                    _channels[i] = new SpeedChannel($"速度通道<{i - 9}>");
                 }
                 else
                 {
-                    _Channels[i] = new PressureChannel(string.Format("其他通道<{0}>", i - 10));
+                    _channels[i] = new PressureChannel($"其他通道<{i - 10}>");
                 }
             }
         }
         public bool Connect()
         {
-            Log("正在连接主控板...");
-            if (CPOpen("192.168.1.178", 4001))
+            Log.Show("正在连接主控板...");
+            if (OpenControl("192.168.1.178", 4001))
             {
-                Log("主控板连接成功.");
+                Log.Show("主控板连接成功.");
             }
             else
             {
-                Log("主控板连接失败.");
+                Log.Show("主控板连接失败.");
                 Status = ConnectStatus.Disconnected;
 
                 return false;
             }
             Thread.Sleep(500);
-            Log("正在连接数位板...");
-            if (DPOpen("192.168.1.126", 8000))
+            Log.Show("正在连接数位板...");
+            if (OpenDigital("192.168.1.126", 8000))
             {
-                Log("数位板连接成功.");
+                Log.Show("数位板连接成功.");
             }
             else
             {
-                Log("数位板连接失败.");
+                Log.Show("数位板连接失败.");
                 Status = ConnectStatus.Disconnected;
-                CommandPanel.StopReading();
-                CommandPanel.Close();
+                _commandPanel.StopReading();
+                _commandPanel.Close();
                 return false;
             }
             return true;
         }
-        public bool CPOpen(string IP, int Port)
+        public bool OpenControl(string ip, int port)
         {
-            CommandPanel = new CommandPanel(IP, Port);
-            CommandPanel.StartRead();
-            return CommandPanel.Open();
+            _commandPanel = new CommandPanel(ip, port);
+            _commandPanel.StartReading();
+            return _commandPanel.Open();
         }
-        public bool DPOpen(string IP, int Port)
+        public bool OpenDigital(string ip, int port)
         {
-            DataPanel = new DataPanel(IP, Port);
-            DataPanel.StartReading();
-            DataPanel.DataReceived += new Device.EventHandle(DataPanel.DataUpdate);
-            return DataPanel.Open();
+            _dataPanel = new DataPanel(ip, port);
+            _dataPanel.StartReading();
+            _dataPanel.DataReceived += _dataPanel.DataUpdate;
+            return _dataPanel.Open();
         }
         //public void StartListening()
         //{
@@ -139,116 +138,98 @@ namespace Slaver
         //}
         public void Close()
         {
-            Log("正在断开连接...");
-            if (DataPanel != null)
+            Log.Show("正在断开连接...");
+            if (_dataPanel != null)
             {
-                DataPanel.DataReceived -= new Device.EventHandle(DataPanel.DataUpdate);
-                DataPanel.StopReading();
-                DataPanel.Close();
-                DataPanel = null;
-                Log("已断开数位板连接.");
+                _dataPanel.DataReceived -= _dataPanel.DataUpdate;
+                _dataPanel.StopReading();
+                _dataPanel.Close();
+                _dataPanel = null;
+                Log.Show("已断开数位板连接.");
             }
-            if (CommandPanel != null)
+            if (_commandPanel != null)
             {
-                CommandPanel.StopReading();
-                CommandPanel.Close();
-                CommandPanel = null;
-                Log("已断开主控板连接.");
+                _commandPanel.StopReading();
+                _commandPanel.Close();
+                _commandPanel = null;
+                Log.Show("已断开主控板连接.");
             }
             Thread.Sleep(500);
         }
         public bool CheckClockStatus()
         {
-            Log("正在发送时钟检测命令...");
-            bool result = CommandPanel.CheckClockStatus();
-            if (result)
-                Log("时钟状态正常.");
-            else
-                Log("时钟状态异常.");
+            Log.Show("正在发送时钟检测命令...");
+            var result = _commandPanel.CheckClockStatus();
+            Log.Show(result ? "时钟状态正常." : "时钟状态异常.");
             return result;
         }
         public void StartReceiving()
         {
-            DataPanel.StartReceiving();
+            _dataPanel.StartReceiving();
         }
         public void Reset()
         {
-            Log("发送复位命令.");
-            CommandPanel.Reset();
+            Log.Show("发送复位命令.");
+            _commandPanel.Reset();
         }
         public void UpdateChannelHealth()
         {
-            DataPanel.CheckChannelStatus(ref _Channels);
-            for (int i = 0; i < _Channels.Length - 2; i++)
+            _dataPanel.CheckChannelStatus(ref _channels);
+            for (var i = 0; i < _channels.Length - 2; i++)
             {
-                Log(string.Format("{0}: {1}.",
-                    _Channels[i].Name,
-                    _Channels[i].Health ? "正常" : "异常"));
+                Log.Show($"{_channels[i].Name}: {(_channels[i].Health ? "正常" : "异常")}.");
             }
         }
         public bool UpdateChannelExist()
         {
-            return CommandPanel.CheckChannelStatus(ref _Channels);
+            return _commandPanel.CheckChannelStatus(ref _channels);
         }
         public void UpdateChannelData()
         {
-            DataPanel.GetCurrentChannelData(ref _Channels);
-            for (int i = 0; i < Channels.Length; i++)
+            _dataPanel.GetCurrentChannelData(ref _channels);
+            foreach (var t in Channels)
             {
-                if (Channels[i].DeviceExist == false)
+                if (t.DeviceExist)
                 {
-                    Channels[i].DeviceExist = false;
-                }
-                else
-                {
-                    Channels[i].DeviceExist = true;
-                    Channels[i].RefreshData();  // 设备存在才刷新数据
-                }
-                if (Channels[i].Health)
-                {
-                    Channels[i].Health = true;
-                }
-                else
-                {
-                    Channels[i].Health = false;
+                    t.RefreshData();  // 设备存在才刷新数据
                 }
             }
         }
-        public void SetTriggerChannel(int ChannelIndex)
+        public void SetTriggerChannel(int channelIndex)
         {
-            int StartIndex = 0, EndIndex = 0;
-            if (ChannelIndex < 6)
+            int startIndex = 0, endIndex = 0;
+            if (channelIndex < 6)
             {
-                StartIndex = 0;
-                EndIndex = 6;
+                startIndex = 0;
+                endIndex = 6;
             }
-            else if (ChannelIndex >= 6 && ChannelIndex < 10)
+            else if (channelIndex >= 6 && channelIndex < 10)
             {
-                StartIndex = 6;
-                EndIndex = 10;
+                startIndex = 6;
+                endIndex = 10;
             }
-            for (int i = StartIndex; i < EndIndex; i++)
+            for (var i = startIndex; i < endIndex; i++)
             {
-                _Channels[i].IsTrigger = false;
+                _channels[i].IsTrigger = false;
             }
-            _Channels[ChannelIndex].IsTrigger = true;
+            _channels[channelIndex].IsTrigger = true;
         }
-        public int GetTriggerChannel(ChannelType ChannelType)
+        public int GetTriggerChannel(ChannelType channelType)
         {
-            int StartIndex = 0, EndIndex = 0;
-            if (ChannelType == ChannelType.Pressure)
+            int startIndex = 0, endIndex = 0;
+            if (channelType == ChannelType.Pressure)
             {
-                StartIndex = 0;
-                EndIndex = 6;
+                startIndex = 0;
+                endIndex = 6;
             }
-            else if (ChannelType == ChannelType.Digital)
+            else if (channelType == ChannelType.Digital)
             {
-                StartIndex = 6;
-                EndIndex = 10;
+                startIndex = 6;
+                endIndex = 10;
             }
-            for (int i = StartIndex; i < EndIndex; i++)
+            for (int i = startIndex; i < endIndex; i++)
             {
-                if (_Channels[i].IsTrigger)
+                if (_channels[i].IsTrigger)
                 {
                     return i;
                 }
@@ -258,45 +239,42 @@ namespace Slaver
         public int MeasuringTime { set; get; }
         public void SelfTest()
         {
-            Log("发送自检命令.");
-            CommandPanel.SelfTest();
+            Log.Show("发送自检命令.");
+            _commandPanel.SelfTest();
         }
-        public void SelfTest(bool Result)
+        public void SelfTest(bool result)
         {
-            if (Result)
-                Log("发送自检成功命令.");
-            else
-                Log("发送自检失败命令.");
-            CommandPanel.SelfTest(Result);
+            Log.Show(result ? "发送自检成功命令." : "发送自检失败命令.");
+            _commandPanel.SelfTest(result);
         }
         public bool WaitTrigger(ref BackgroundWorker sender, ref DoWorkEventArgs e)
         {
-            int TriggerIndex = GetTriggerChannel(ChannelType.Pressure);
-            if (TriggerIndex == -1)
+            var triggerIndex = GetTriggerChannel(ChannelType.Pressure);
+            if (triggerIndex == -1)
             {
-                Log("需要设置触发通道.");
+                Log.Show("需要设置触发通道.");
                 return false;
             }
-            BaseChannel TriggerChannel = Channels[TriggerIndex];
-            double Increment = 0;
-            int MapIndex = -1;
-            if (TriggerIndex < 6)
+            BaseChannel triggerChannel = Channels[triggerIndex];
+            double increment = 0;
+            var mapIndex = -1;
+            if (triggerIndex < 6)
             {
-                MapIndex = TriggerIndex + 9;
+                mapIndex = triggerIndex + 9;
             }
-            else if (TriggerIndex >= 6 && TriggerIndex < 10)
+            else if (triggerIndex >= 6 && triggerIndex < 10)
             {
-                MapIndex = TriggerIndex - 6;
+                mapIndex = triggerIndex - 6;
             }
             //WaitTriggerSwitch = true;
-            while (Increment < TriggerChannel.TriggerIncrement)
+            while (increment < triggerChannel.TriggerIncrement)
             {
                 if (sender.CancellationPending)
                 {
                     e.Cancel = true;
                     return false;
                 }
-                Increment = TriggerChannel.Formula(DataPanel.CurAverageData[MapIndex]);
+                increment = triggerChannel.Formula(_dataPanel.CurAverageData[mapIndex]);
                 Thread.Sleep(5);
             }
             return true;
@@ -312,29 +290,27 @@ namespace Slaver
                 //    Log("需要设置触发通道.");
                 //    return;
                 //}
-                Log("等待触发...");
+                Log.Show("等待触发...");
                 //Channels[TriggerIndex].WaitTriggerSwitch = !StopFlag;
                 if (WaitTrigger(ref sender, ref e))
                 {
-                    StartCountDown(MeasuringTime / 1000);
-                    Log(string.Format("{0}触发.", Channels[GetTriggerChannel(ChannelType.Pressure)].Name));
-                    if (Measure(ref sender, ref e))
-                    {
-                        Log("正在绘制图表...");
-                        DrawLines(Channels);
-                        Log("正在显示图表...");
-                    }
+                    StartCountDown?.Invoke(MeasuringTime / 1000d);
+                    Log.Show($"{Channels[GetTriggerChannel(ChannelType.Pressure)].Name}触发.");
+                    if (!Measure(ref sender, ref e))
+                        return;
+                    Log.Show("正在绘制图表...");
+                    DrawLines?.Invoke(Channels);
+                    Log.Show("正在显示图表...");
                 }
             }
-            else if (TriggerMode == TriggerMode.manual)
+            else if (TriggerMode == TriggerMode.Manual)
             {
-                StartCountDown(MeasuringTime / 1000);
-                if (Measure(ref sender, ref e))
-                {
-                    Log("正在绘制图表...");
-                    DrawLines(Channels);
-                    Log("正在显示图表...");
-                }
+                StartCountDown?.Invoke(MeasuringTime / 1000d);
+                if (!Measure(ref sender, ref e))
+                    return;
+                Log.Show("正在绘制图表...");
+                DrawLines?.Invoke(Channels);
+                Log.Show("正在显示图表...");
             }
         }
         //public void StopMeasuring()
@@ -346,46 +322,46 @@ namespace Slaver
         //}
         private bool Measure(ref BackgroundWorker sender, ref DoWorkEventArgs e)
         {
-            Log("正在记录数据...");
+            Log.Show("正在记录数据...");
             //var ByteData = DataPanel.DataStoreByTime(MeasuringTime);
-            var ByteData = DataPanel.DataStoreByCount(Convert.ToInt64(MeasuringTime * 6.4));
-            Log("正在处理数据...");
-            foreach (var Item in Channels)
+            var byteData = _dataPanel.DataStoreByCount(Convert.ToInt64(MeasuringTime * 6.4));
+            Log.Show("正在处理数据...");
+            foreach (var t in Channels)
             {
                 if (sender.CancellationPending)
                 {
                     e.Cancel = true;
                     return false;
                 }
-                Item.MeasuringData = new List<double>();
+                t.MeasuringData = new List<double>();
             }
-            foreach (var Item in ByteData)
+            foreach (var t in byteData)
             {
                 if (sender.CancellationPending)
                 {
                     e.Cancel = true;
                     return false;
                 }
-                for (int i = 0; i < 6; i++)
+                for (var i = 0; i < 6; i++)
                 {
                     if (sender.CancellationPending)
                     {
                         e.Cancel = true;
                         return false;
                     }
-                    _Channels[i].MeasuringData.Add(Channels[i].Formula(Item[i + 9]));
+                    _channels[i].MeasuringData.Add(Channels[i].Formula(t[i + 9]));
                 }
-                for (int i = 6; i < 10; i++)
+                for (var i = 6; i < 10; i++)
                 {
                     if (sender.CancellationPending)
                     {
                         e.Cancel = true;
                         return false;
                     }
-                    _Channels[i].MeasuringData.Add(Channels[i].Formula(Item[i - 6]));
+                    _channels[i].MeasuringData.Add(Channels[i].Formula(t[i - 6]));
                 }
             }
-            Log("数据处理完毕.");
+            Log.Show("数据处理完毕.");
             return true;
         }
     }

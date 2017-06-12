@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Drawing;
-using System.ComponentModel;
 using Controls.Channel;
-using Slaver.Panel;
-using System.Windows.Forms;
 
 namespace Slaver.Channel
 {
@@ -20,21 +15,35 @@ namespace Slaver.Channel
     {
         //public delegate void LogFun(string LogInfo);
         //public event SlaverDevice.LogFun Log;
-        Mutex HealthLock = new Mutex(),
-            ExistLock = new Mutex(),
-            DataLock = new Mutex(),
-            AvgLock = new Mutex();
+        private readonly Mutex _healthLock = new Mutex();
+
+        private readonly Mutex _existLock = new Mutex();
+
+        private readonly Mutex _dataLock = new Mutex();
+
+        private readonly Mutex _avgLock = new Mutex();
+
         public ChannelType Type { set; get; }
         public string Name { set; get; }
-        public VarChannelControl Control;
-        private bool _Health;
+        private VarChannelControl _control;
+
+        public VarChannelControl Control
+        {
+            set
+            {
+                _control = value;
+                _control.SetTitle(Name);
+            }
+            get => _control;
+        }
+        private bool _health;
         public bool Health
         {
             set
             {
-                HealthLock.WaitOne();
-                _Health = value;
-                HealthLock.ReleaseMutex();
+                _healthLock.WaitOne();
+                _health = value;
+                _healthLock.ReleaseMutex();
                 if (value)
                 {
                     Control.MarkHealth();
@@ -46,20 +55,20 @@ namespace Slaver.Channel
             }
             get
             {
-                HealthLock.WaitOne();
-                var temp = _Health;
-                HealthLock.ReleaseMutex();
+                _healthLock.WaitOne();
+                var temp = _health;
+                _healthLock.ReleaseMutex();
                 return temp;
             }
         }
-        private bool _DeviceExist;
+        private bool _deviceExist;
         public bool DeviceExist
         {
             set
             {
-                ExistLock.WaitOne();
-                _DeviceExist = value;
-                ExistLock.ReleaseMutex();
+                _existLock.WaitOne();
+                _deviceExist = value;
+                _existLock.ReleaseMutex();
                 if (value)
                 {
                     Control.Activate();
@@ -71,44 +80,44 @@ namespace Slaver.Channel
             }
             get
             {
-                ExistLock.WaitOne();
-                var temp = _DeviceExist;
-                ExistLock.ReleaseMutex();
+                _existLock.WaitOne();
+                var temp = _deviceExist;
+                _existLock.ReleaseMutex();
                 return temp;
             }
         }
-        private int _CurrenData;
+        private int _currenData;
         public int CurrentData
         {
             set
             {
-                DataLock.WaitOne();
-                _CurrenData = value;
-                DataLock.ReleaseMutex();
+                _dataLock.WaitOne();
+                _currenData = value;
+                _dataLock.ReleaseMutex();
                 //Control.OriginData = value;
             }
             get
             {
-                DataLock.WaitOne();
-                var temp = _CurrenData;
-                DataLock.ReleaseMutex();
+                _dataLock.WaitOne();
+                var temp = _currenData;
+                _dataLock.ReleaseMutex();
                 return temp;
             }
         }
-        private int _AverageData;
+        private int _averageData;
         public int AverageData
         {
             set
             {
-                AvgLock.WaitOne();
-                _AverageData = value;
-                AvgLock.ReleaseMutex();
+                _avgLock.WaitOne();
+                _averageData = value;
+                _avgLock.ReleaseMutex();
             }
             get
             {
-                AvgLock.WaitOne();
-                var temp = _AverageData;
-                AvgLock.ReleaseMutex();
+                _avgLock.WaitOne();
+                var temp = _averageData;
+                _avgLock.ReleaseMutex();
                 return temp;
             }
         }
@@ -119,13 +128,13 @@ namespace Slaver.Channel
         //public bool WaitTriggerSwitch { set; get; }
         public List<double> MeasuringData { set; get; }
         public Point[] PointData { set; get; }
-        protected BaseChannel(string Name)
+        protected BaseChannel(string name)
         {
-            this.Name = Name;
+            Name = name;
             TriggerIncrement = 0.05;
             TriggerGroupCount = 32;
         }
-        public abstract double Formula(int OriginData);
+        public abstract double Formula(int originData);
         public abstract void RefreshData();
         //public abstract bool WaitTrigger(ref BackgroundWorker sender, ref DoWorkEventArgs e);
         //static public double Formula(int OriginData, int Range, double Calibration)  // 压力通道公式

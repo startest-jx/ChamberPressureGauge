@@ -1,21 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Communication.Base
+﻿namespace Communication.Base
 {
     public enum DeviceType
     {
         Ethernet,
         SerialPort,
-        USB,
+        UniversalSerialBus,
     }
     public abstract class Device  // 通用抽象设备
     {
         public DeviceType Type { get; }
-        public Device(DeviceType Type)
+
+        protected Device(DeviceType type)
         {
-            this.Type = Type;
+            Type = type;
         }
 
         public abstract bool Open();

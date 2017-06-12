@@ -1,32 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Controls.Channel;
-using System.Threading;
-using System.ComponentModel;
 
 namespace Slaver.Channel
 {
     public class DigitalChannel : BaseChannel
     {
-        public override double ActualValue
-        {
-            get
-            {
-                return Formula(CurrentData);
-            }
-        }
+        public override double ActualValue => Formula(CurrentData);
 
-        public DigitalChannel(string Name) : base (Name)
+        public DigitalChannel(string name) : base (name)
         {
             Type = ChannelType.Digital;
-            Control = new DigitalChannelControl();
-            Control.SetTitle(Name);
+            //Control = new DigitalChannelControl();
+            //Control.SetTitle(Name);
         }
-        public override double Formula(int OriginData)  // 数字量/计时通道公式
+        public override double Formula(int originData)  // 数字量/计时通道公式
         {
-            return Convert.ToDouble(OriginData) / 65536d * 5d;
+            return Convert.ToDouble(originData) / 65536d * 5d;
         }
         public override void RefreshData()
         {

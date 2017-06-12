@@ -37,8 +37,8 @@
   <ItemGroup>
     <Compile Include="Ethernet\Device.cs" />
     <Compile Include="Base\Device.cs" />
-    <Compile Include="ICommand.cs" />
-    <Compile Include="IData.cs" />
+    <Compile Include="Base\ICommand.cs" />
+    <Compile Include="Base\IData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

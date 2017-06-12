@@ -1,46 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Controls.Channel;
-using System.Threading;
-using System.ComponentModel;
 
 namespace Slaver.Channel
 {
     public class PressureChannel : BaseChannel
     {
-        public int Range
-        {
-            get
-            {
-                return ((PressureChannelControl)Control).Range;
-            }
-        }
-        public double Calibration
-        {
-            get
-            {
-                return ((PressureChannelControl)Control).Calibration;
-            }
-        }
-        public override double ActualValue
-        {
-            get
-            {
-                return Formula(CurrentData);
-            }
-        }
+        public int Range => ((PressureChannelControl)Control).Range;
 
-        public PressureChannel(string Name) : base (Name)
+        public double Calibration => ((PressureChannelControl)Control).Calibration;
+
+        public override double ActualValue => Formula(CurrentData);
+
+        public PressureChannel(string name) : base (name)
         {
             Type = ChannelType.Pressure;
-            Control = new PressureChannelControl();
-            Control.SetTitle(Name);
+            //Control = new PressureChannelControl();
+            //Control.SetTitle(Name);
         }
-        public override double Formula(int OriginData)  // 压力通道公式
+        public override double Formula(int originData)  // 压力通道公式
         {
-            return (Convert.ToDouble(OriginData) * Math.Pow(2, -20) * 25d - 0.25)
+            return (Convert.ToDouble(originData) * Math.Pow(2, -20) * 25d - 0.25)
                 * Range + Calibration;
         }
         public override void RefreshData()

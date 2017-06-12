@@ -1,23 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Text;
+﻿using System.ComponentModel;
 using System.Windows.Forms;
 using System.Threading;
+using System;
 
 namespace Controls.Other
 {
     public partial class CountDown : UserControl
     {
-        private double InitValue;
-        public delegate void _delegate();
-        public _delegate AfterDone { set; get; }
-        public _delegate AfterCancel { set; get; }
-        public _delegate BeforeStart { set; get; }
-        private delegate void _ChangeValue(double value);
-
+        private double _initValue;
+        public event Action AfterDone;
+        public event Action AfterCancel;
+        public event Action BeforeStart;
 
         public CountDown()
         {
@@ -27,7 +20,7 @@ namespace Controls.Other
         public void Start(double second)
         {
             BeforeStart?.Invoke();
-            InitValue = second;
+            _initValue = second;
             bwCountDown.RunWorkerAsync();
         }
 
@@ -41,30 +34,21 @@ namespace Controls.Other
 
         private void ChangeValue(double value)
         {
-            txtCountDown.Text = string.Format("{0:F2}s", value);
+            txtCountDown.Text = $@"{value:F2}s";
         }
 
         private void bwCountDown_DoWork(object sender, DoWorkEventArgs e)
         {
-            while (InitValue >= 0)
+            while (_initValue >= 0)
             {
                 if (bwCountDown.CancellationPending)
                 {
                     e.Cancel = true;
                     return;
                 }
-                if (InvokeRequired)
-                {
-                    _ChangeValue me = new _ChangeValue(ChangeValue);
-                    object[] arg = new object[] { InitValue };
-                    Invoke(me, arg);
-                }
-                else
-                {
-                    ChangeValue(InitValue);
-                }
+                Invoke(new Action(() => { ChangeValue(_initValue); }));
                 //txtCountDown.Text = string.Format("{0:F2}s", InitValue);
-                InitValue -= 0.01;
+                _initValue -= 0.01;
                 Thread.Sleep(10);
             }
         }

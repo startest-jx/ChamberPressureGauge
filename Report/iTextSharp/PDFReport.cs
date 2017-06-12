@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.IO;
+﻿using System.IO;
 using System.Diagnostics;
 using System.Drawing;
 using iTextSharp.text;
@@ -13,11 +10,11 @@ using Image = iTextSharp.text.Image;
 
 namespace Report.iTextSharp
 {
-    public class PDFReport
+    public class PdfReport
     {
-        private Document Document;  // 文档
-        private BaseFont BF_Light;  // 字体
-        private PdfPTable Table;  // 表格
+        private readonly Document _document;  // 文档
+        private readonly BaseFont _bfLight;  // 字体
+        private readonly PdfPTable _table;  // 表格
         public string FilePath { set; get; }  // 路径
         public string Author { set; get; }  // 作者
         public string Creator { set; get; }  // 创建人
@@ -25,20 +22,22 @@ namespace Report.iTextSharp
         public string Title { set; get; }  // 标题
         public string Keywords { set; get; }  // 关键字
 
-        public PDFReport()
+        public PdfReport()
         {
-            Document = new Document(PageSize.A4);
-            BF_Light = BaseFont.CreateFont(@"C:\Windows\Fonts\simsun.ttc,0", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-            Table = new PdfPTable(1);
+            _document = new Document(PageSize.A4);
+            _bfLight = BaseFont.CreateFont(@"C:\Windows\Fonts\simsun.ttc,0", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+            _table = new PdfPTable(1);
         }
 
-        public void AddTitle(string Text)
+        public void AddTitle(string text)
         {
-            Paragraph MyParagraph = new Paragraph(Text, new Font(BF_Light, 20, 1));
-            PdfPCell MyCell = new PdfPCell(MyParagraph);
-            MyCell.HorizontalAlignment = Element.ALIGN_CENTER;
-            MyCell.Border = 0;
-            Table.AddCell(MyCell);
+            var myParagraph = new Paragraph(text, new Font(_bfLight, 20, 1));
+            var myCell = new PdfPCell(myParagraph)
+            {
+                HorizontalAlignment = Element.ALIGN_CENTER,
+                Border = 0
+            };
+            _table.AddCell(myCell);
 
         }
 
@@ -47,35 +46,33 @@ namespace Report.iTextSharp
             AddText(" ");
         }
 
-        public void AddText(string Text)
+        public void AddText(string text)
         {
-            Paragraph MyParagraph = new Paragraph(Text, new Font(BF_Light, 13));
-            PdfPCell MyCell = new PdfPCell(MyParagraph);
-            MyCell.Border = 0;
-            Table.AddCell(MyCell);
+            var myParagraph = new Paragraph(text, new Font(_bfLight, 13));
+            var myCell = new PdfPCell(myParagraph) {Border = 0};
+            _table.AddCell(myCell);
         }
 
-        public void AddImage(Bitmap BitMap)
+        public void AddImage(Bitmap bitMap)
         {
-            Image MyImage = Image.GetInstance(BitMap, System.Drawing.Imaging.ImageFormat.Bmp);
-            PdfPCell MyCell = new PdfPCell(MyImage, true);
-            MyCell.Border = 0;
-            Table.AddCell(MyCell);
+            var myImage = Image.GetInstance(bitMap, System.Drawing.Imaging.ImageFormat.Bmp);
+            var myCell = new PdfPCell(myImage, true) {Border = 0};
+            _table.AddCell(myCell);
         }
 
         public void Print()
         {
-            PdfWriter.GetInstance(Document, new FileStream(FilePath, FileMode.Create));
+            PdfWriter.GetInstance(_document, new FileStream(FilePath, FileMode.Create));
 
-            Document.AddAuthor(Author);
-            Document.AddCreationDate();
-            Document.AddCreator(Creator);
-            Document.AddSubject(Subject);
-            Document.AddTitle(Title);
-            Document.AddKeywords(Keywords);
-            Document.Open();
-            Document.Add(Table);
-            Document.Close();
+            _document.AddAuthor(Author);
+            _document.AddCreationDate();
+            _document.AddCreator(Creator);
+            _document.AddSubject(Subject);
+            _document.AddTitle(Title);
+            _document.AddKeywords(Keywords);
+            _document.Open();
+            _document.Add(_table);
+            _document.Close();
         }
 
         public void Open()

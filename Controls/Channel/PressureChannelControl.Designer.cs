@@ -30,7 +30,7 @@
         {
             this.gbTitle = new System.Windows.Forms.GroupBox();
             this.agMain = new LiveCharts.WinForms.AngularGauge();
-            this.lblNoDevice = new System.Windows.Forms.Label();
+            //this.lblNoDevice = new System.Windows.Forms.Label();
             this.txtCalibration = new System.Windows.Forms.NumericUpDown();
             this.cbRange = new System.Windows.Forms.ComboBox();
             this.gbTitle.SuspendLayout();
@@ -40,7 +40,6 @@
             // gbTitle
             // 
             this.gbTitle.Controls.Add(this.agMain);
-            this.gbTitle.Controls.Add(this.lblNoDevice);
             this.gbTitle.Controls.Add(this.txtCalibration);
             this.gbTitle.Controls.Add(this.cbRange);
             this.gbTitle.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
@@ -57,17 +56,6 @@
             this.agMain.Name = "agMain";
             this.agMain.Size = new System.Drawing.Size(118, 115);
             this.agMain.TabIndex = 6;
-            // 
-            // lblNoDevice
-            // 
-            this.lblNoDevice.AutoSize = true;
-            this.lblNoDevice.Font = new System.Drawing.Font("Cambria", 27.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblNoDevice.ForeColor = System.Drawing.Color.DodgerBlue;
-            this.lblNoDevice.Location = new System.Drawing.Point(194, 7);
-            this.lblNoDevice.Name = "lblNoDevice";
-            this.lblNoDevice.Size = new System.Drawing.Size(203, 43);
-            this.lblNoDevice.TabIndex = 5;
-            this.lblNoDevice.Text = "NO DEVICE";
             // 
             // txtCalibration
             // 
@@ -124,7 +112,7 @@
         private System.Windows.Forms.GroupBox gbTitle;
         private System.Windows.Forms.ComboBox cbRange;
         private System.Windows.Forms.NumericUpDown txtCalibration;
-        private System.Windows.Forms.Label lblNoDevice;
+        //private System.Windows.Forms.Label lblNoDevice;
         private LiveCharts.WinForms.AngularGauge agMain;
     }
 }
