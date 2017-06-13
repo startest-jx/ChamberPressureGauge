@@ -28,23 +28,22 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.lvChart = new LiveCharts.WinForms.CartesianChart();
+            this._chart = new LiveCharts.WinForms.CartesianChart();
             this.SuspendLayout();
             // 
             // lvChart
             // 
-            this.lvChart.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lvChart.Location = new System.Drawing.Point(0, 0);
-            this.lvChart.Name = "lvChart";
-            this.lvChart.Size = new System.Drawing.Size(333, 275);
-            this.lvChart.TabIndex = 0;
-            this.lvChart.Text = "cartesianChart1";
+            this._chart.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._chart.Location = new System.Drawing.Point(0, 0);
+            this._chart.Name = "_chart";
+            this._chart.Size = new System.Drawing.Size(333, 275);
+            this._chart.TabIndex = 0;
             // 
             // MyChart
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.lvChart);
+            this.Controls.Add(this._chart);
             this.Name = "MyChart";
             this.Size = new System.Drawing.Size(333, 275);
             this.ResumeLayout(false);
@@ -53,6 +52,6 @@
 
         #endregion
 
-        private LiveCharts.WinForms.CartesianChart lvChart;
+        private LiveCharts.WinForms.CartesianChart _chart;
     }
 }

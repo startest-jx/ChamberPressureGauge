@@ -52,98 +52,22 @@ namespace Controls.Channel
         }
         public sealed override void Activate()
         {
-            ////if (InvokeRequired)
-            ////{
-            ////    Set me = new Set(Activate);
-            ////    Invoke(me);
-            ////    return;
-            ////}
-            //if (agMain.IsHandleCreated)
-            //{
-            //    agMain.Invoke(new Action(() =>
-            //    {
-            //        agMain.Show();
-            //    }));
-            //}
-            //if (lblNoDevice.IsHandleCreated)
-            //{
-            //    lblNoDevice.Invoke(new Action(() =>
-            //    {
-            //        lblNoDevice.Hide();
-            //    }));
-            //}
-            //try
-            //{
-            //    agMain.Show();
-            //    lblNoDevice.Hide();
-            //}
-            //catch
-            //{
-
-            //}
             agMain.Show();
             _lblNoDevice.Hide();
         }
         public override void Silenced()
         {
-            ////if (InvokeRequired)
-            ////{
-            ////    Set me = new Set(Silenced);
-            ////    Invoke(me);
-            ////    return;
-            ////}
-            //if (agMain.IsHandleCreated)
-            //{
-            //    agMain.Invoke(new Action(() =>
-            //    {
-            //        agMain.Hide();
-            //    }));
-            //}
-            //if (lblNoDevice.IsHandleCreated)
-            //{
-            //    lblNoDevice.Invoke(new Action(() =>
-            //    {
-            //        lblNoDevice.Location = new Point((Width - lblNoDevice.Width) / 2,
-            //            (Height - lblNoDevice.Height) / 2 + 5);
-            //        lblNoDevice.Show();
-            //    }));
-            //}
-            //try
-            //{
-            //    agMain.Hide();
-            //    lblNoDevice.Location = new Point((Width - lblNoDevice.Width) / 2,
-            //        (Height - lblNoDevice.Height) / 2 + 5);
-            //    lblNoDevice.Show();
-            //}
-            //catch
-            //{
-
-            //}
             agMain.Hide();
             _lblNoDevice.Location = new Point((Width - _lblNoDevice.Width) / 2, (Height - _lblNoDevice.Height) / 2 + 5);
             _lblNoDevice.Show();
         }
         public override void MarkHealth()
         {
-            //if (agMain.IsHandleCreated)
-            //{
-            //    agMain.Invoke(new Action(() =>
-            //    {
-            //        agMain.Sections[0].Fill = System.Windows.Media.Brushes.White;
-            //    }));
-            //}
-            agMain.Sections[0].Fill = System.Windows.Media.Brushes.White;
+            agMain.Sections[0].Fill = System.Windows.Media.Brushes.DodgerBlue;
         }
         public override void MarkIll()
         {
-            //if (agMain.IsHandleCreated)
-            //{
-            //    agMain.Invoke(new Action(() =>
-            //    {
-            //        agMain.Sections[0].Fill = System.Windows.Media.Brushes.LightYellow;
-            //    }));
-            //}
-            agMain.Sections[0].Fill = System.Windows.Media.Brushes.LightYellow;
+            agMain.Sections[0].Fill = System.Windows.Media.Brushes.Yellow;
         }
         public override void RefreshData(double currentData)  // 刷新数据
         {
@@ -160,7 +84,7 @@ namespace Controls.Channel
                 Name = "lblNoDevice",
                 Size = new Size(203, 43),
                 TabIndex = 5,
-                Text = "NO DEVICE"
+                Text = @"NO DEVICE"
             };
             //lblNoDevice.Location = new Point(194, 7);
             gbTitle.Controls.Add(_lblNoDevice);

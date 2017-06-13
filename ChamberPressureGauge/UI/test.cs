@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Media;
-using LiveCharts.Wpf;
 using Brushes = System.Windows.Media.Brushes;
 using System.Windows;
 

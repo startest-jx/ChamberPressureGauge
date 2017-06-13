@@ -93,52 +93,6 @@ namespace Controls.Channel
         }
         public sealed override void Activate()
         {
-            ////if (InvokeRequired)
-            ////{
-            ////    Set me = new Set(Activate);
-            ////    Invoke(me);
-            ////    return;
-            ////}
-            //if (agMain.IsHandleCreated)
-            //{
-            //    agMain.Invoke(new Action(() =>
-            //    {
-            //        agMain.Show();
-            //    }));
-            //}
-
-            //if (cbRange.IsHandleCreated)
-            //{
-            //    cbRange.Invoke(new Action(() =>
-            //    {
-            //        cbRange.Show();
-            //    }));
-            //}
-            //if (txtCalibration.IsHandleCreated)
-            //{
-            //    txtCalibration.Invoke(new Action(() =>
-            //    {
-            //        txtCalibration.Show();
-            //    }));
-            //}
-            //if (lblNoDevice.IsHandleCreated)
-            //{
-            //    lblNoDevice.Invoke(new Action(() =>
-            //    {
-            //        lblNoDevice.Hide();
-            //    }));
-            //}
-            //try
-            //{
-            //    agMain.Show();
-            //    cbRange.Show();
-            //    txtCalibration.Show();
-            //    lblNoDevice.Hide();
-            //}
-            //catch
-            //{
-
-            //}
             agMain.Show();
             cbRange.Show();
             txtCalibration.Show();
@@ -146,55 +100,6 @@ namespace Controls.Channel
         }
         public override void Silenced()
         {
-            ////if (InvokeRequired)
-            ////{
-            ////    Set me = new Set(Silenced);
-            ////    Invoke(me);
-            ////    return;
-            ////}
-            //if (agMain.IsHandleCreated)
-            //{
-            //    agMain.Invoke(new Action(() =>
-            //    {
-            //        agMain.Hide();
-            //    }));
-            //}
-            //if (cbRange.IsHandleCreated)
-            //{
-            //    cbRange.Invoke(new Action(() =>
-            //    {
-            //        cbRange.Hide();
-            //    }));
-            //}
-            //if (txtCalibration.IsHandleCreated)
-            //{
-            //    txtCalibration.Invoke(new Action(() =>
-            //    {
-            //        txtCalibration.Hide();
-            //    }));
-            //}
-            //if (lblNoDevice.IsHandleCreated)
-            //{
-            //    lblNoDevice.Invoke(new Action(() =>
-            //    {
-            //        lblNoDevice.Location = new Point((Width - lblNoDevice.Width) / 2,
-            //            (Height - lblNoDevice.Height) / 2 + 5);
-            //        lblNoDevice.Show();
-            //    }));
-            //}
-            //try
-            //{
-            //    agMain.Hide();
-            //    cbRange.Hide();
-            //    txtCalibration.Hide();
-            //    lblNoDevice.Location = new Point((Width - lblNoDevice.Width) / 2,
-            //        (Height - lblNoDevice.Height) / 2 + 5);
-            //    lblNoDevice.Show();
-            //}
-            //catch
-            //{
-
-            //}
             agMain.Hide();
             cbRange.Hide();
             txtCalibration.Hide();
@@ -203,25 +108,11 @@ namespace Controls.Channel
         }
         public override void MarkHealth()
         {
-            //if (agMain.IsHandleCreated)
-            //{
-            //    agMain.Invoke(new Action(() =>
-            //    {
-            //        agMain.Sections[0].Fill = System.Windows.Media.Brushes.White;
-            //    }));
-            //}
-            agMain.Sections[0].Fill = System.Windows.Media.Brushes.White;
+            agMain.Sections[1].Fill = System.Windows.Media.Brushes.DodgerBlue;
         }
         public override void MarkIll()
         {
-            //if (agMain.IsHandleCreated)
-            //{
-            //    agMain.Invoke(new Action(() =>
-            //    {
-            //        agMain.Sections[0].Fill = System.Windows.Media.Brushes.LightYellow;
-            //    }));
-            //}
-            agMain.Sections[0].Fill = System.Windows.Media.Brushes.LightYellow;
+            agMain.Sections[1].Fill = System.Windows.Media.Brushes.Yellow;
         }
         public override void RefreshData(double currentData)  // 刷新数据
         {

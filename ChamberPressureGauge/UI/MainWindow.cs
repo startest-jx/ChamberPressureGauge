@@ -12,11 +12,7 @@ using System.Threading;
 using ChamberPressureGauge.Properties;
 
 //using System.Windows.Media;
-using LiveCharts.Geared;
-using LiveCharts.Wpf;
-using Brushes = System.Windows.Media.Brushes;
-using DColor = System.Drawing.Color;
-using MColor = System.Windows.Media.Color;
+//using LiveCharts.Wpf;
 using LiveCharts;
 using Controls.Other;
 
@@ -50,7 +46,7 @@ namespace ChamberPressureGauge.UI
         private SlaverDevice _slaver;  // 下位机
         private bool _channelUpdating;  // 通道检测Timer是否被占用
 
-        private Thread _loadingThread;
+        //private Thread _loadingThread;
         //private Chart DataChart;
         //private double CountDownValue;  // 倒计时
         //private Thread tCountDown;
@@ -110,6 +106,7 @@ namespace ChamberPressureGauge.UI
 
                     lblDisconnected.Show();
                     tcChannel.Hide();
+                    gbMeasure.Hide();
                     //picLoading.Hide();
  
                     //foreach (var Item in _Slaver.Channels)
@@ -136,6 +133,7 @@ namespace ChamberPressureGauge.UI
 
                     lblDisconnected.Hide();
                     tcChannel.Hide();
+                    gbMeasure.Hide();
                     //picLoading.Show();
 
                     break;
@@ -158,6 +156,7 @@ namespace ChamberPressureGauge.UI
 
                     lblDisconnected.Hide();
                     tcChannel.Show();
+                    gbMeasure.Show();
                     //picLoading.Hide();
 
                     break;
@@ -180,6 +179,7 @@ namespace ChamberPressureGauge.UI
 
                     lblDisconnected.Hide();
                     tcChannel.Show();
+                    gbMeasure.Show();
                     //picLoading.Show();
 
                     break;
@@ -330,34 +330,34 @@ namespace ChamberPressureGauge.UI
             InitializeComponent();
             //CheckForIllegalCrossThreadCalls = false;
         }
-        private void ChartInit()
-        {
-            lvChart.Series = new SeriesCollection();
-            lvChart.LegendLocation = LegendLocation.Top;
-            lvChart.Zoom = ZoomingOptions.X;
-            lvChart.DisableAnimations = true;
-            lvChart.Hoverable = false;
-            //lvChart.ScrollMode = ScrollMode.XY;
-            //lvChart.ScrollBarFill = new SolidColorBrush(MColor.FromArgb(37, 48, 48, 48));
-            lvChart.AxisX.Clear();
-            lvChart.AxisX.Add(new Axis()
-            {
-                Title = "时间/s",
-                MinValue = 0,
-                LabelFormatter = value => $"{value:F2}",
-                Separator = new Separator
-                {
-                    Step = 1d,
-                    IsEnabled = false,
-                }
-            });
-            lvChart.AxisY.Clear();
-            lvChart.AxisY.Add(new Axis()
-            {
-                Title = "压力/MPa",
-                LabelFormatter = value => $"{value:F5}"
-            });
-        }
+        //private void ChartInit()
+        //{
+        //    lvChart.Series = new SeriesCollection();
+        //    lvChart.LegendLocation = LegendLocation.Top;
+        //    lvChart.Zoom = ZoomingOptions.X;
+        //    lvChart.DisableAnimations = true;
+        //    lvChart.Hoverable = false;
+        //    //lvChart.ScrollMode = ScrollMode.XY;
+        //    //lvChart.ScrollBarFill = new SolidColorBrush(MColor.FromArgb(37, 48, 48, 48));
+        //    lvChart.AxisX.Clear();
+        //    lvChart.AxisX.Add(new Axis()
+        //    {
+        //        Title = "时间/s",
+        //        MinValue = 0,
+        //        LabelFormatter = value => $"{value:F2}",
+        //        Separator = new Separator
+        //        {
+        //            Step = 1d,
+        //            IsEnabled = false,
+        //        }
+        //    });
+        //    lvChart.AxisY.Clear();
+        //    lvChart.AxisY.Add(new Axis()
+        //    {
+        //        Title = "压力/MPa",
+        //        LabelFormatter = value => $"{value:F5}"
+        //    });
+        //}
 
         private void CountDownInit()
         {
@@ -415,7 +415,7 @@ namespace ChamberPressureGauge.UI
 
             _slaver.Channels[10].Control = scc;
             _slaver.Channels[11].Control = ecc;
-           
+
             //for (int i = 0; i < 6; i ++)
             //{
 
@@ -427,9 +427,7 @@ namespace ChamberPressureGauge.UI
             //_Slaver.Channels[i].Control.TabIndex = i;
             //_Slaver.Channels[i].Control.TabStop = false;
             //}
-
-            ChartInit();
-
+            mcChart.Init();
 
             _slaver.Status = ConnectStatus.Disconnected;
             cbTriggerMode.SelectedIndex = 0;
@@ -471,11 +469,12 @@ namespace ChamberPressureGauge.UI
         private void Reset(object sender, EventArgs e)
         {
             _slaver.Reset();
-            ChartInit();
+            mcChart.Init();
         }
 
         private void StartConnect()
         {
+            _loadWindow.CancelFun += bwConnect.CancelAsync;
             bwConnect.RunWorkerAsync();
             ShowLoadWindow();
         }
@@ -522,6 +521,7 @@ namespace ChamberPressureGauge.UI
 
         private void StartMeasure()
         {
+            _loadWindow.CancelFun += bwMeasure.CancelAsync;
             bwMeasure.RunWorkerAsync();
             ShowLoadWindow();
         }
@@ -562,37 +562,18 @@ namespace ChamberPressureGauge.UI
                     continue;
                 }
                 // LiveChart
-                object lineSeries = null;
-                //var Values = new LiveCharts.ChartValues<LiveCharts.Defaults.ObservablePoint>();
-                var values = new GearedValues<LiveCharts.Defaults.ObservablePoint> {Quality = Quality.Low};
+                //object lineSeries = null;
+                ////var Values = new LiveCharts.ChartValues<LiveCharts.Defaults.ObservablePoint>();
+                //var values = new GearedValues<LiveCharts.Defaults.ObservablePoint> {Quality = Quality.Low};
                 switch (t.Type)
                 {
                     case ChannelType.Pressure:
-                        lineSeries = new GLineSeries
-                        {
-                            Fill = Brushes.Transparent,
-                            //StrokeThickness = 0.5,
-                            Values = values,
-                            PointGeometry = null,
-                            LineSmoothness = 1,
-                            Title = t.Name,
-                            AreaLimit = 0,
-                        };
+                        mcChart.DrawPressureLine(t.MeasuringData, pointCount, t.Name);
                         break;
                     case ChannelType.Digital:
-                        lineSeries = new GStepLineSeries()
-                        {
-                            Fill = Brushes.Transparent,
-                            //StrokeThickness = 0.5,
-                            Values = values,
-                            PointGeometry = null,
-                            Title = t.Name,
-                        };
+                        mcChart.DrawDigitalLine(t.MeasuringData, pointCount, t.Name);
                         break;
                     case ChannelType.Speed:
-                        break;
-                    default:
-                        lineSeries = new GLineSeries();
                         break;
                 }
                 //var Series = new Series();
@@ -600,30 +581,9 @@ namespace ChamberPressureGauge.UI
                 //Series.BorderWidth = 2;
                 //Series.Color = Colors[i];
                 //Series.LegendText = Channels[i].Name;
-                var x = 0;
-                int avgX;
-                if (pointCount == 0)
-                {
-                    avgX = t.MeasuringData.Count;
-                }
-                else
-                {
-                    avgX = t.MeasuringData.Count / pointCount;
-                }
-                foreach (var y in t.MeasuringData)
-                {
-                    if (x % avgX == 0)
-                    {
-                        var secX = (x - avgX / 2d) / (2000d * 3.2d);
-                        var avgY = y;
-                        //Series.Points.AddXY(SecX, AvgY);
-                        values.Add(new LiveCharts.Defaults.ObservablePoint(secX, avgY));
-                    }
-                    x += 1;
-                }
+
                 //DataChart.Series.Add(Series);
 
-                lvChart.Series.Add((LiveCharts.Definitions.Series.ISeriesView)lineSeries);
             }
 
             //ChartArea.AxisX.ScrollBar = new AxisScrollBar();
@@ -691,6 +651,7 @@ namespace ChamberPressureGauge.UI
 
         private void bwConnect_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            _loadWindow.CancelFun -= bwConnect.CancelAsync;
             CloseLoadWindow();
             if (e.Cancelled)
             {
@@ -717,6 +678,7 @@ namespace ChamberPressureGauge.UI
 
         private void bwMeasure_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            _loadWindow.CancelFun -= bwMeasure.CancelAsync;
             CloseLoadWindow();
             _log.Print(e.Cancelled ? "测量失败." : "测量完成.");
             _slaver.Status = ConnectStatus.Connected;
@@ -728,7 +690,7 @@ namespace ChamberPressureGauge.UI
             configWindow.ShowDialog();
         }
 
-        private void lvChart_DataHover(object sender, ChartPoint chartPoint)
+        private void ChartDataHover(object sender, ChartPoint chartPoint)
         {
             txtX.Text = $@"{chartPoint.X:F3} s";
             txtY.Text = $@"{chartPoint.Y:F4} MPa";
@@ -745,10 +707,10 @@ namespace ChamberPressureGauge.UI
         private void bwBuildReport_DoWork(object sender, DoWorkEventArgs e)
         {
             _log.Print("正在导出报告...");
-            var chartBitmap = new Bitmap(lvChart.Width, lvChart.Height);
+            var chartBitmap = new Bitmap(mcChart.Width, mcChart.Height);
             Invoke(new Action(() =>
             {
-                lvChart.DrawToBitmap(chartBitmap, new Rectangle(0, 0, lvChart.Width, lvChart.Height));
+                mcChart.DrawToBitmap(chartBitmap, new Rectangle(0, 0, mcChart.Width, mcChart.Height));
             }));
             //lvChart.DrawToBitmap(ChartBitmap, new Rectangle(0, 0, lvChart.Width, lvChart.Height));
             chartBitmap.Save(Application.StartupPath + "/report/img.jpg", System.Drawing.Imaging.ImageFormat.Jpeg);

@@ -86,23 +86,7 @@
     </Reference>
     <Reference Include="LiveCharts, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Release\bin\controls\LiveCharts.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="LiveCharts.Geared, Version=1.2.8.0, Culture=neutral, PublicKeyToken=7292f245d14ab8bf, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Release\bin\controls\LiveCharts.Geared.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="LiveCharts.WinForms, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Release\bin\controls\LiveCharts.WinForms.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="LiveCharts.Wpf, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Release\bin\controls\LiveCharts.Wpf.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>..\Release\bin\LiveCharts.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />

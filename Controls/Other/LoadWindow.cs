@@ -5,6 +5,7 @@ namespace Controls.Other
 {
     public partial class LoadWindow : Form
     {
+        public event Action CancelFun;
         public LoadWindow()
         {
             InitializeComponent();
@@ -18,6 +19,12 @@ namespace Controls.Other
                 return;
             }
             lblInfo.Text = text;
+            btnCancel.Visible = CancelFun != null;
+        }
+
+        private void btnCancel_Click(object sender, EventArgs e)
+        {
+            CancelFun?.Invoke();
         }
     }
 }
