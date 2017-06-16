@@ -316,14 +316,11 @@ namespace ChamberPressureGauge.UI
         }
         public void ChannelCheck()
         {
-            if (_slaver.Status == ConnectStatus.Connected || _slaver.Status == ConnectStatus.Measuring)
-            {
-                if (!_slaver.UpdateChannelExist())
-                {
-                    return;
-                }
-                _slaver.UpdateChannelData();
-            }
+            if (_slaver.Status != ConnectStatus.Connected && _slaver.Status != ConnectStatus.Measuring)
+                return;
+            if (!_slaver.UpdateChannelExist())
+                return;
+            _slaver.UpdateChannelData();
         }
         public MainWindow()
         {
@@ -413,8 +410,8 @@ namespace ChamberPressureGauge.UI
             _slaver.Channels[8].Control = dcc3;
             _slaver.Channels[9].Control = dcc4;
 
-            _slaver.Channels[10].Control = scc;
-            _slaver.Channels[11].Control = ecc;
+            _slaver.Channels[10].Control = vcc;
+            _slaver.Channels[11].Control = null;
 
             //for (int i = 0; i < 6; i ++)
             //{
@@ -458,10 +455,6 @@ namespace ChamberPressureGauge.UI
         {
             WinClosing(null, null);
         }
-        private void EventConfig(object sender, EventArgs e)
-        {
-
-        }
         private void timClock_Tick(object sender, EventArgs e)
         {
             lblTime.Text = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
@@ -470,6 +463,14 @@ namespace ChamberPressureGauge.UI
         {
             _slaver.Reset();
             mcChart.Init();
+            ResultInit();
+        }
+
+        private void ResultInit()
+        {
+            txtResultTotalTime.Text = "";
+            txtResultDigitalTriggerStart.Text = "";
+            txtResultDigitalTriggerLast.Text = "";
         }
 
         private void StartConnect()
@@ -597,17 +598,26 @@ namespace ChamberPressureGauge.UI
         }
         private void cbTriggerChannel_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (cbTriggerChannel.SelectedIndex == -1)
+            if (cbPressureTriggerChannel.SelectedIndex == -1)
             {
                 return;
             }
-            _slaver.SetTriggerChannel(int.Parse(System.Text.RegularExpressions.Regex.Replace(cbTriggerChannel.SelectedItem.ToString(), @"[^0-9]+", "")) - 1);
+            _slaver.SetTriggerChannel(int.Parse(System.Text.RegularExpressions.Regex.Replace(cbPressureTriggerChannel.SelectedItem.ToString(), @"[^0-9]+", "")) - 1);
+        }
+
+        private void cbDigitalTriggerChannel_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cbDigitalTriggerChannel.SelectedIndex == -1)
+            {
+                return;
+            }
+            _slaver.SetTriggerChannel(int.Parse(System.Text.RegularExpressions.Regex.Replace(cbDigitalTriggerChannel.SelectedItem.ToString(), @"[^0-9]+", "")) + 5);
         }
 
         private void AutoTrigger(bool enable)
         {
             lblTriggerChannel.Enabled = enable;
-            cbTriggerChannel.Enabled = enable;
+            cbPressureTriggerChannel.Enabled = enable;
             btnRefreshTriggerChannel.Enabled = enable;
             if (enable)
                 RefreshTriggerChannel();
@@ -619,17 +629,33 @@ namespace ChamberPressureGauge.UI
                 Invoke(new Action(RefreshTriggerChannel));
                 return;
             }
-            cbTriggerChannel.Items.Clear();
+
+            // 刷新压力通道
+            cbPressureTriggerChannel.Items.Clear();
             for (var i = 0; i < 6; i++)
             {
                 if (_slaver.Channels[i].DeviceExist)
                 {
-                    cbTriggerChannel.Items.Add(_slaver.Channels[i].Name);
+                    cbPressureTriggerChannel.Items.Add(_slaver.Channels[i].Name);
                 }
             }
-            if (cbTriggerChannel.SelectedIndex == -1 && cbTriggerChannel.Items.Count != 0)
+            if (cbPressureTriggerChannel.SelectedIndex == -1 && cbPressureTriggerChannel.Items.Count != 0)
             {
-                cbTriggerChannel.SelectedIndex = 0;
+                cbPressureTriggerChannel.SelectedIndex = 0;
+            }
+
+            // 刷新数字量/计时通道
+            cbDigitalTriggerChannel.Items.Clear();
+            for (var i = 6; i < 10; i++)
+            {
+                if (_slaver.Channels[i].DeviceExist)
+                {
+                    cbDigitalTriggerChannel.Items.Add(_slaver.Channels[i].Name);
+                }
+            }
+            if (cbDigitalTriggerChannel.SelectedIndex == -1 && cbDigitalTriggerChannel.Items.Count != 0)
+            {
+                cbDigitalTriggerChannel.SelectedIndex = 0;
             }
         }
 
@@ -680,7 +706,18 @@ namespace ChamberPressureGauge.UI
         {
             _loadWindow.CancelFun -= bwMeasure.CancelAsync;
             CloseLoadWindow();
-            _log.Print(e.Cancelled ? "测量失败." : "测量完成.");
+            if (e.Cancelled)
+            {
+                _log.Print("测量失败.");
+            }
+            else
+            {
+                _log.Print("测量完成.");
+                _slaver.DischargeGateOpenTime(out double startTime, out double lastTime);
+                txtResultTotalTime.Text = $@"{_slaver.MeasuringTime} 毫秒";
+                txtResultDigitalTriggerStart.Text = $@"{startTime} 秒";
+                txtResultDigitalTriggerLast.Text = $@"{lastTime} 秒";
+            }
             _slaver.Status = ConnectStatus.Connected;
         }
 

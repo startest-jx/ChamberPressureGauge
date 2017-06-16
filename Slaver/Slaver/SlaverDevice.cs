@@ -217,17 +217,18 @@ namespace Slaver.Slaver
         public int GetTriggerChannel(ChannelType channelType)
         {
             int startIndex = 0, endIndex = 0;
-            if (channelType == ChannelType.Pressure)
+            switch (channelType)
             {
-                startIndex = 0;
-                endIndex = 6;
+                case ChannelType.Pressure:
+                    startIndex = 0;
+                    endIndex = 6;
+                    break;
+                case ChannelType.Digital:
+                    startIndex = 6;
+                    endIndex = 10;
+                    break;
             }
-            else if (channelType == ChannelType.Digital)
-            {
-                startIndex = 6;
-                endIndex = 10;
-            }
-            for (int i = startIndex; i < endIndex; i++)
+            for (var i = startIndex; i < endIndex; i++)
             {
                 if (_channels[i].IsTrigger)
                 {
@@ -255,7 +256,7 @@ namespace Slaver.Slaver
                 Log.Show("需要设置触发通道.");
                 return false;
             }
-            BaseChannel triggerChannel = Channels[triggerIndex];
+            var triggerChannel = Channels[triggerIndex];
             double increment = 0;
             var mapIndex = -1;
             if (triggerIndex < 6)
@@ -349,7 +350,7 @@ namespace Slaver.Slaver
                         e.Cancel = true;
                         return false;
                     }
-                    _channels[i].MeasuringData.Add(Channels[i].Formula(t[i + 9]));
+                    Channels[i].MeasuringData.Add(Channels[i].Formula(t[i + 9]));
                 }
                 for (var i = 6; i < 10; i++)
                 {
@@ -358,11 +359,42 @@ namespace Slaver.Slaver
                         e.Cancel = true;
                         return false;
                     }
-                    _channels[i].MeasuringData.Add(Channels[i].Formula(t[i - 6]));
+                    Channels[i].MeasuringData.Add(Channels[i].Formula(t[i - 6]));
                 }
             }
             Log.Show("数据处理完毕.");
             return true;
+        }
+
+        public void DischargeGateOpenTime(out double openTime, out double lastTime)
+        {
+            openTime = 0;
+            lastTime = 0;
+            var triggerIndex = GetTriggerChannel(ChannelType.Digital);
+            if (triggerIndex == -1) return;
+            var triggerChannel = Channels[triggerIndex];
+            var i = 0; var count = 0;
+            var hasOpened = false;
+            foreach (var t in triggerChannel.MeasuringData)
+            {
+                i++;
+                if (t < 2.5)
+                {
+                    count++;
+                    if (count > 4000)
+                    {
+                        hasOpened = true;
+                    }
+                }
+                else
+                {
+                    if (!hasOpened) continue;
+                    openTime = (i - count) / 6400d;
+                    lastTime = count / 6400d;
+                    return;
+                }
+
+            }
         }
     }
 }

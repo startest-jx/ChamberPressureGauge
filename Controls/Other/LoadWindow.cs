@@ -19,7 +19,14 @@ namespace Controls.Other
                 return;
             }
             lblInfo.Text = text;
-            btnCancel.Visible = CancelFun != null;
+            lblInfo.Top = (Height - lblInfo.Height) / 2;
+            lblInfo.Left = (Width - lblInfo.Width) / 2;
+            picLoading.Left = lblInfo.Left - picLoading.Width - 5;
+            btnCancel.Hide();
+            if (CancelFun == null) return;
+            lblInfo.Top -= btnCancel.Height / 2;
+            btnCancel.Show();
+            //btnCancel.Visible = CancelFun != null;
         }
 
         private void btnCancel_Click(object sender, EventArgs e)

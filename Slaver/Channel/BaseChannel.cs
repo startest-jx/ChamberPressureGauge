@@ -32,7 +32,7 @@ namespace Slaver.Channel
             set
             {
                 _control = value;
-                _control.SetTitle(Name);
+                _control?.SetTitle(Name);
             }
             get => _control;
         }
@@ -46,11 +46,11 @@ namespace Slaver.Channel
                 _healthLock.ReleaseMutex();
                 if (value)
                 {
-                    Control.MarkHealth();
+                    Control?.MarkHealth();
                 }
                 else
                 {
-                    Control.MarkIll();
+                    Control?.MarkIll();
                 }
             }
             get
@@ -71,11 +71,11 @@ namespace Slaver.Channel
                 _existLock.ReleaseMutex();
                 if (value)
                 {
-                    Control.Activate();
+                    Control?.Activate();
                 }
                 else
                 {
-                    Control.Silenced();
+                    Control?.Silenced();
                 }
             }
             get
