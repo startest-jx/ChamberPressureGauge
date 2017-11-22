@@ -19,7 +19,7 @@ namespace Controls.Channel
         {
             InitializeComponent();
 
-            agMain.LabelFormatter = value => value == 0 ? "0" : $"{value:F1}";
+            agMain.LabelFormatter = value => value == 0 ? "0" : $"{value:F0}";
             agMain.LabelsEffect = null;
             agMain.NeedleFill = System.Windows.Media.Brushes.DarkRed;
             agMain.TicksForeground = System.Windows.Media.Brushes.Black;
@@ -30,17 +30,15 @@ namespace Controls.Channel
             agMain.Wedge = 135;
             agMain.TicksStrokeThickness = 1;
 
-            agMain.FromValue = 0d;
-            agMain.ToValue = 5d;
+            agMain.FromValue = 0;
+            agMain.ToValue = 5;
+            agMain.LabelsStep = 1;
+            agMain.TickStep = 0.2;
 
             agMain.Sections.Add(new AngularSection
             {
-                Fill = System.Windows.Media.Brushes.White,
-            });
-            agMain.Sections.Add(new AngularSection
-            {
                 FromValue = 0,
-                ToValue = 5d,
+                ToValue = 5,
                 Fill = System.Windows.Media.Brushes.DodgerBlue,
             });
 
@@ -86,7 +84,7 @@ namespace Controls.Channel
                 Name = "lblNoDevice",
                 Size = new Size(203, 43),
                 TabIndex = 5,
-                Text = "NO DEVICE"
+                Text = @"NO DEVICE"
             };
             //lblNoDevice.Location = new Point(194, 7);
             gbTitle.Controls.Add(_lblNoDevice);

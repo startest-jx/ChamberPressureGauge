@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.12
+VisualStudioVersion = 15.0.26430.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChamberPressureGauge", "ChamberPressureGauge\ChamberPressureGauge.csproj", "{EAD796EB-6559-48CF-AB45-74540A4C37DA}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -16,10 +16,14 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slaver", "Slaver\Slaver.csproj", "{A373AB19-E78F-4791-8371-A9BC1F53869D}"
 	ProjectSection(ProjectDependencies) = postProject
 		{D754C55D-69C4-403B-86AA-5D45B2BD1A73} = {D754C55D-69C4-403B-86AA-5D45B2BD1A73}
+		{565FF99B-0BB5-4E2F-9D74-A1C9C5353728} = {565FF99B-0BB5-4E2F-9D74-A1C9C5353728}
 		{FD3C58FA-4727-407F-BEED-1122974638CD} = {FD3C58FA-4727-407F-BEED-1122974638CD}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Controls", "Controls\Controls.csproj", "{D754C55D-69C4-403B-86AA-5D45B2BD1A73}"
+	ProjectSection(ProjectDependencies) = postProject
+		{565FF99B-0BB5-4E2F-9D74-A1C9C5353728} = {565FF99B-0BB5-4E2F-9D74-A1C9C5353728}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Report", "Report\Report.csproj", "{2E5205A3-173F-4CC7-A806-487B1F0403E6}"
 EndProject

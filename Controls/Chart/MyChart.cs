@@ -6,6 +6,7 @@ using LiveCharts.Events;
 using System.Collections.Generic;
 using LiveCharts.Geared;
 using System.Windows.Media;
+using Tools.Configuration;
 
 namespace Controls.Chart
 {
@@ -57,11 +58,13 @@ namespace Controls.Chart
             });
         }
 
-        public void DrawPressureLine(List<double> dataList, int drawPointCount, string title)
+        public void DrawPressureLine(List<double> dataList, Configuration config , string title)
         {
             // LiveChart
-            //var Values = new LiveCharts.ChartValues<LiveCharts.Defaults.ObservablePoint>();
-            var values = new GearedValues<LiveCharts.Defaults.ObservablePoint> { Quality = Quality.Low };
+            //var Values = new LiveCharts.ChartValues<LiveCharts.Defaults.ObservablePoint>();\
+            var lineQuality = (Quality) int.Parse(config.Chart["Quality"].ToString());
+            var drawPointCount = int.Parse(config.Chart["PointCount"].ToString());
+            var values = new GearedValues<LiveCharts.Defaults.ObservablePoint> { Quality = lineQuality };
             var lineSeries = new GLineSeries
             {
                 Fill = Brushes.Transparent,

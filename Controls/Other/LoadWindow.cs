@@ -31,6 +31,7 @@ namespace Controls.Other
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
+            Message("正在取消...");
             CancelFun?.Invoke();
         }
     }

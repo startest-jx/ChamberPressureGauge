@@ -11,12 +11,12 @@ namespace Communication.Ethernet
         private bool _isConnected;
         protected Thread ReadThread;  // 连接线程，接收线程
 
-        protected int ReceiveTimeOut
+        public int ReceiveTimeOut
         {
             set => _socket.ReceiveTimeout = value;
             get => _socket. ReceiveTimeout;
         }
-        protected int ReceiveBufferSize
+        public int ReceiveBufferSize
         {
             set => _socket.ReceiveBufferSize = value;
             get => _socket.ReceiveBufferSize;

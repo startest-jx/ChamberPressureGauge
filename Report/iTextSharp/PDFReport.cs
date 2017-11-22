@@ -16,11 +16,12 @@ namespace Report.iTextSharp
         private readonly BaseFont _bfLight;  // 字体
         private readonly PdfPTable _table;  // 表格
         public string FilePath { set; get; }  // 路径
-        public string Author { set; get; }  // 作者
-        public string Creator { set; get; }  // 创建人
-        public string Subject { set; get; }  // 主题
-        public string Title { set; get; }  // 标题
-        public string Keywords { set; get; }  // 关键字
+        public string Author { set => _document?.AddAuthor(value);}  // 作者
+        public string Creator { set => _document?.AddCreator(value); }  // 创建人
+        public void CreateDate() => _document?.AddCreationDate();  // 创建日期
+        public string Subject { set => _document?.AddSubject(value); }  // 主题
+        public string Title { set => _document?.AddTitle(value); }  // 标题
+        public string Keywords { set => _document?.AddKeywords(value); }  // 关键字
 
         public PdfReport()
         {
@@ -60,19 +61,27 @@ namespace Report.iTextSharp
             _table.AddCell(myCell);
         }
 
-        public void Print()
+        public bool Print()
         {
-            PdfWriter.GetInstance(_document, new FileStream(FilePath, FileMode.Create));
+            try
+            {
+                PdfWriter.GetInstance(_document, new FileStream(FilePath, FileMode.Create));
 
-            _document.AddAuthor(Author);
-            _document.AddCreationDate();
-            _document.AddCreator(Creator);
-            _document.AddSubject(Subject);
-            _document.AddTitle(Title);
-            _document.AddKeywords(Keywords);
-            _document.Open();
-            _document.Add(_table);
-            _document.Close();
+                //_document.AddAuthor(Author);
+                //_document.AddCreationDate();
+                //_document.AddCreator(Creator);
+                //_document.AddSubject(Subject);
+                //_document.AddTitle(Title);
+                //_document.AddKeywords(Keywords);
+                //_document.Open();
+                //_document.Add(_table);
+                //_document.Close();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public void Open()

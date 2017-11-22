@@ -127,6 +127,9 @@
   <data name="monitor" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\monitor.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="soft" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\soft.ico;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="toolbar_disconnect" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\toolbar_disconnect.ico;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -163,7 +166,10 @@
   <data name="toolbar_chart" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\toolbar_chart.ico;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="soft" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Images\soft.ico;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="toolbar_export" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\toolbar_export.ico;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="toolbar_import" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\toolbar_import.ico;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

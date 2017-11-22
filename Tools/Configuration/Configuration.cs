@@ -1,89 +1,101 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Collections;
+using System.IO;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Tools.Configuration
 {
-    internal class Configuration
+    public class Configuration
     {
-        public class ConnectionConfig
+        public string FileName { set; get; }
+        private JObject _configTable;
+        public JObject ConfigTable
         {
-            public int TimeOut { set; get; }
-
-            public class CommandPanel
+            set
             {
-                public string IpAddress { set; get; }
-                public int Port { set; get; }
+                _configTable = value;
+                // 解析配置信息
+                Connect = (JObject)_configTable["Connect"];
+                Measure = (JObject)_configTable["Measure"];
+                Data = (JObject)_configTable["Data"];
+                Chart = (JObject)_configTable["Chart"];
+                Report = (JObject)_configTable["Report"];
             }
-            public CommandPanel MyCommandPanel { set; get; }
-            public class DigitalPanel
+            get
             {
-                public string IpAddress { set; get; }
-                public int Port { set; get; }
+                _configTable["Connect"] = Connect;
+                _configTable["Measure"] = Measure;
+                _configTable["Data"] = Data;
+                _configTable["Chart"] = Chart;
+                _configTable["Report"] = Report;
+                return _configTable;
             }
-            public DigitalPanel MyDigitalPanel { set; get; }
         }
-        public ConnectionConfig MyConnection { set; get; }
-
-        public class MeasuringConfig
+        public JObject Connect { set; get; }
+        public JObject Measure { set; get; }
+        private JObject _data;
+        public JObject Data
         {
-            public enum MeasuringMode
+            set
             {
-                Auto,
-                Manual
+                _data = value;
+                var mappingRuleArray = (JArray) _data["ChannelMappingRule"];
+                MappingRule = new Hashtable();
+                foreach (var t in mappingRuleArray)
+                {
+                    var channel = Convert.ToInt32(t["LogicalChannel"]);
+                    var bit = Convert.ToInt32(t["Bit"]);
+                    MappingRule[channel] = bit;
+                }
             }
-            public enum TriggerMode
+            get
             {
-                Threshold,
-                Increment
+                var mappingRuleArray = new JArray();
+                foreach(int t in MappingRule.Keys)
+                {
+                    var channel = t;
+                    var bit = (int)MappingRule[t];
+                    var u = new JObject
+                    {
+                        ["LogicalChannel"] = channel,
+                        ["Bit"] = bit
+                    };
+                    mappingRuleArray.Add(u);
+                }
+                _data["ChannelMappingRule"] = mappingRuleArray;
+                return _data;
             }
-            public MeasuringMode DefaultMeasuringMode { set; get; }
-            public class AutoTrigger
-            {
-                public int DefaultTriggerChannel { set; get; }
-                public TriggerMode TriggerMode { set; get; }
-                public double TriggerValue { set; get; }
-                public int MeasuringTime { set; get; }
-            }
-            public AutoTrigger MyAutoTrigger { set; get; }
-
-            public class ManualTigger
-            {
-                public int MeasuringTime { set; get; }
-            }
-            public ManualTigger MyManualTigger { set; get; }
         }
-        public MeasuringConfig MyMeasuring { set; get; }
+        public JObject Chart { set; get; }
+        public JObject Report { set; get; }
 
-        public class DataConfig
+        private string HashString
         {
-            
+            set => ConfigTable = JsonConvert.DeserializeObject<JObject>(value);
+            get => JsonConvert.SerializeObject(ConfigTable);
         }
-        public DataConfig MyData { set; get; }
 
-        public class ReportConfig
+        public Hashtable MappingRule { set; get; }
+
+        public Configuration(string fileName) => FileName = fileName;
+
+        public Configuration() { }
+
+        public void LoadFromFile()
         {
-            public string Title { set; get; }
-            public string Author { set; get; }
-            public string Subject { set; get; }
-            public string DateTime { set; get; }
-            public string Path { set; get; }
-            public bool AutoOpen { set; get; }
-            public class Content
+            using (var sr = new StreamReader(FileName))
             {
-                public bool Trigger{ set; get; }
-                public bool Pressure { set; get; }
-                public bool Digital { set; get; }
-                public bool Chart { set; get; }
+                HashString = sr.ReadToEnd();
             }
-            public Content MyContent { set; get; }
         }
-        public ReportConfig MyReport { set; get; }
 
-        public class ChartConfig
+        public void SaveToFile()
         {
-            
+            using (var sw = new StreamWriter(FileName))
+            {
+                sw.Write(HashString);
+            }
         }
-        public ChartConfig MyChart { set; get; }
     }
 }

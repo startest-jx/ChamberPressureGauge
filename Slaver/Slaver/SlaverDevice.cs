@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
+using Newtonsoft.Json.Linq;
 using Slaver.Channel;
 using Slaver.Panel;
+using Tools.Configuration;
 using Tools.Log;
 
 namespace Slaver.Slaver
@@ -14,6 +17,7 @@ namespace Slaver.Slaver
         Connecting,
         Connected,
         Measuring,
+        Error,
     }
     public enum TriggerMode  // 触发方式
     {
@@ -36,13 +40,74 @@ namespace Slaver.Slaver
             get => _status;
         }
         public TriggerMode TriggerMode { set; get; }
+
+        public int PressureTriggerIndex
+        {
+            set => SetTriggerChannelIndex(value);
+            get => GetTriggerChannelIndex(ChannelType.Pressure);
+        }
+        public int DigitalTriggerIndex
+        {
+            set => SetTriggerChannelIndex(value);
+            get => GetTriggerChannelIndex(ChannelType.Digital);
+        }
+        public BaseChannel PressureTriggerChannel
+        {
+            set
+            {
+                var triggerIndex = GetTriggerChannelIndex(ChannelType.Pressure);
+                Channels[triggerIndex] = value;
+            }
+            get
+            {
+                var triggerIndex = GetTriggerChannelIndex(ChannelType.Pressure);
+                return triggerIndex == -1 ? null : Channels[triggerIndex];
+            }
+        }
+        public BaseChannel DigitalTriggerChannel
+        {
+            set
+            {
+                var triggerIndex = GetTriggerChannelIndex(ChannelType.Digital);
+                Channels[triggerIndex] = value;
+            }
+            get
+            {
+                var triggerIndex = GetTriggerChannelIndex(ChannelType.Digital);
+                return triggerIndex == -1 ? null : Channels[triggerIndex];
+            }
+        }
         public Action<ConnectStatus> ChangeStatus;
+        private Configuration _config;
+        public Configuration Config
+        {
+            set
+            {
+                _config = value;
+                var connectTable = (JObject)Config.ConfigTable["Connect"];
+                CmdTable = (JObject)connectTable["CommandPanel"];
+                DataTable = (JObject)connectTable["DataPanel"];
+                _mappingRule = Config.MappingRule;
+                var autoTrigger = (JObject) Config.Measure["AutoTrigger"];
+                var manualTrigger = (JObject)Config.Measure["ManualTrigger"];
+                AutoMeasuringTime = (int) autoTrigger["MeasureTime"];
+                ManualMeasuringTime = (int)manualTrigger["MeasureTime"];
+            }
+            get => _config;
+        }
+
+        private JObject CmdTable { get; set; }
+
+        private JObject DataTable { get; set; }
+
+        private Hashtable _mappingRule;
+
         public Log Log{ set; get; }
         public Action<BaseChannel[]> DrawLines;
         public Action<double> StartCountDown;
         public Action CancelCountDown;
 
-        public int TriggerInterval { set; get; }
+        //public int TriggerInterval { set; get; }
         private BaseChannel[] _channels;  // 通道
         public BaseChannel[] Channels
         {
@@ -82,7 +147,21 @@ namespace Slaver.Slaver
         public bool Connect()
         {
             Log.Show("正在连接主控板...");
-            if (OpenControl("192.168.1.178", 4001))
+            string cmdIP, dataIP;
+            int cmdPort, dataPort;
+            try
+            {
+                cmdIP = CmdTable["IPAddress"].ToString();
+                cmdPort = (int)CmdTable["Port"];
+                dataIP = DataTable["IPAddress"].ToString();
+                dataPort = (int)DataTable["Port"];
+            }
+            catch
+            {
+                Log.Show("IP地址/端口号信息读取失败,请检查配置文件.");
+                return false;
+            }
+            if (OpenControl(cmdIP, cmdPort))
             {
                 Log.Show("主控板连接成功.");
             }
@@ -95,7 +174,7 @@ namespace Slaver.Slaver
             }
             Thread.Sleep(500);
             Log.Show("正在连接数位板...");
-            if (OpenDigital("192.168.1.126", 8000))
+            if (OpenData(dataIP, dataPort))
             {
                 Log.Show("数位板连接成功.");
             }
@@ -112,12 +191,44 @@ namespace Slaver.Slaver
         public bool OpenControl(string ip, int port)
         {
             _commandPanel = new CommandPanel(ip, port);
+            try
+            {
+                _commandPanel.ReceiveTimeOut = (int)CmdTable["TimeOut"];
+            }
+            catch
+            {
+                CmdTable["TimeOut"] = "500";
+            }
+            try
+            {
+                _commandPanel.ReceiveBufferSize = (int)CmdTable["BufferSize"];
+            }
+            catch
+            {
+                CmdTable["BufferSize"] = "1024";
+            }
             _commandPanel.StartReading();
             return _commandPanel.Open();
         }
-        public bool OpenDigital(string ip, int port)
+        public bool OpenData(string ip, int port)
         {
             _dataPanel = new DataPanel(ip, port);
+            try
+            {
+                _dataPanel.ReceiveTimeOut = (int)DataTable["TimeOut"];
+            }
+            catch
+            {
+                DataTable["TimeOut"] = "500";
+            }
+            try
+            {
+                _dataPanel.ReceiveBufferSize = (int)DataTable["BufferSize"];
+            }
+            catch
+            {
+                DataTable["BufferSize"] = "1024";
+            }
             _dataPanel.StartReading();
             _dataPanel.DataReceived += _dataPanel.DataUpdate;
             return _dataPanel.Open();
@@ -195,7 +306,7 @@ namespace Slaver.Slaver
                 }
             }
         }
-        public void SetTriggerChannel(int channelIndex)
+        public void SetTriggerChannelIndex(int channelIndex)
         {
             int startIndex = 0, endIndex = 0;
             if (channelIndex < 6)
@@ -214,7 +325,7 @@ namespace Slaver.Slaver
             }
             _channels[channelIndex].IsTrigger = true;
         }
-        public int GetTriggerChannel(ChannelType channelType)
+        public int GetTriggerChannelIndex(ChannelType channelType)
         {
             int startIndex = 0, endIndex = 0;
             switch (channelType)
@@ -237,7 +348,11 @@ namespace Slaver.Slaver
             }
             return -1;
         }
-        public int MeasuringTime { set; get; }
+
+        public int AutoMeasuringTime { set; get; }
+        public int ManualMeasuringTime { set; get; }
+
+        public int MeasuringTime => TriggerMode == TriggerMode.Auto ? AutoMeasuringTime : ManualMeasuringTime;
         public void SelfTest()
         {
             Log.Show("发送自检命令.");
@@ -250,32 +365,22 @@ namespace Slaver.Slaver
         }
         public bool WaitTrigger(ref BackgroundWorker sender, ref DoWorkEventArgs e)
         {
-            var triggerIndex = GetTriggerChannel(ChannelType.Pressure);
-            if (triggerIndex == -1)
+            if (PressureTriggerIndex == -1)
             {
                 Log.Show("需要设置触发通道.");
                 return false;
             }
-            var triggerChannel = Channels[triggerIndex];
             double increment = 0;
-            var mapIndex = -1;
-            if (triggerIndex < 6)
-            {
-                mapIndex = triggerIndex + 9;
-            }
-            else if (triggerIndex >= 6 && triggerIndex < 10)
-            {
-                mapIndex = triggerIndex - 6;
-            }
-            //WaitTriggerSwitch = true;
-            while (increment < triggerChannel.TriggerIncrement)
+            var mapIndex = (int)_mappingRule[PressureTriggerIndex];
+            var autoTrigger = (JObject)Config.Measure["AutoTrigger"];
+            while (increment < (double)autoTrigger["Value"])
             {
                 if (sender.CancellationPending)
                 {
                     e.Cancel = true;
                     return false;
                 }
-                increment = triggerChannel.Formula(_dataPanel.CurAverageData[mapIndex]);
+                increment = PressureTriggerChannel.Formula(_dataPanel.CurAverageData[mapIndex]);
                 Thread.Sleep(5);
             }
             return true;
@@ -293,16 +398,14 @@ namespace Slaver.Slaver
                 //}
                 Log.Show("等待触发...");
                 //Channels[TriggerIndex].WaitTriggerSwitch = !StopFlag;
-                if (WaitTrigger(ref sender, ref e))
-                {
-                    StartCountDown?.Invoke(MeasuringTime / 1000d);
-                    Log.Show($"{Channels[GetTriggerChannel(ChannelType.Pressure)].Name}触发.");
-                    if (!Measure(ref sender, ref e))
-                        return;
-                    Log.Show("正在绘制图表...");
-                    DrawLines?.Invoke(Channels);
-                    Log.Show("正在显示图表...");
-                }
+                if (!WaitTrigger(ref sender, ref e)) return;
+                StartCountDown?.Invoke(MeasuringTime / 1000d);
+                Log.Show($"{Channels[GetTriggerChannelIndex(ChannelType.Pressure)].Name}触发.");
+                if (!Measure(ref sender, ref e))
+                    return;
+                Log.Show("正在绘制图表...");
+                DrawLines?.Invoke(Channels);
+                Log.Show("正在显示图表...");
             }
             else if (TriggerMode == TriggerMode.Manual)
             {
@@ -343,24 +446,33 @@ namespace Slaver.Slaver
                     e.Cancel = true;
                     return false;
                 }
-                for (var i = 0; i < 6; i++)
+                for (var i = 0; i < 12; i++)
                 {
                     if (sender.CancellationPending)
                     {
                         e.Cancel = true;
                         return false;
                     }
-                    Channels[i].MeasuringData.Add(Channels[i].Formula(t[i + 9]));
+                    Channels[i].MeasuringData.Add(Channels[i].Formula(t[(int)_mappingRule[i]]));
                 }
-                for (var i = 6; i < 10; i++)
-                {
-                    if (sender.CancellationPending)
-                    {
-                        e.Cancel = true;
-                        return false;
-                    }
-                    Channels[i].MeasuringData.Add(Channels[i].Formula(t[i - 6]));
-                }
+                //for (var i = 0; i < 6; i++)
+                //{
+                //    if (sender.CancellationPending)
+                //    {
+                //        e.Cancel = true;
+                //        return false;
+                //    }
+                //    Channels[i].MeasuringData.Add(Channels[i].Formula(t[i + 9]));
+                //}
+                //for (var i = 6; i < 10; i++)
+                //{
+                //    if (sender.CancellationPending)
+                //    {
+                //        e.Cancel = true;
+                //        return false;
+                //    }
+                //    Channels[i].MeasuringData.Add(Channels[i].Formula(t[i - 6]));
+                //}
             }
             Log.Show("数据处理完毕.");
             return true;
@@ -370,7 +482,7 @@ namespace Slaver.Slaver
         {
             openTime = 0;
             lastTime = 0;
-            var triggerIndex = GetTriggerChannel(ChannelType.Digital);
+            var triggerIndex = GetTriggerChannelIndex(ChannelType.Digital);
             if (triggerIndex == -1) return;
             var triggerChannel = Channels[triggerIndex];
             var i = 0; var count = 0;

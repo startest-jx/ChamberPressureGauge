@@ -22,7 +22,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\Release\bin\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
@@ -32,10 +32,6 @@
   <ItemGroup>
     <Reference Include="itextsharp">
       <HintPath>..\Debug\bin\itextsharp.dll</HintPath>
-    </Reference>
-    <Reference Include="PdfSharp, Version=1.32.2608.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\PDFSharp\PDFsharp\code\PdfSharp\bin\Release\PdfSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />

@@ -32,28 +32,14 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.menuMain = new System.Windows.Forms.MenuStrip();
             this.menConnect = new System.Windows.Forms.ToolStripMenuItem();
-            this.miConnect = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
-            this.miConfig = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
-            this.miExit = new System.Windows.Forms.ToolStripMenuItem();
             this.menData = new System.Windows.Forms.ToolStripMenuItem();
-            this.miStart = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
-            this.miReset = new System.Windows.Forms.ToolStripMenuItem();
             this.miView = new System.Windows.Forms.ToolStripMenuItem();
-            this.miChart = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
-            this.miCurReport = new System.Windows.Forms.ToolStripMenuItem();
             this.menHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.tbMain = new System.Windows.Forms.ToolStrip();
-            this.tbConnet = new System.Windows.Forms.ToolStripButton();
-            this.tbStart = new System.Windows.Forms.ToolStripButton();
-            this.tbReset = new System.Windows.Forms.ToolStripButton();
-            this.tbChart = new System.Windows.Forms.ToolStripButton();
-            this.tbReport = new System.Windows.Forms.ToolStripButton();
-            this.tbConfig = new System.Windows.Forms.ToolStripButton();
-            this.tbExit = new System.Windows.Forms.ToolStripButton();
             this.staMain = new System.Windows.Forms.StatusStrip();
             this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.lblNone = new System.Windows.Forms.ToolStripStatusLabel();
@@ -69,10 +55,6 @@
             this.lblTriggerMode = new System.Windows.Forms.Label();
             this.lblTriggerChannel = new System.Windows.Forms.Label();
             this.cbPressureTriggerChannel = new System.Windows.Forms.ComboBox();
-            this.btnRefreshTriggerChannel = new System.Windows.Forms.Button();
-            this.lblMeasuringTime = new System.Windows.Forms.Label();
-            this.lblSecond = new System.Windows.Forms.Label();
-            this.txtMeasuringTime = new System.Windows.Forms.MaskedTextBox();
             this.tcChannel = new System.Windows.Forms.TabControl();
             this.tpPressure = new System.Windows.Forms.TabPage();
             this.pcc6 = new Controls.Channel.PressureChannelControl();
@@ -86,6 +68,8 @@
             this.dcc3 = new Controls.Channel.DigitalChannelControl();
             this.dcc2 = new Controls.Channel.DigitalChannelControl();
             this.dcc1 = new Controls.Channel.DigitalChannelControl();
+            this.tpSpeed = new System.Windows.Forms.TabPage();
+            this.scc = new Controls.Channel.SpeedChannelControl();
             this.CountDown = new Controls.Other.CountDown();
             this.lblDisconnected = new System.Windows.Forms.Label();
             this.gbChart = new System.Windows.Forms.GroupBox();
@@ -94,7 +78,6 @@
             this.label3 = new System.Windows.Forms.Label();
             this.txtX = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
             this.timChannelUpdate = new System.Timers.Timer();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.txtResultDigitalTriggerLast = new System.Windows.Forms.TextBox();
@@ -103,13 +86,30 @@
             this.label5 = new System.Windows.Forms.Label();
             this.txtResultTotalTime = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
-            this.txtPointCount = new System.Windows.Forms.MaskedTextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.bwConnect = new System.ComponentModel.BackgroundWorker();
             this.bwMeasure = new System.ComponentModel.BackgroundWorker();
             this.bwBuildReport = new System.ComponentModel.BackgroundWorker();
-            this.tpSpeed = new System.Windows.Forms.TabPage();
-            this.vcc = new Controls.Channel.SpeedChannelControl();
+            this.miExport = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripSeparator();
+            this.btnRefreshTriggerChannel = new System.Windows.Forms.Button();
+            this.tbConnet = new System.Windows.Forms.ToolStripButton();
+            this.tbStart = new System.Windows.Forms.ToolStripButton();
+            this.tbReset = new System.Windows.Forms.ToolStripButton();
+            this.tbChart = new System.Windows.Forms.ToolStripButton();
+            this.tbReport = new System.Windows.Forms.ToolStripButton();
+            this.tbConfig = new System.Windows.Forms.ToolStripButton();
+            this.tbExit = new System.Windows.Forms.ToolStripButton();
+            this.miConnect = new System.Windows.Forms.ToolStripMenuItem();
+            this.miConfig = new System.Windows.Forms.ToolStripMenuItem();
+            this.miExit = new System.Windows.Forms.ToolStripMenuItem();
+            this.miStart = new System.Windows.Forms.ToolStripMenuItem();
+            this.miReset = new System.Windows.Forms.ToolStripMenuItem();
+            this.miImport = new System.Windows.Forms.ToolStripMenuItem();
+            this.miChart = new System.Windows.Forms.ToolStripMenuItem();
+            this.miReport = new System.Windows.Forms.ToolStripMenuItem();
+            this.tbImport = new System.Windows.Forms.ToolStripButton();
+            this.tbExport = new System.Windows.Forms.ToolStripButton();
             this.menuMain.SuspendLayout();
             this.tbMain.SuspendLayout();
             this.staMain.SuspendLayout();
@@ -119,11 +119,11 @@
             this.tcChannel.SuspendLayout();
             this.tpPressure.SuspendLayout();
             this.tpDigital.SuspendLayout();
+            this.tpSpeed.SuspendLayout();
             this.gbChart.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.timChannelUpdate)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
-            this.tpSpeed.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuMain
@@ -152,94 +152,48 @@
             this.menConnect.Size = new System.Drawing.Size(60, 21);
             this.menConnect.Text = "连接(&C)";
             // 
-            // miConnect
-            // 
-            this.miConnect.Name = "miConnect";
-            this.miConnect.Size = new System.Drawing.Size(151, 22);
-            this.miConnect.Text = "开始连接(&C)";
-            this.miConnect.Click += new System.EventHandler(this.Connect);
-            // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
             this.toolStripMenuItem1.Size = new System.Drawing.Size(148, 6);
-            // 
-            // miConfig
-            // 
-            this.miConfig.Name = "miConfig";
-            this.miConfig.Size = new System.Drawing.Size(151, 22);
-            this.miConfig.Text = "配置参数(&O)...";
-            this.miConfig.Click += new System.EventHandler(this.ShowConfigWindow);
             // 
             // toolStripMenuItem2
             // 
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
             this.toolStripMenuItem2.Size = new System.Drawing.Size(148, 6);
             // 
-            // miExit
-            // 
-            this.miExit.Name = "miExit";
-            this.miExit.Size = new System.Drawing.Size(151, 22);
-            this.miExit.Text = "退出(&E)";
-            this.miExit.Click += new System.EventHandler(this.WinClosing);
-            // 
             // menData
             // 
             this.menData.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.miStart,
             this.toolStripMenuItem3,
-            this.miReset});
+            this.miReset,
+            this.toolStripMenuItem5,
+            this.miImport,
+            this.miExport});
             this.menData.Name = "menData";
             this.menData.Size = new System.Drawing.Size(61, 21);
             this.menData.Text = "数据(&D)";
             // 
-            // miStart
-            // 
-            this.miStart.Name = "miStart";
-            this.miStart.ShortcutKeys = System.Windows.Forms.Keys.F5;
-            this.miStart.Size = new System.Drawing.Size(145, 22);
-            this.miStart.Text = "开始测量";
-            this.miStart.Click += new System.EventHandler(this.Start);
-            // 
             // toolStripMenuItem3
             // 
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-            this.toolStripMenuItem3.Size = new System.Drawing.Size(142, 6);
-            // 
-            // miReset
-            // 
-            this.miReset.Name = "miReset";
-            this.miReset.Size = new System.Drawing.Size(145, 22);
-            this.miReset.Text = "复位(&R)";
-            this.miReset.Click += new System.EventHandler(this.Reset);
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(149, 6);
             // 
             // miView
             // 
             this.miView.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.miChart,
             this.toolStripMenuItem4,
-            this.miCurReport});
+            this.miReport});
             this.miView.Name = "miView";
             this.miView.Size = new System.Drawing.Size(60, 21);
             this.miView.Text = "查看(&V)";
             // 
-            // miChart
-            // 
-            this.miChart.Name = "miChart";
-            this.miChart.Size = new System.Drawing.Size(140, 22);
-            this.miChart.Text = "图表(&C)";
-            // 
             // toolStripMenuItem4
             // 
             this.toolStripMenuItem4.Name = "toolStripMenuItem4";
-            this.toolStripMenuItem4.Size = new System.Drawing.Size(137, 6);
-            // 
-            // miCurReport
-            // 
-            this.miCurReport.Name = "miCurReport";
-            this.miCurReport.Size = new System.Drawing.Size(140, 22);
-            this.miCurReport.Text = "当前报告(&R)";
-            this.miCurReport.Click += new System.EventHandler(this.Report);
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(113, 6);
             // 
             // menHelp
             // 
@@ -256,6 +210,8 @@
             this.tbReset,
             this.tbChart,
             this.tbReport,
+            this.tbImport,
+            this.tbExport,
             this.tbConfig,
             this.tbExit});
             this.tbMain.Location = new System.Drawing.Point(0, 25);
@@ -264,95 +220,6 @@
             this.tbMain.Size = new System.Drawing.Size(1043, 87);
             this.tbMain.TabIndex = 1;
             this.tbMain.Text = "toolStrip1";
-            // 
-            // tbConnet
-            // 
-            this.tbConnet.AutoSize = false;
-            this.tbConnet.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tbConnet.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_connect;
-            this.tbConnet.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
-            this.tbConnet.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tbConnet.Name = "tbConnet";
-            this.tbConnet.Size = new System.Drawing.Size(84, 84);
-            this.tbConnet.Text = "toolStripButton2";
-            this.tbConnet.ToolTipText = "开始连接";
-            this.tbConnet.Click += new System.EventHandler(this.Connect);
-            // 
-            // tbStart
-            // 
-            this.tbStart.AutoSize = false;
-            this.tbStart.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tbStart.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_start_listening;
-            this.tbStart.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
-            this.tbStart.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tbStart.Name = "tbStart";
-            this.tbStart.Size = new System.Drawing.Size(84, 84);
-            this.tbStart.Text = "toolStripButton3";
-            this.tbStart.ToolTipText = "开始测量";
-            this.tbStart.Click += new System.EventHandler(this.Start);
-            // 
-            // tbReset
-            // 
-            this.tbReset.AutoSize = false;
-            this.tbReset.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tbReset.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_reset;
-            this.tbReset.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
-            this.tbReset.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tbReset.Name = "tbReset";
-            this.tbReset.Size = new System.Drawing.Size(84, 84);
-            this.tbReset.Text = "toolStripButton4";
-            this.tbReset.ToolTipText = "复位";
-            this.tbReset.Click += new System.EventHandler(this.Reset);
-            // 
-            // tbChart
-            // 
-            this.tbChart.AutoSize = false;
-            this.tbChart.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tbChart.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_chart;
-            this.tbChart.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
-            this.tbChart.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tbChart.Name = "tbChart";
-            this.tbChart.Size = new System.Drawing.Size(84, 84);
-            this.tbChart.Text = "toolStripButton5";
-            this.tbChart.ToolTipText = "查看图表";
-            // 
-            // tbReport
-            // 
-            this.tbReport.AutoSize = false;
-            this.tbReport.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tbReport.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_report;
-            this.tbReport.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
-            this.tbReport.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tbReport.Name = "tbReport";
-            this.tbReport.Size = new System.Drawing.Size(84, 84);
-            this.tbReport.ToolTipText = "导出...";
-            this.tbReport.Click += new System.EventHandler(this.Report);
-            // 
-            // tbConfig
-            // 
-            this.tbConfig.AutoSize = false;
-            this.tbConfig.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tbConfig.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_config;
-            this.tbConfig.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
-            this.tbConfig.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tbConfig.Name = "tbConfig";
-            this.tbConfig.Size = new System.Drawing.Size(84, 84);
-            this.tbConfig.Text = "toolStripButton1";
-            this.tbConfig.ToolTipText = "配置";
-            this.tbConfig.Click += new System.EventHandler(this.ShowConfigWindow);
-            // 
-            // tbExit
-            // 
-            this.tbExit.AutoSize = false;
-            this.tbExit.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tbExit.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_close;
-            this.tbExit.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
-            this.tbExit.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tbExit.Name = "tbExit";
-            this.tbExit.Size = new System.Drawing.Size(84, 84);
-            this.tbExit.Text = "toolStripButton7";
-            this.tbExit.ToolTipText = "退出";
-            this.tbExit.Click += new System.EventHandler(this.WinClosing);
             // 
             // staMain
             // 
@@ -387,7 +254,7 @@
             // grpLog
             // 
             this.grpLog.Controls.Add(this.txtLog);
-            this.grpLog.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.grpLog.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.grpLog.Location = new System.Drawing.Point(12, 554);
             this.grpLog.Name = "grpLog";
             this.grpLog.Size = new System.Drawing.Size(509, 138);
@@ -418,7 +285,7 @@
             this.gbTotalChannel.Controls.Add(this.tcChannel);
             this.gbTotalChannel.Controls.Add(this.CountDown);
             this.gbTotalChannel.Controls.Add(this.lblDisconnected);
-            this.gbTotalChannel.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.gbTotalChannel.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.gbTotalChannel.Location = new System.Drawing.Point(12, 115);
             this.gbTotalChannel.Name = "gbTotalChannel";
             this.gbTotalChannel.Size = new System.Drawing.Size(509, 436);
@@ -435,9 +302,6 @@
             this.gbMeasure.Controls.Add(this.lblTriggerChannel);
             this.gbMeasure.Controls.Add(this.cbPressureTriggerChannel);
             this.gbMeasure.Controls.Add(this.btnRefreshTriggerChannel);
-            this.gbMeasure.Controls.Add(this.lblMeasuringTime);
-            this.gbMeasure.Controls.Add(this.lblSecond);
-            this.gbMeasure.Controls.Add(this.txtMeasuringTime);
             this.gbMeasure.Location = new System.Drawing.Point(3, 329);
             this.gbMeasure.Name = "gbMeasure";
             this.gbMeasure.Size = new System.Drawing.Size(503, 104);
@@ -448,7 +312,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label7.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label7.Location = new System.Drawing.Point(206, 71);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(132, 17);
@@ -459,7 +323,7 @@
             // 
             this.cbDigitalTriggerChannel.BackColor = System.Drawing.Color.White;
             this.cbDigitalTriggerChannel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbDigitalTriggerChannel.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.cbDigitalTriggerChannel.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.cbDigitalTriggerChannel.FormattingEnabled = true;
             this.cbDigitalTriggerChannel.Location = new System.Drawing.Point(344, 68);
             this.cbDigitalTriggerChannel.Name = "cbDigitalTriggerChannel";
@@ -471,7 +335,7 @@
             // 
             this.cbTriggerMode.BackColor = System.Drawing.Color.White;
             this.cbTriggerMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbTriggerMode.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.cbTriggerMode.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.cbTriggerMode.FormattingEnabled = true;
             this.cbTriggerMode.Items.AddRange(new object[] {
             "自动触发(推荐)",
@@ -486,7 +350,7 @@
             // lblTriggerMode
             // 
             this.lblTriggerMode.AutoSize = true;
-            this.lblTriggerMode.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.lblTriggerMode.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.lblTriggerMode.Location = new System.Drawing.Point(8, 29);
             this.lblTriggerMode.Name = "lblTriggerMode";
             this.lblTriggerMode.Size = new System.Drawing.Size(59, 17);
@@ -496,7 +360,7 @@
             // lblTriggerChannel
             // 
             this.lblTriggerChannel.AutoSize = true;
-            this.lblTriggerChannel.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.lblTriggerChannel.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.lblTriggerChannel.Location = new System.Drawing.Point(206, 29);
             this.lblTriggerChannel.Name = "lblTriggerChannel";
             this.lblTriggerChannel.Size = new System.Drawing.Size(91, 17);
@@ -507,7 +371,7 @@
             // 
             this.cbPressureTriggerChannel.BackColor = System.Drawing.Color.White;
             this.cbPressureTriggerChannel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbPressureTriggerChannel.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.cbPressureTriggerChannel.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.cbPressureTriggerChannel.FormattingEnabled = true;
             this.cbPressureTriggerChannel.Location = new System.Drawing.Point(344, 26);
             this.cbPressureTriggerChannel.Name = "cbPressureTriggerChannel";
@@ -515,57 +379,12 @@
             this.cbPressureTriggerChannel.TabIndex = 3;
             this.cbPressureTriggerChannel.SelectedIndexChanged += new System.EventHandler(this.cbTriggerChannel_SelectedIndexChanged);
             // 
-            // btnRefreshTriggerChannel
-            // 
-            this.btnRefreshTriggerChannel.BackColor = System.Drawing.SystemColors.Control;
-            this.btnRefreshTriggerChannel.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.btnRefreshTriggerChannel.Image = global::ChamberPressureGauge.Properties.Resources.Refresh;
-            this.btnRefreshTriggerChannel.Location = new System.Drawing.Point(473, 25);
-            this.btnRefreshTriggerChannel.Name = "btnRefreshTriggerChannel";
-            this.btnRefreshTriggerChannel.Size = new System.Drawing.Size(24, 24);
-            this.btnRefreshTriggerChannel.TabIndex = 4;
-            this.btnRefreshTriggerChannel.UseVisualStyleBackColor = false;
-            this.btnRefreshTriggerChannel.Click += new System.EventHandler(this.btnRefreshTriggerChannel_Click);
-            // 
-            // lblMeasuringTime
-            // 
-            this.lblMeasuringTime.AutoSize = true;
-            this.lblMeasuringTime.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.lblMeasuringTime.Location = new System.Drawing.Point(8, 71);
-            this.lblMeasuringTime.Name = "lblMeasuringTime";
-            this.lblMeasuringTime.Size = new System.Drawing.Size(59, 17);
-            this.lblMeasuringTime.TabIndex = 5;
-            this.lblMeasuringTime.Text = "测量时间:";
-            // 
-            // lblSecond
-            // 
-            this.lblSecond.AutoSize = true;
-            this.lblSecond.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.lblSecond.Location = new System.Drawing.Point(162, 71);
-            this.lblSecond.Name = "lblSecond";
-            this.lblSecond.Size = new System.Drawing.Size(32, 17);
-            this.lblSecond.TabIndex = 7;
-            this.lblSecond.Text = "毫秒";
-            // 
-            // txtMeasuringTime
-            // 
-            this.txtMeasuringTime.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.txtMeasuringTime.Location = new System.Drawing.Point(73, 68);
-            this.txtMeasuringTime.Mask = "99999";
-            this.txtMeasuringTime.Name = "txtMeasuringTime";
-            this.txtMeasuringTime.PromptChar = ' ';
-            this.txtMeasuringTime.Size = new System.Drawing.Size(83, 23);
-            this.txtMeasuringTime.TabIndex = 8;
-            this.txtMeasuringTime.Text = "3700";
-            this.txtMeasuringTime.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.txtMeasuringTime.ValidatingType = typeof(int);
-            // 
             // tcChannel
             // 
             this.tcChannel.Controls.Add(this.tpPressure);
             this.tcChannel.Controls.Add(this.tpDigital);
             this.tcChannel.Controls.Add(this.tpSpeed);
-            this.tcChannel.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.tcChannel.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.tcChannel.Location = new System.Drawing.Point(3, 19);
             this.tcChannel.Name = "tcChannel";
             this.tcChannel.SelectedIndex = 0;
@@ -581,7 +400,7 @@
             this.tpPressure.Controls.Add(this.pcc3);
             this.tpPressure.Controls.Add(this.pcc2);
             this.tpPressure.Controls.Add(this.pcc1);
-            this.tpPressure.Font = new System.Drawing.Font("SimSun", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.tpPressure.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.tpPressure.Location = new System.Drawing.Point(4, 26);
             this.tpPressure.Name = "tpPressure";
             this.tpPressure.Padding = new System.Windows.Forms.Padding(3);
@@ -655,7 +474,7 @@
             this.tpDigital.Controls.Add(this.dcc3);
             this.tpDigital.Controls.Add(this.dcc2);
             this.tpDigital.Controls.Add(this.dcc1);
-            this.tpDigital.Font = new System.Drawing.Font("SimSun", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.tpDigital.Font = new System.Drawing.Font("宋体", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.tpDigital.Location = new System.Drawing.Point(4, 26);
             this.tpDigital.Name = "tpDigital";
             this.tpDigital.Padding = new System.Windows.Forms.Padding(3);
@@ -696,10 +515,30 @@
             this.dcc1.Size = new System.Drawing.Size(239, 85);
             this.dcc1.TabIndex = 0;
             // 
+            // tpSpeed
+            // 
+            this.tpSpeed.Controls.Add(this.scc);
+            this.tpSpeed.Location = new System.Drawing.Point(4, 26);
+            this.tpSpeed.Name = "tpSpeed";
+            this.tpSpeed.Size = new System.Drawing.Size(495, 278);
+            this.tpSpeed.TabIndex = 2;
+            this.tpSpeed.Text = "速度";
+            this.tpSpeed.UseVisualStyleBackColor = true;
+            // 
+            // scc
+            // 
+            this.scc.Location = new System.Drawing.Point(6, 6);
+            this.scc.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.scc.Name = "scc";
+            this.scc.OriginData = 0;
+            this.scc.Size = new System.Drawing.Size(239, 85);
+            this.scc.TabIndex = 0;
+            // 
             // CountDown
             // 
             this.CountDown.AutoSize = true;
             this.CountDown.Location = new System.Drawing.Point(101, 71);
+            this.CountDown.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.CountDown.Name = "CountDown";
             this.CountDown.Size = new System.Drawing.Size(302, 205);
             this.CountDown.TabIndex = 9;
@@ -718,7 +557,7 @@
             // gbChart
             // 
             this.gbChart.Controls.Add(this.mcChart);
-            this.gbChart.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.gbChart.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.gbChart.Location = new System.Drawing.Point(527, 115);
             this.gbChart.Name = "gbChart";
             this.gbChart.Size = new System.Drawing.Size(506, 436);
@@ -738,7 +577,7 @@
             // 
             // txtY
             // 
-            this.txtY.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.txtY.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.txtY.Location = new System.Drawing.Point(39, 69);
             this.txtY.Name = "txtY";
             this.txtY.ReadOnly = true;
@@ -748,7 +587,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label3.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label3.Location = new System.Drawing.Point(14, 72);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(18, 17);
@@ -757,7 +596,7 @@
             // 
             // txtX
             // 
-            this.txtX.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.txtX.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.txtX.Location = new System.Drawing.Point(39, 40);
             this.txtX.Name = "txtX";
             this.txtX.ReadOnly = true;
@@ -767,22 +606,12 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label2.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label2.Location = new System.Drawing.Point(14, 43);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(19, 17);
             this.label2.TabIndex = 2;
             this.label2.Text = "X:";
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label1.Location = new System.Drawing.Point(220, 66);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(59, 17);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "绘点数量:";
             // 
             // timChannelUpdate
             // 
@@ -798,10 +627,8 @@
             this.groupBox1.Controls.Add(this.label5);
             this.groupBox1.Controls.Add(this.txtResultTotalTime);
             this.groupBox1.Controls.Add(this.label4);
-            this.groupBox1.Controls.Add(this.txtPointCount);
             this.groupBox1.Controls.Add(this.groupBox2);
-            this.groupBox1.Controls.Add(this.label1);
-            this.groupBox1.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.groupBox1.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.groupBox1.Location = new System.Drawing.Point(527, 554);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(506, 138);
@@ -855,24 +682,13 @@
             this.label4.TabIndex = 8;
             this.label4.Text = "总时间:";
             // 
-            // txtPointCount
-            // 
-            this.txtPointCount.Location = new System.Drawing.Point(285, 63);
-            this.txtPointCount.Mask = "999";
-            this.txtPointCount.Name = "txtPointCount";
-            this.txtPointCount.PromptChar = ' ';
-            this.txtPointCount.Size = new System.Drawing.Size(70, 23);
-            this.txtPointCount.TabIndex = 7;
-            this.txtPointCount.Text = "500";
-            this.txtPointCount.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            // 
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.txtX);
             this.groupBox2.Controls.Add(this.txtY);
             this.groupBox2.Controls.Add(this.label2);
             this.groupBox2.Controls.Add(this.label3);
-            this.groupBox2.Font = new System.Drawing.Font("Microsoft YaHei", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.groupBox2.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.groupBox2.Location = new System.Drawing.Point(371, 20);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(129, 112);
@@ -899,24 +715,203 @@
             this.bwBuildReport.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bwBuildReport_DoWork);
             this.bwBuildReport.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bwBuildReport_RunWorkerCompleted);
             // 
-            // tpSpeed
+            // miExport
             // 
-            this.tpSpeed.Controls.Add(this.vcc);
-            this.tpSpeed.Location = new System.Drawing.Point(4, 26);
-            this.tpSpeed.Name = "tpSpeed";
-            this.tpSpeed.Size = new System.Drawing.Size(495, 278);
-            this.tpSpeed.TabIndex = 2;
-            this.tpSpeed.Text = "速度";
-            this.tpSpeed.UseVisualStyleBackColor = true;
+            this.miExport.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_export;
+            this.miExport.Name = "miExport";
+            this.miExport.Size = new System.Drawing.Size(152, 22);
+            this.miExport.Text = "导出(&E)";
             // 
-            // vcc
+            // toolStripMenuItem5
             // 
-            this.vcc.Location = new System.Drawing.Point(6, 6);
-            this.vcc.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.vcc.Name = "vcc";
-            this.vcc.OriginData = 0;
-            this.vcc.Size = new System.Drawing.Size(239, 85);
-            this.vcc.TabIndex = 0;
+            this.toolStripMenuItem5.Name = "toolStripMenuItem5";
+            this.toolStripMenuItem5.Size = new System.Drawing.Size(149, 6);
+            // 
+            // btnRefreshTriggerChannel
+            // 
+            this.btnRefreshTriggerChannel.BackColor = System.Drawing.SystemColors.Control;
+            this.btnRefreshTriggerChannel.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.btnRefreshTriggerChannel.Image = global::ChamberPressureGauge.Properties.Resources.Refresh;
+            this.btnRefreshTriggerChannel.Location = new System.Drawing.Point(473, 25);
+            this.btnRefreshTriggerChannel.Name = "btnRefreshTriggerChannel";
+            this.btnRefreshTriggerChannel.Size = new System.Drawing.Size(24, 24);
+            this.btnRefreshTriggerChannel.TabIndex = 4;
+            this.btnRefreshTriggerChannel.UseVisualStyleBackColor = false;
+            this.btnRefreshTriggerChannel.Click += new System.EventHandler(this.btnRefreshTriggerChannel_Click);
+            // 
+            // tbConnet
+            // 
+            this.tbConnet.AutoSize = false;
+            this.tbConnet.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbConnet.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_connect;
+            this.tbConnet.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.tbConnet.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tbConnet.Name = "tbConnet";
+            this.tbConnet.Size = new System.Drawing.Size(84, 84);
+            this.tbConnet.Text = "toolStripButton2";
+            this.tbConnet.ToolTipText = "开始连接";
+            this.tbConnet.Click += new System.EventHandler(this.Connect);
+            // 
+            // tbStart
+            // 
+            this.tbStart.AutoSize = false;
+            this.tbStart.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbStart.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_start_listening;
+            this.tbStart.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.tbStart.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tbStart.Name = "tbStart";
+            this.tbStart.Size = new System.Drawing.Size(84, 84);
+            this.tbStart.Text = "toolStripButton3";
+            this.tbStart.ToolTipText = "开始测量";
+            this.tbStart.Click += new System.EventHandler(this.Start);
+            // 
+            // tbReset
+            // 
+            this.tbReset.AutoSize = false;
+            this.tbReset.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbReset.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_reset;
+            this.tbReset.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.tbReset.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tbReset.Name = "tbReset";
+            this.tbReset.Size = new System.Drawing.Size(84, 84);
+            this.tbReset.Text = "toolStripButton4";
+            this.tbReset.ToolTipText = "复位";
+            this.tbReset.Click += new System.EventHandler(this.Reset);
+            // 
+            // tbChart
+            // 
+            this.tbChart.AutoSize = false;
+            this.tbChart.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbChart.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_chart;
+            this.tbChart.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.tbChart.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tbChart.Name = "tbChart";
+            this.tbChart.Size = new System.Drawing.Size(84, 84);
+            this.tbChart.Text = "toolStripButton5";
+            this.tbChart.ToolTipText = "查看图表";
+            // 
+            // tbReport
+            // 
+            this.tbReport.AutoSize = false;
+            this.tbReport.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbReport.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_report;
+            this.tbReport.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.tbReport.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tbReport.Name = "tbReport";
+            this.tbReport.Size = new System.Drawing.Size(84, 84);
+            this.tbReport.ToolTipText = "生成报告";
+            this.tbReport.Click += new System.EventHandler(this.Report);
+            // 
+            // tbConfig
+            // 
+            this.tbConfig.AutoSize = false;
+            this.tbConfig.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbConfig.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_config;
+            this.tbConfig.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.tbConfig.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tbConfig.Name = "tbConfig";
+            this.tbConfig.Size = new System.Drawing.Size(84, 84);
+            this.tbConfig.Text = "toolStripButton1";
+            this.tbConfig.ToolTipText = "配置";
+            this.tbConfig.Click += new System.EventHandler(this.ShowConfigWindow);
+            // 
+            // tbExit
+            // 
+            this.tbExit.AutoSize = false;
+            this.tbExit.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbExit.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_close;
+            this.tbExit.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.tbExit.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tbExit.Name = "tbExit";
+            this.tbExit.Size = new System.Drawing.Size(84, 84);
+            this.tbExit.Text = "toolStripButton7";
+            this.tbExit.ToolTipText = "退出";
+            this.tbExit.Click += new System.EventHandler(this.WinClosing);
+            // 
+            // miConnect
+            // 
+            this.miConnect.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_connect;
+            this.miConnect.Name = "miConnect";
+            this.miConnect.Size = new System.Drawing.Size(151, 22);
+            this.miConnect.Text = "开始连接(&C)";
+            this.miConnect.Click += new System.EventHandler(this.Connect);
+            // 
+            // miConfig
+            // 
+            this.miConfig.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_config;
+            this.miConfig.Name = "miConfig";
+            this.miConfig.Size = new System.Drawing.Size(151, 22);
+            this.miConfig.Text = "配置参数(&O)...";
+            this.miConfig.Click += new System.EventHandler(this.ShowConfigWindow);
+            // 
+            // miExit
+            // 
+            this.miExit.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_close;
+            this.miExit.Name = "miExit";
+            this.miExit.Size = new System.Drawing.Size(151, 22);
+            this.miExit.Text = "退出(&E)";
+            this.miExit.Click += new System.EventHandler(this.WinClosing);
+            // 
+            // miStart
+            // 
+            this.miStart.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_start_listening;
+            this.miStart.Name = "miStart";
+            this.miStart.ShortcutKeys = System.Windows.Forms.Keys.F5;
+            this.miStart.Size = new System.Drawing.Size(152, 22);
+            this.miStart.Text = "开始测量";
+            this.miStart.Click += new System.EventHandler(this.Start);
+            // 
+            // miReset
+            // 
+            this.miReset.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_reset;
+            this.miReset.Name = "miReset";
+            this.miReset.Size = new System.Drawing.Size(152, 22);
+            this.miReset.Text = "复位(&R)";
+            this.miReset.Click += new System.EventHandler(this.Reset);
+            // 
+            // miImport
+            // 
+            this.miImport.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_import;
+            this.miImport.Name = "miImport";
+            this.miImport.Size = new System.Drawing.Size(152, 22);
+            this.miImport.Text = "导入(&I)";
+            // 
+            // miChart
+            // 
+            this.miChart.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_chart;
+            this.miChart.Name = "miChart";
+            this.miChart.Size = new System.Drawing.Size(116, 22);
+            this.miChart.Text = "图表(&C)";
+            // 
+            // miReport
+            // 
+            this.miReport.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_report;
+            this.miReport.Name = "miReport";
+            this.miReport.Size = new System.Drawing.Size(116, 22);
+            this.miReport.Text = "报告(&R)";
+            this.miReport.Click += new System.EventHandler(this.Report);
+            // 
+            // tbImport
+            // 
+            this.tbImport.AutoSize = false;
+            this.tbImport.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbImport.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_import;
+            this.tbImport.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.tbImport.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tbImport.Name = "tbImport";
+            this.tbImport.Size = new System.Drawing.Size(84, 84);
+            this.tbImport.ToolTipText = "导入";
+            // 
+            // tbExport
+            // 
+            this.tbExport.AutoSize = false;
+            this.tbExport.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbExport.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_export;
+            this.tbExport.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.tbExport.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tbExport.Name = "tbExport";
+            this.tbExport.Size = new System.Drawing.Size(84, 84);
+            this.tbExport.ToolTipText = "导出";
             // 
             // MainWindow
             // 
@@ -953,13 +948,13 @@
             this.tcChannel.ResumeLayout(false);
             this.tpPressure.ResumeLayout(false);
             this.tpDigital.ResumeLayout(false);
+            this.tpSpeed.ResumeLayout(false);
             this.gbChart.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.timChannelUpdate)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
-            this.tpSpeed.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -982,7 +977,7 @@
         private System.Windows.Forms.ToolStripMenuItem miReset;
         private System.Windows.Forms.ToolStripMenuItem miChart;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem4;
-        private System.Windows.Forms.ToolStripMenuItem miCurReport;
+        private System.Windows.Forms.ToolStripMenuItem miReport;
         private System.Windows.Forms.ToolStrip tbMain;
         private System.Windows.Forms.ToolStripButton tbConnet;
         private System.Windows.Forms.ToolStripButton tbStart;
@@ -1008,9 +1003,6 @@
         private System.Windows.Forms.ComboBox cbTriggerMode;
         private System.Windows.Forms.Label lblTriggerMode;
         private System.Windows.Forms.Button btnRefreshTriggerChannel;
-        private System.Windows.Forms.Label lblSecond;
-        private System.Windows.Forms.Label lblMeasuringTime;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox txtY;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox txtX;
@@ -1019,8 +1011,6 @@
         private System.Windows.Forms.GroupBox groupBox2;
         private System.ComponentModel.BackgroundWorker bwConnect;
         private System.ComponentModel.BackgroundWorker bwMeasure;
-        private System.Windows.Forms.MaskedTextBox txtMeasuringTime;
-        private System.Windows.Forms.MaskedTextBox txtPointCount;
         private System.Windows.Forms.ToolStripButton tbConfig;
         private Controls.Other.CountDown CountDown;
         private System.ComponentModel.BackgroundWorker bwBuildReport;
@@ -1046,7 +1036,12 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.ComboBox cbDigitalTriggerChannel;
         private System.Windows.Forms.TabPage tpSpeed;
-        private Controls.Channel.SpeedChannelControl vcc;
+        private Controls.Channel.SpeedChannelControl scc;
+        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem5;
+        private System.Windows.Forms.ToolStripMenuItem miImport;
+        private System.Windows.Forms.ToolStripMenuItem miExport;
+        private System.Windows.Forms.ToolStripButton tbImport;
+        private System.Windows.Forms.ToolStripButton tbExport;
     }
 }
 

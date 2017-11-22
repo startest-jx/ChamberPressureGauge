@@ -7,6 +7,7 @@ using Tools.Log;
 using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
 using System.Threading;
 using ChamberPressureGauge.Properties;
@@ -15,6 +16,8 @@ using ChamberPressureGauge.Properties;
 //using LiveCharts.Wpf;
 using LiveCharts;
 using Controls.Other;
+using Newtonsoft.Json.Linq;
+using Tools.Configuration;
 
 //using LiveCharts;
 //using LiveCharts.Defaults;
@@ -43,6 +46,7 @@ namespace ChamberPressureGauge.UI
         // 全局变量
         private LoadWindow _loadWindow;
         private Log _log;  // 日志对象
+        private Configuration _config;  // 配置文件
         private SlaverDevice _slaver;  // 下位机
         private bool _channelUpdating;  // 通道检测Timer是否被占用
 
@@ -87,20 +91,47 @@ namespace ChamberPressureGauge.UI
             }
             switch (status)
             {
+                case ConnectStatus.Error:
+                    tbConnet.Enabled = miConnect.Enabled = false;
+                    tbConnet.ToolTipText = miConnect.Text = @"连接";
+                    tbConnet.Image = miConnect.Image = Resources.toolbar_connect;
+
+                    tbStart.Enabled = miStart.Enabled = false;
+                    tbStart.ToolTipText = miStart.Text = @"开始测量";
+                    tbStart.Image = miStart.Image = Resources.toolbar_start_listening;
+
+                    tbReset.Enabled = miReset.Enabled = false;
+                    tbReset.ToolTipText = miReset.Text = @"复位";
+
+                    tbChart.Enabled = miChart.Enabled = false;
+                    tbChart.ToolTipText = miChart.Text = @"查看图表";
+
+                    tbReport.Enabled = miReport.Enabled = false;
+
+                    tbConfig.Enabled = miConfig.Enabled = false;
+
+                    lblStatus.Text = @"异常";
+
+                    lblDisconnected.Show();
+                    lblDisconnected.Text = @"Error";
+                    tcChannel.Hide();
+                    gbMeasure.Hide();
+
+                    break;
                 case ConnectStatus.Disconnected:
-                    tbConnet.Enabled = true;
-                    tbConnet.ToolTipText = @"连接";
-                    tbConnet.Image = Resources.toolbar_connect;
+                    tbConnet.Enabled = miConnect.Enabled = true;
+                    tbConnet.ToolTipText = miConnect.Text = @"连接";
+                    tbConnet.Image = miConnect.Image = Resources.toolbar_connect;
 
-                    tbStart.Enabled = false;
-                    tbStart.ToolTipText = @"开始测量(需要先连接)";
-                    tbStart.Image = Resources.toolbar_start_listening;
+                    tbStart.Enabled = miStart.Enabled = false;
+                    tbStart.ToolTipText = miStart.Text = @"开始测量(需要先连接)";
+                    tbStart.Image = miStart.Image = Resources.toolbar_start_listening;
 
-                    tbReset.Enabled = false;
-                    tbReset.ToolTipText = @"复位(需要先连接)";
+                    tbReset.Enabled = miReset.Enabled = false;
+                    tbReset.ToolTipText = miReset.Text = @"复位(需要先连接)";
 
-                    tbChart.Enabled = false;
-                    tbChart.ToolTipText = @"查看图表(需要先连接)";
+                    tbChart.Enabled = miChart.Enabled = false;
+                    tbChart.ToolTipText = miChart.Text = @"查看图表(需要先连接)";
 
                     lblStatus.Text = @"断开";
 
@@ -116,41 +147,42 @@ namespace ChamberPressureGauge.UI
                     break;
                 case ConnectStatus.Connecting:
                     _log.Show("开始连接...");
-                    tbConnet.Enabled = true;
-                    tbConnet.ToolTipText = @"取消";
-                    tbConnet.Image = Resources.toolbar_cancel;
+                    tbConnet.Enabled = miConnect.Enabled = true;
+                    tbConnet.ToolTipText = miConnect.Text = @"取消";
+                    tbConnet.Image = miConnect.Image = Resources.toolbar_cancel;
 
-                    tbStart.Enabled = false;
-                    tbStart.ToolTipText = @"开始测量(需要先连接)";
+                    tbStart.Enabled = miStart.Enabled = false;
+                    tbStart.ToolTipText = miStart.Text = @"开始测量(需要先连接)";
+                    tbStart.Image = miStart.Image = Resources.toolbar_start_listening;
 
-                    tbReset.Enabled = false;
-                    tbReset.ToolTipText = @"复位(需要先连接)";
+                    tbReset.Enabled = miReset.Enabled = false;
+                    tbReset.ToolTipText = miReset.Text = @"复位(需要先连接)";
 
-                    tbChart.Enabled = false;
-                    tbChart.ToolTipText = @"查看图表(需要先连接)";
+                    tbChart.Enabled = miChart.Enabled = false;
+                    tbChart.ToolTipText = miChart.Text = @"查看图表(需要先连接)";
 
                     lblStatus.Text = @"正在连接...";
 
-                    lblDisconnected.Hide();
+                    lblDisconnected.Show();
                     tcChannel.Hide();
                     gbMeasure.Hide();
                     //picLoading.Show();
 
                     break;
                 case ConnectStatus.Connected:
-                    tbConnet.Enabled = true;
-                    tbConnet.ToolTipText = @"断开连接";
-                    tbConnet.Image = Resources.toolbar_disconnect;
+                    tbConnet.Enabled = miConnect.Enabled = true;
+                    tbConnet.ToolTipText = miConnect.Text = @"断开连接";
+                    tbConnet.Image = miConnect.Image = Resources.toolbar_disconnect;
 
-                    tbStart.Enabled = true;
-                    tbStart.ToolTipText = @"开始测量";
-                    tbStart.Image = Resources.toolbar_start_listening;
+                    tbStart.Enabled = miStart.Enabled = true;
+                    tbStart.ToolTipText = miStart.Text = @"开始测量";
+                    tbStart.Image = miStart.Image = Resources.toolbar_start_listening;
 
-                    tbReset.Enabled = true;
-                    tbReset.ToolTipText = @"复位";
+                    tbReset.Enabled = miReset.Enabled = true;
+                    tbReset.ToolTipText = miReset.Text = @"复位";
 
-                    tbChart.Enabled = true;
-                    tbChart.ToolTipText = @"查看图表";
+                    tbChart.Enabled = miChart.Enabled = true;
+                    tbChart.ToolTipText = miChart.Text = @"查看图表";
 
                     lblStatus.Text = @"已连接";
 
@@ -161,19 +193,19 @@ namespace ChamberPressureGauge.UI
 
                     break;
                 case ConnectStatus.Measuring:
-                    tbConnet.Enabled = false;
-                    tbConnet.ToolTipText = @"断开连接";
-                    tbConnet.Image = Resources.toolbar_disconnect;
+                    tbConnet.Enabled = miConnect.Enabled = false;
+                    tbConnet.ToolTipText = miConnect.Text = @"断开连接";
+                    tbConnet.Image = miConnect.Image = Resources.toolbar_disconnect;
 
-                    tbStart.Enabled = true;
-                    tbStart.ToolTipText = @"停止测量";
-                    tbStart.Image = Resources.toolbar_stop_listening;
+                    tbStart.Enabled = miStart.Enabled = true;
+                    tbStart.ToolTipText = miStart.Text = @"停止测量";
+                    tbStart.Image = miStart.Image = Resources.toolbar_stop_listening;
 
-                    tbReset.Enabled = false;
-                    tbReset.ToolTipText = @"复位";
+                    tbReset.Enabled = miReset.Enabled = false;
+                    tbReset.ToolTipText = miReset.Text = @"复位";
 
-                    tbChart.Enabled = false;
-                    tbChart.ToolTipText = @"查看图表";
+                    tbChart.Enabled = miChart.Enabled = false;
+                    tbChart.ToolTipText = miChart.Text = @"查看图表";
 
                     lblStatus.Text = @"正在测量...";
 
@@ -391,10 +423,33 @@ namespace ChamberPressureGauge.UI
             // 注册日志对象
             _log = new Log();
             _log.ShowLogFun += LogPrint;
-
             _log.Print("程序初始化...");
+
             CountDownInit();
             _slaver = new SlaverDevice(_log, ChangeStatus, DrawLines, CountDown.Start);  // 主对象
+
+            if (!File.Exists("Config.json"))
+            {
+                _log.Show("配置文件丢失, 请重新安装软件.");
+                _slaver.Status = ConnectStatus.Error;
+                return;
+            }
+            // 读取配置文件
+            _log.Print("正在读取配置文件...");
+            try
+            {
+                _config = new Configuration("Config.json");
+                _config.LoadFromFile();
+            }
+            catch
+            {
+                _log.Print("配置文件已损坏，请修复后重启程序.");
+                _slaver.Status = ConnectStatus.Error;
+                return;
+            }
+
+            _slaver.Config = _config;
+
             // 控件注册
             _loadWindow = new LoadWindow();
             
@@ -410,7 +465,7 @@ namespace ChamberPressureGauge.UI
             _slaver.Channels[8].Control = dcc3;
             _slaver.Channels[9].Control = dcc4;
 
-            _slaver.Channels[10].Control = vcc;
+            _slaver.Channels[10].Control = scc;
             _slaver.Channels[11].Control = null;
 
             //for (int i = 0; i < 6; i ++)
@@ -496,6 +551,7 @@ namespace ChamberPressureGauge.UI
             switch (_slaver.Status)
             {
                 case ConnectStatus.Disconnected:
+                    //_slaver.Config = _config;  // 刷新配置信息
                     StartConnect();
                     break;
                 case ConnectStatus.Connected:
@@ -555,7 +611,7 @@ namespace ChamberPressureGauge.UI
                 return;
             }
 
-            var pointCount = int.Parse(txtPointCount.Text.Replace(" ", ""));
+            var pointCount = int.Parse(_config.Chart["PointCount"].ToString());
             foreach (var t in channels)
             {
                 if (!t.DeviceExist)
@@ -569,13 +625,15 @@ namespace ChamberPressureGauge.UI
                 switch (t.Type)
                 {
                     case ChannelType.Pressure:
-                        mcChart.DrawPressureLine(t.MeasuringData, pointCount, t.Name);
+                        mcChart.DrawPressureLine(t.MeasuringData, _config, t.Name);
                         break;
                     case ChannelType.Digital:
                         mcChart.DrawDigitalLine(t.MeasuringData, pointCount, t.Name);
                         break;
                     case ChannelType.Speed:
                         break;
+                    default:
+                        return;
                 }
                 //var Series = new Series();
                 //Series.ChartType = SeriesChartType.Spline;
@@ -602,7 +660,7 @@ namespace ChamberPressureGauge.UI
             {
                 return;
             }
-            _slaver.SetTriggerChannel(int.Parse(System.Text.RegularExpressions.Regex.Replace(cbPressureTriggerChannel.SelectedItem.ToString(), @"[^0-9]+", "")) - 1);
+            _slaver.PressureTriggerIndex = int.Parse(System.Text.RegularExpressions.Regex.Replace(cbPressureTriggerChannel.SelectedItem.ToString(), @"[^0-9]+", "")) - 1;
         }
 
         private void cbDigitalTriggerChannel_SelectedIndexChanged(object sender, EventArgs e)
@@ -611,7 +669,7 @@ namespace ChamberPressureGauge.UI
             {
                 return;
             }
-            _slaver.SetTriggerChannel(int.Parse(System.Text.RegularExpressions.Regex.Replace(cbDigitalTriggerChannel.SelectedItem.ToString(), @"[^0-9]+", "")) + 5);
+            _slaver.DigitalTriggerIndex = int.Parse(System.Text.RegularExpressions.Regex.Replace(cbDigitalTriggerChannel.SelectedItem.ToString(), @"[^0-9]+", "")) + 5;
         }
 
         private void AutoTrigger(bool enable)
@@ -630,6 +688,11 @@ namespace ChamberPressureGauge.UI
                 return;
             }
 
+            // 获取默认计量通道
+            var autoTrigger = (JObject)_config.Measure["AutoTrigger"];
+            var defaultPressureChannelIndex = (int)autoTrigger["DefaultPressureChannel"] - 1;
+            var defaultDigitalChannelIndex = (int)autoTrigger["DefaultDigitalChannel"] - 1;
+
             // 刷新压力通道
             cbPressureTriggerChannel.Items.Clear();
             for (var i = 0; i < 6; i++)
@@ -639,7 +702,14 @@ namespace ChamberPressureGauge.UI
                     cbPressureTriggerChannel.Items.Add(_slaver.Channels[i].Name);
                 }
             }
-            if (cbPressureTriggerChannel.SelectedIndex == -1 && cbPressureTriggerChannel.Items.Count != 0)
+            if (defaultPressureChannelIndex != -1)
+            {
+                if (cbPressureTriggerChannel.FindStringExact(_slaver.Channels[defaultPressureChannelIndex].Name) != -1)
+                {
+                    cbPressureTriggerChannel.SelectedItem = _slaver.Channels[defaultPressureChannelIndex].Name;
+                }
+            }
+            else if (cbPressureTriggerChannel.SelectedIndex == -1 && cbPressureTriggerChannel.Items.Count != 0)
             {
                 cbPressureTriggerChannel.SelectedIndex = 0;
             }
@@ -653,7 +723,14 @@ namespace ChamberPressureGauge.UI
                     cbDigitalTriggerChannel.Items.Add(_slaver.Channels[i].Name);
                 }
             }
-            if (cbDigitalTriggerChannel.SelectedIndex == -1 && cbDigitalTriggerChannel.Items.Count != 0)
+            if (defaultDigitalChannelIndex != -1)
+            {
+                if (cbDigitalTriggerChannel.FindStringExact(_slaver.Channels[defaultDigitalChannelIndex].Name) != -1)
+                {
+                    cbDigitalTriggerChannel.SelectedItem = _slaver.Channels[defaultDigitalChannelIndex].Name;
+                }
+            }
+            else if (cbDigitalTriggerChannel.SelectedIndex == -1 && cbDigitalTriggerChannel.Items.Count != 0)
             {
                 cbDigitalTriggerChannel.SelectedIndex = 0;
             }
@@ -697,7 +774,7 @@ namespace ChamberPressureGauge.UI
         private void bwMeasure_DoWork(object sender, DoWorkEventArgs e)
         {
             _slaver.Status = ConnectStatus.Measuring;
-            _slaver.MeasuringTime = int.Parse(txtMeasuringTime.Text.Replace(" ", ""));
+            //_slaver.AutoMeasuringTime = int.Parse(txtMeasuringTime.Text.Replace(" ", ""));
             _log.Print("打开测量线程.");
             Measure(ref bwMeasure, ref e);
         }
@@ -714,7 +791,7 @@ namespace ChamberPressureGauge.UI
             {
                 _log.Print("测量完成.");
                 _slaver.DischargeGateOpenTime(out double startTime, out double lastTime);
-                txtResultTotalTime.Text = $@"{_slaver.MeasuringTime} 毫秒";
+                txtResultTotalTime.Text = $@"{_slaver.AutoMeasuringTime} 毫秒";
                 txtResultDigitalTriggerStart.Text = $@"{startTime} 秒";
                 txtResultDigitalTriggerLast.Text = $@"{lastTime} 秒";
             }
@@ -723,7 +800,7 @@ namespace ChamberPressureGauge.UI
 
         private void ShowConfigWindow(object sender, EventArgs e)
         {
-            ConfigWindow configWindow = new ConfigWindow();
+            var configWindow = new ConfigWindow(ref _config);
             configWindow.ShowDialog();
         }
 
@@ -750,42 +827,81 @@ namespace ChamberPressureGauge.UI
                 mcChart.DrawToBitmap(chartBitmap, new Rectangle(0, 0, mcChart.Width, mcChart.Height));
             }));
             //lvChart.DrawToBitmap(ChartBitmap, new Rectangle(0, 0, lvChart.Width, lvChart.Height));
-            chartBitmap.Save(Application.StartupPath + "/report/img.jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
-
+            //chartBitmap.Save(Application.StartupPath + "/report/img.jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
+            var content = _config.Report["Content"];
+            var build = _config.Report["Build"];
             var report = new PdfReport
             {
-                FilePath =
-                    $"{Application.StartupPath}/report/{DateTime.Now:yyyyMMddHHmmss}.pdf"
+                //FilePath =
+                //    $"{Application.StartupPath}/report/{DateTime.Now:yyyyMMddHHmmss}.pdf"
+                FilePath = $"{build["Path"]}\\{DateTime.Now:yyyyMMddHHmmss}.pdf"
             };
-            report.AddTitle("测量报告");
-            report.AddEmptyLine();
-            report.AddText($"测量日期: {DateTime.Now}");
-            report.AddText($"测量时间: {_slaver.MeasuringTime} 毫秒");
-            switch (_slaver.TriggerMode)
+            if ((int)content["ShowTitle"] != 0)
             {
-                case TriggerMode.Auto:
-                    var triggerChannel = _slaver.Channels[_slaver.GetTriggerChannel(ChannelType.Pressure)];
-                    report.AddText("触发方式: 自动触发");
-                    report.AddText($"触发通道: {triggerChannel.Name}");
-                    report.AddText($"触发值: {triggerChannel.TriggerIncrement} MPa");
-                    break;
-                case TriggerMode.Manual:
-                    report.AddText("触发方式: 手动触发");
-                    break;
-                case TriggerMode.External:
-                    report.AddText("触发方式: 外触发");
-                    break;
-                default:
-                    report.AddText("触发方式: 异常");
-                    break;
+                report.Title = content["Title"].ToString();
+                report.AddTitle(content["Title"].ToString());
             }
+
+            if ((int)content["ShowSubject"] != 0)
+            {
+                report.Subject = content["Subject"].ToString();
+                report.AddText($"{content["Subject"]}");
+            }
+
+            if ((int) content["ShowAuthor"] != 0)
+            {
+                report.Creator = content["Author"].ToString();
+                report.AddText($"作者: {content["Author"]}");
+            }
+            
             report.AddEmptyLine();
-            report.AddText("测量结果:");
-            report.AddImage(chartBitmap);
-            report.Print();
+            if ((int)content["ShowDate"] != 0)
+            {
+                report.CreateDate();
+                report.AddText($"测量日期: {DateTime.Now}");
+            }
+                
+            report.AddText($"测量时间: {_slaver.AutoMeasuringTime} 毫秒");
+            if ((int)content["ShowTrigger"] != 0)
+            {
+                switch (_slaver.TriggerMode)
+                {
+                    case TriggerMode.Auto:
+                        var triggerChannel = _slaver.PressureTriggerChannel;
+                        report.AddText("触发方式: 自动触发");
+                        report.AddText($"触发通道: {triggerChannel?.Name}");
+                        report.AddText($"触发值: {triggerChannel?.TriggerIncrement} MPa");
+                        break;
+                    case TriggerMode.Manual:
+                        report.AddText("触发方式: 手动触发");
+                        break;
+                    case TriggerMode.External:
+                        report.AddText("触发方式: 外触发");
+                        break;
+                    default:
+                        report.AddText("触发方式: 异常");
+                        break;
+                }
+                report.AddEmptyLine();
+            }
+
+            if ((int)content["ShowChart"] != 0)
+            {
+                report.AddText("测量结果:");
+                report.AddImage(chartBitmap);
+            }
+
+            if (report.Print())
+            {
+                _log.Print("导出报告完成，正在打开...");
+                report.Open();
+            }
+            else
+            {
+                _log.Show("导出报告失败.");
+            }
             //var waterMarkPdfPath = $"report/Report{DateTime.Now:yyyyMMddHHmmss}.pdf";
-            _log.Print("导出报告完成，正在打开...");
-            report.Open();
+            
         }
 
         private void bwBuildReport_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
