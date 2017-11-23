@@ -149,5 +149,10 @@ namespace Controls.Chart
 
             Chart.Series.Add(lineSeries);
         }
+
+        public void Import()
+        {
+            
+        }
     }
 }

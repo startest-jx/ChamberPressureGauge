@@ -909,5 +909,11 @@ namespace ChamberPressureGauge.UI
             CloseLoadWindow();
             tbReport.Enabled = true;
         }
+
+        private void Import(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+
+        }
     }
 }

@@ -32,14 +32,33 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.menuMain = new System.Windows.Forms.MenuStrip();
             this.menConnect = new System.Windows.Forms.ToolStripMenuItem();
+            this.miConnect = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
+            this.miConfig = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
+            this.miExit = new System.Windows.Forms.ToolStripMenuItem();
             this.menData = new System.Windows.Forms.ToolStripMenuItem();
+            this.miStart = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
+            this.miReset = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripSeparator();
+            this.miImport = new System.Windows.Forms.ToolStripMenuItem();
+            this.miExport = new System.Windows.Forms.ToolStripMenuItem();
             this.miView = new System.Windows.Forms.ToolStripMenuItem();
+            this.miChart = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
+            this.miReport = new System.Windows.Forms.ToolStripMenuItem();
             this.menHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.tbMain = new System.Windows.Forms.ToolStrip();
+            this.tbConnet = new System.Windows.Forms.ToolStripButton();
+            this.tbStart = new System.Windows.Forms.ToolStripButton();
+            this.tbReset = new System.Windows.Forms.ToolStripButton();
+            this.tbChart = new System.Windows.Forms.ToolStripButton();
+            this.tbReport = new System.Windows.Forms.ToolStripButton();
+            this.tbImport = new System.Windows.Forms.ToolStripButton();
+            this.tbExport = new System.Windows.Forms.ToolStripButton();
+            this.tbConfig = new System.Windows.Forms.ToolStripButton();
+            this.tbExit = new System.Windows.Forms.ToolStripButton();
             this.staMain = new System.Windows.Forms.StatusStrip();
             this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.lblNone = new System.Windows.Forms.ToolStripStatusLabel();
@@ -55,6 +74,7 @@
             this.lblTriggerMode = new System.Windows.Forms.Label();
             this.lblTriggerChannel = new System.Windows.Forms.Label();
             this.cbPressureTriggerChannel = new System.Windows.Forms.ComboBox();
+            this.btnRefreshTriggerChannel = new System.Windows.Forms.Button();
             this.tcChannel = new System.Windows.Forms.TabControl();
             this.tpPressure = new System.Windows.Forms.TabPage();
             this.pcc6 = new Controls.Channel.PressureChannelControl();
@@ -90,26 +110,6 @@
             this.bwConnect = new System.ComponentModel.BackgroundWorker();
             this.bwMeasure = new System.ComponentModel.BackgroundWorker();
             this.bwBuildReport = new System.ComponentModel.BackgroundWorker();
-            this.miExport = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripSeparator();
-            this.btnRefreshTriggerChannel = new System.Windows.Forms.Button();
-            this.tbConnet = new System.Windows.Forms.ToolStripButton();
-            this.tbStart = new System.Windows.Forms.ToolStripButton();
-            this.tbReset = new System.Windows.Forms.ToolStripButton();
-            this.tbChart = new System.Windows.Forms.ToolStripButton();
-            this.tbReport = new System.Windows.Forms.ToolStripButton();
-            this.tbConfig = new System.Windows.Forms.ToolStripButton();
-            this.tbExit = new System.Windows.Forms.ToolStripButton();
-            this.miConnect = new System.Windows.Forms.ToolStripMenuItem();
-            this.miConfig = new System.Windows.Forms.ToolStripMenuItem();
-            this.miExit = new System.Windows.Forms.ToolStripMenuItem();
-            this.miStart = new System.Windows.Forms.ToolStripMenuItem();
-            this.miReset = new System.Windows.Forms.ToolStripMenuItem();
-            this.miImport = new System.Windows.Forms.ToolStripMenuItem();
-            this.miChart = new System.Windows.Forms.ToolStripMenuItem();
-            this.miReport = new System.Windows.Forms.ToolStripMenuItem();
-            this.tbImport = new System.Windows.Forms.ToolStripButton();
-            this.tbExport = new System.Windows.Forms.ToolStripButton();
             this.menuMain.SuspendLayout();
             this.tbMain.SuspendLayout();
             this.staMain.SuspendLayout();
@@ -152,15 +152,39 @@
             this.menConnect.Size = new System.Drawing.Size(60, 21);
             this.menConnect.Text = "连接(&C)";
             // 
+            // miConnect
+            // 
+            this.miConnect.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_connect;
+            this.miConnect.Name = "miConnect";
+            this.miConnect.Size = new System.Drawing.Size(151, 22);
+            this.miConnect.Text = "开始连接(&C)";
+            this.miConnect.Click += new System.EventHandler(this.Connect);
+            // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
             this.toolStripMenuItem1.Size = new System.Drawing.Size(148, 6);
             // 
+            // miConfig
+            // 
+            this.miConfig.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_config;
+            this.miConfig.Name = "miConfig";
+            this.miConfig.Size = new System.Drawing.Size(151, 22);
+            this.miConfig.Text = "配置参数(&O)...";
+            this.miConfig.Click += new System.EventHandler(this.ShowConfigWindow);
+            // 
             // toolStripMenuItem2
             // 
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
             this.toolStripMenuItem2.Size = new System.Drawing.Size(148, 6);
+            // 
+            // miExit
+            // 
+            this.miExit.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_close;
+            this.miExit.Name = "miExit";
+            this.miExit.Size = new System.Drawing.Size(151, 22);
+            this.miExit.Text = "退出(&E)";
+            this.miExit.Click += new System.EventHandler(this.WinClosing);
             // 
             // menData
             // 
@@ -175,10 +199,46 @@
             this.menData.Size = new System.Drawing.Size(61, 21);
             this.menData.Text = "数据(&D)";
             // 
+            // miStart
+            // 
+            this.miStart.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_start_listening;
+            this.miStart.Name = "miStart";
+            this.miStart.ShortcutKeys = System.Windows.Forms.Keys.F5;
+            this.miStart.Size = new System.Drawing.Size(152, 22);
+            this.miStart.Text = "开始测量";
+            this.miStart.Click += new System.EventHandler(this.Start);
+            // 
             // toolStripMenuItem3
             // 
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
             this.toolStripMenuItem3.Size = new System.Drawing.Size(149, 6);
+            // 
+            // miReset
+            // 
+            this.miReset.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_reset;
+            this.miReset.Name = "miReset";
+            this.miReset.Size = new System.Drawing.Size(152, 22);
+            this.miReset.Text = "复位(&R)";
+            this.miReset.Click += new System.EventHandler(this.Reset);
+            // 
+            // toolStripMenuItem5
+            // 
+            this.toolStripMenuItem5.Name = "toolStripMenuItem5";
+            this.toolStripMenuItem5.Size = new System.Drawing.Size(149, 6);
+            // 
+            // miImport
+            // 
+            this.miImport.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_import;
+            this.miImport.Name = "miImport";
+            this.miImport.Size = new System.Drawing.Size(152, 22);
+            this.miImport.Text = "导入(&I)";
+            // 
+            // miExport
+            // 
+            this.miExport.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_export;
+            this.miExport.Name = "miExport";
+            this.miExport.Size = new System.Drawing.Size(152, 22);
+            this.miExport.Text = "导出(&E)";
             // 
             // miView
             // 
@@ -190,10 +250,25 @@
             this.miView.Size = new System.Drawing.Size(60, 21);
             this.miView.Text = "查看(&V)";
             // 
+            // miChart
+            // 
+            this.miChart.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_chart;
+            this.miChart.Name = "miChart";
+            this.miChart.Size = new System.Drawing.Size(152, 22);
+            this.miChart.Text = "图表(&C)";
+            // 
             // toolStripMenuItem4
             // 
             this.toolStripMenuItem4.Name = "toolStripMenuItem4";
-            this.toolStripMenuItem4.Size = new System.Drawing.Size(113, 6);
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(149, 6);
+            // 
+            // miReport
+            // 
+            this.miReport.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_report;
+            this.miReport.Name = "miReport";
+            this.miReport.Size = new System.Drawing.Size(152, 22);
+            this.miReport.Text = "报告(&R)";
+            this.miReport.Click += new System.EventHandler(this.Report);
             // 
             // menHelp
             // 
@@ -220,6 +295,118 @@
             this.tbMain.Size = new System.Drawing.Size(1043, 87);
             this.tbMain.TabIndex = 1;
             this.tbMain.Text = "toolStrip1";
+            // 
+            // tbConnet
+            // 
+            this.tbConnet.AutoSize = false;
+            this.tbConnet.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbConnet.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_connect;
+            this.tbConnet.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.tbConnet.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tbConnet.Name = "tbConnet";
+            this.tbConnet.Size = new System.Drawing.Size(84, 84);
+            this.tbConnet.Text = "toolStripButton2";
+            this.tbConnet.ToolTipText = "开始连接";
+            this.tbConnet.Click += new System.EventHandler(this.Connect);
+            // 
+            // tbStart
+            // 
+            this.tbStart.AutoSize = false;
+            this.tbStart.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbStart.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_start_listening;
+            this.tbStart.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.tbStart.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tbStart.Name = "tbStart";
+            this.tbStart.Size = new System.Drawing.Size(84, 84);
+            this.tbStart.Text = "toolStripButton3";
+            this.tbStart.ToolTipText = "开始测量";
+            this.tbStart.Click += new System.EventHandler(this.Start);
+            // 
+            // tbReset
+            // 
+            this.tbReset.AutoSize = false;
+            this.tbReset.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbReset.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_reset;
+            this.tbReset.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.tbReset.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tbReset.Name = "tbReset";
+            this.tbReset.Size = new System.Drawing.Size(84, 84);
+            this.tbReset.Text = "toolStripButton4";
+            this.tbReset.ToolTipText = "复位";
+            this.tbReset.Click += new System.EventHandler(this.Reset);
+            // 
+            // tbChart
+            // 
+            this.tbChart.AutoSize = false;
+            this.tbChart.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbChart.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_chart;
+            this.tbChart.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.tbChart.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tbChart.Name = "tbChart";
+            this.tbChart.Size = new System.Drawing.Size(84, 84);
+            this.tbChart.Text = "toolStripButton5";
+            this.tbChart.ToolTipText = "查看图表";
+            // 
+            // tbReport
+            // 
+            this.tbReport.AutoSize = false;
+            this.tbReport.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbReport.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_report;
+            this.tbReport.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.tbReport.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tbReport.Name = "tbReport";
+            this.tbReport.Size = new System.Drawing.Size(84, 84);
+            this.tbReport.ToolTipText = "生成报告";
+            this.tbReport.Click += new System.EventHandler(this.Report);
+            // 
+            // tbImport
+            // 
+            this.tbImport.AutoSize = false;
+            this.tbImport.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbImport.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_import;
+            this.tbImport.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.tbImport.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tbImport.Name = "tbImport";
+            this.tbImport.Size = new System.Drawing.Size(84, 84);
+            this.tbImport.ToolTipText = "导入";
+            this.tbImport.Click += new System.EventHandler(this.Import);
+            // 
+            // tbExport
+            // 
+            this.tbExport.AutoSize = false;
+            this.tbExport.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbExport.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_export;
+            this.tbExport.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.tbExport.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tbExport.Name = "tbExport";
+            this.tbExport.Size = new System.Drawing.Size(84, 84);
+            this.tbExport.ToolTipText = "导出";
+            // 
+            // tbConfig
+            // 
+            this.tbConfig.AutoSize = false;
+            this.tbConfig.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbConfig.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_config;
+            this.tbConfig.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.tbConfig.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tbConfig.Name = "tbConfig";
+            this.tbConfig.Size = new System.Drawing.Size(84, 84);
+            this.tbConfig.Text = "toolStripButton1";
+            this.tbConfig.ToolTipText = "配置";
+            this.tbConfig.Click += new System.EventHandler(this.ShowConfigWindow);
+            // 
+            // tbExit
+            // 
+            this.tbExit.AutoSize = false;
+            this.tbExit.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tbExit.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_close;
+            this.tbExit.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
+            this.tbExit.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tbExit.Name = "tbExit";
+            this.tbExit.Size = new System.Drawing.Size(84, 84);
+            this.tbExit.Text = "toolStripButton7";
+            this.tbExit.ToolTipText = "退出";
+            this.tbExit.Click += new System.EventHandler(this.WinClosing);
             // 
             // staMain
             // 
@@ -378,6 +565,18 @@
             this.cbPressureTriggerChannel.Size = new System.Drawing.Size(121, 25);
             this.cbPressureTriggerChannel.TabIndex = 3;
             this.cbPressureTriggerChannel.SelectedIndexChanged += new System.EventHandler(this.cbTriggerChannel_SelectedIndexChanged);
+            // 
+            // btnRefreshTriggerChannel
+            // 
+            this.btnRefreshTriggerChannel.BackColor = System.Drawing.SystemColors.Control;
+            this.btnRefreshTriggerChannel.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.btnRefreshTriggerChannel.Image = global::ChamberPressureGauge.Properties.Resources.Refresh;
+            this.btnRefreshTriggerChannel.Location = new System.Drawing.Point(473, 25);
+            this.btnRefreshTriggerChannel.Name = "btnRefreshTriggerChannel";
+            this.btnRefreshTriggerChannel.Size = new System.Drawing.Size(24, 24);
+            this.btnRefreshTriggerChannel.TabIndex = 4;
+            this.btnRefreshTriggerChannel.UseVisualStyleBackColor = false;
+            this.btnRefreshTriggerChannel.Click += new System.EventHandler(this.btnRefreshTriggerChannel_Click);
             // 
             // tcChannel
             // 
@@ -714,204 +913,6 @@
             // 
             this.bwBuildReport.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bwBuildReport_DoWork);
             this.bwBuildReport.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bwBuildReport_RunWorkerCompleted);
-            // 
-            // miExport
-            // 
-            this.miExport.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_export;
-            this.miExport.Name = "miExport";
-            this.miExport.Size = new System.Drawing.Size(152, 22);
-            this.miExport.Text = "导出(&E)";
-            // 
-            // toolStripMenuItem5
-            // 
-            this.toolStripMenuItem5.Name = "toolStripMenuItem5";
-            this.toolStripMenuItem5.Size = new System.Drawing.Size(149, 6);
-            // 
-            // btnRefreshTriggerChannel
-            // 
-            this.btnRefreshTriggerChannel.BackColor = System.Drawing.SystemColors.Control;
-            this.btnRefreshTriggerChannel.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.btnRefreshTriggerChannel.Image = global::ChamberPressureGauge.Properties.Resources.Refresh;
-            this.btnRefreshTriggerChannel.Location = new System.Drawing.Point(473, 25);
-            this.btnRefreshTriggerChannel.Name = "btnRefreshTriggerChannel";
-            this.btnRefreshTriggerChannel.Size = new System.Drawing.Size(24, 24);
-            this.btnRefreshTriggerChannel.TabIndex = 4;
-            this.btnRefreshTriggerChannel.UseVisualStyleBackColor = false;
-            this.btnRefreshTriggerChannel.Click += new System.EventHandler(this.btnRefreshTriggerChannel_Click);
-            // 
-            // tbConnet
-            // 
-            this.tbConnet.AutoSize = false;
-            this.tbConnet.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tbConnet.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_connect;
-            this.tbConnet.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
-            this.tbConnet.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tbConnet.Name = "tbConnet";
-            this.tbConnet.Size = new System.Drawing.Size(84, 84);
-            this.tbConnet.Text = "toolStripButton2";
-            this.tbConnet.ToolTipText = "开始连接";
-            this.tbConnet.Click += new System.EventHandler(this.Connect);
-            // 
-            // tbStart
-            // 
-            this.tbStart.AutoSize = false;
-            this.tbStart.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tbStart.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_start_listening;
-            this.tbStart.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
-            this.tbStart.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tbStart.Name = "tbStart";
-            this.tbStart.Size = new System.Drawing.Size(84, 84);
-            this.tbStart.Text = "toolStripButton3";
-            this.tbStart.ToolTipText = "开始测量";
-            this.tbStart.Click += new System.EventHandler(this.Start);
-            // 
-            // tbReset
-            // 
-            this.tbReset.AutoSize = false;
-            this.tbReset.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tbReset.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_reset;
-            this.tbReset.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
-            this.tbReset.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tbReset.Name = "tbReset";
-            this.tbReset.Size = new System.Drawing.Size(84, 84);
-            this.tbReset.Text = "toolStripButton4";
-            this.tbReset.ToolTipText = "复位";
-            this.tbReset.Click += new System.EventHandler(this.Reset);
-            // 
-            // tbChart
-            // 
-            this.tbChart.AutoSize = false;
-            this.tbChart.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tbChart.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_chart;
-            this.tbChart.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
-            this.tbChart.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tbChart.Name = "tbChart";
-            this.tbChart.Size = new System.Drawing.Size(84, 84);
-            this.tbChart.Text = "toolStripButton5";
-            this.tbChart.ToolTipText = "查看图表";
-            // 
-            // tbReport
-            // 
-            this.tbReport.AutoSize = false;
-            this.tbReport.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tbReport.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_report;
-            this.tbReport.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
-            this.tbReport.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tbReport.Name = "tbReport";
-            this.tbReport.Size = new System.Drawing.Size(84, 84);
-            this.tbReport.ToolTipText = "生成报告";
-            this.tbReport.Click += new System.EventHandler(this.Report);
-            // 
-            // tbConfig
-            // 
-            this.tbConfig.AutoSize = false;
-            this.tbConfig.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tbConfig.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_config;
-            this.tbConfig.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
-            this.tbConfig.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tbConfig.Name = "tbConfig";
-            this.tbConfig.Size = new System.Drawing.Size(84, 84);
-            this.tbConfig.Text = "toolStripButton1";
-            this.tbConfig.ToolTipText = "配置";
-            this.tbConfig.Click += new System.EventHandler(this.ShowConfigWindow);
-            // 
-            // tbExit
-            // 
-            this.tbExit.AutoSize = false;
-            this.tbExit.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tbExit.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_close;
-            this.tbExit.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
-            this.tbExit.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tbExit.Name = "tbExit";
-            this.tbExit.Size = new System.Drawing.Size(84, 84);
-            this.tbExit.Text = "toolStripButton7";
-            this.tbExit.ToolTipText = "退出";
-            this.tbExit.Click += new System.EventHandler(this.WinClosing);
-            // 
-            // miConnect
-            // 
-            this.miConnect.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_connect;
-            this.miConnect.Name = "miConnect";
-            this.miConnect.Size = new System.Drawing.Size(151, 22);
-            this.miConnect.Text = "开始连接(&C)";
-            this.miConnect.Click += new System.EventHandler(this.Connect);
-            // 
-            // miConfig
-            // 
-            this.miConfig.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_config;
-            this.miConfig.Name = "miConfig";
-            this.miConfig.Size = new System.Drawing.Size(151, 22);
-            this.miConfig.Text = "配置参数(&O)...";
-            this.miConfig.Click += new System.EventHandler(this.ShowConfigWindow);
-            // 
-            // miExit
-            // 
-            this.miExit.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_close;
-            this.miExit.Name = "miExit";
-            this.miExit.Size = new System.Drawing.Size(151, 22);
-            this.miExit.Text = "退出(&E)";
-            this.miExit.Click += new System.EventHandler(this.WinClosing);
-            // 
-            // miStart
-            // 
-            this.miStart.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_start_listening;
-            this.miStart.Name = "miStart";
-            this.miStart.ShortcutKeys = System.Windows.Forms.Keys.F5;
-            this.miStart.Size = new System.Drawing.Size(152, 22);
-            this.miStart.Text = "开始测量";
-            this.miStart.Click += new System.EventHandler(this.Start);
-            // 
-            // miReset
-            // 
-            this.miReset.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_reset;
-            this.miReset.Name = "miReset";
-            this.miReset.Size = new System.Drawing.Size(152, 22);
-            this.miReset.Text = "复位(&R)";
-            this.miReset.Click += new System.EventHandler(this.Reset);
-            // 
-            // miImport
-            // 
-            this.miImport.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_import;
-            this.miImport.Name = "miImport";
-            this.miImport.Size = new System.Drawing.Size(152, 22);
-            this.miImport.Text = "导入(&I)";
-            // 
-            // miChart
-            // 
-            this.miChart.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_chart;
-            this.miChart.Name = "miChart";
-            this.miChart.Size = new System.Drawing.Size(116, 22);
-            this.miChart.Text = "图表(&C)";
-            // 
-            // miReport
-            // 
-            this.miReport.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_report;
-            this.miReport.Name = "miReport";
-            this.miReport.Size = new System.Drawing.Size(116, 22);
-            this.miReport.Text = "报告(&R)";
-            this.miReport.Click += new System.EventHandler(this.Report);
-            // 
-            // tbImport
-            // 
-            this.tbImport.AutoSize = false;
-            this.tbImport.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tbImport.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_import;
-            this.tbImport.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
-            this.tbImport.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tbImport.Name = "tbImport";
-            this.tbImport.Size = new System.Drawing.Size(84, 84);
-            this.tbImport.ToolTipText = "导入";
-            // 
-            // tbExport
-            // 
-            this.tbExport.AutoSize = false;
-            this.tbExport.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tbExport.Image = global::ChamberPressureGauge.Properties.Resources.toolbar_export;
-            this.tbExport.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
-            this.tbExport.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tbExport.Name = "tbExport";
-            this.tbExport.Size = new System.Drawing.Size(84, 84);
-            this.tbExport.ToolTipText = "导出";
             // 
             // MainWindow
             // 
